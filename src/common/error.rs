@@ -63,6 +63,10 @@ impl IntoResponse for AppError {
 
 
 impl AppError {
+    pub fn default() -> Result<(), AppError> {
+        Err(AppError::BusinessError("服务器发生内部异常，请稍后再试"))
+    }
+    
     pub fn build_validation_error_message(e: &validator::ValidationErrors) -> String {
         e.field_errors().iter().map(|(field, errors)| {
             let messages: Vec<String> = errors.iter().map(|error| {
@@ -80,3 +84,4 @@ impl AppError {
         AppError::ValidationError(Self::build_validation_error_message(e))
     }
 }
+
