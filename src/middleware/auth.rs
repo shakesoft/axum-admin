@@ -24,7 +24,7 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
             code: 401,
             data: Some("None".to_string()),
         });
-        return Ok((StatusCode::OK, json).into_response());
+        return Ok((StatusCode::UNAUTHORIZED, json).into_response());
     }
     let authorization = auth_header.unwrap();
 
@@ -42,7 +42,7 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
                 code: 401,
                 data: Some("None".to_string()),
             });
-            return Ok((StatusCode::OK, json).into_response());
+            return Ok((StatusCode::UNAUTHORIZED, json).into_response());
         }
     };
 
@@ -54,11 +54,11 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
                     code: 401,
                     data: Some("None".to_string()),
                 });
-                return Ok((StatusCode::OK, json).into_response());
+                return Ok((StatusCode::UNAUTHORIZED, json).into_response());
             }
             if is_admin || has_permission(&permissions, &path) {
                 req.headers_mut().insert("user_id", user_id.to_string().parse().unwrap());
-
+                req.extensions_mut().insert(permissions);
                 Ok(next.run(req).await)
             } else {
                 let json = Json(BaseResponse {
@@ -66,7 +66,7 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
                     code: 401,
                     data: Some("None".to_string()),
                 });
-                Ok((StatusCode::OK, json).into_response())
+                Ok((StatusCode::UNAUTHORIZED, json).into_response())
             }
         }
         Err(e) => {
@@ -75,7 +75,7 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
                 code: 401,
                 data: Some("None".to_string()),
             });
-            Ok((StatusCode::OK, json).into_response())
+            Ok((StatusCode::UNAUTHORIZED, json).into_response())
         }
     }
 }

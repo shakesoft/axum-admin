@@ -32,8 +32,9 @@ use std::sync::Arc;
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn add_sys_user(State(state): State<Arc<AppState>>, Json(mut item): Json<UserReq>) -> impl IntoResponse {
-    info!("add sys_user params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     if User::select_by_user_name(rb, &item.user_name).await?.is_some() {
@@ -65,8 +66,9 @@ pub async fn add_sys_user(State(state): State<Arc<AppState>>, Json(mut item): Js
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn delete_sys_user(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(item): Json<DeleteUserReq>) -> impl IntoResponse {
-    info!("delete sys_user params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
     let mut conn = state.redis.get_connection()?;
 
@@ -96,8 +98,9 @@ pub async fn delete_sys_user(headers: HeaderMap, State(state): State<Arc<AppStat
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn update_sys_user(State(state): State<Arc<AppState>>, Json(item): Json<UserReq>) -> impl IntoResponse {
-    info!("update sys_user params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let mut conn = state.redis.get_connection()?;
@@ -156,8 +159,9 @@ pub async fn update_sys_user(State(state): State<Arc<AppState>>, Json(item): Jso
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn update_sys_user_status(State(state): State<Arc<AppState>>, Json(item): Json<UpdateUserStatusReq>) -> impl IntoResponse {
-    info!("update sys_user_status params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let ids = item.ids.clone();
@@ -184,8 +188,9 @@ pub async fn update_sys_user_status(State(state): State<Arc<AppState>>, Json(ite
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn reset_sys_user_password(State(state): State<Arc<AppState>>, Json(item): Json<ResetUserPwdReq>) -> impl IntoResponse {
-    info!("update sys_user_password params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
 
     let rb = &state.batis;
     let mut conn = state.redis.get_connection()?;
@@ -214,8 +219,9 @@ pub async fn reset_sys_user_password(State(state): State<Arc<AppState>>, Json(it
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn update_sys_user_password(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(item): Json<UpdateUserPwdReq>) -> impl IntoResponse {
-    info!("update sys_user_password params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
 
     let rb = &state.batis;
 
@@ -239,8 +245,9 @@ pub async fn update_sys_user_password(headers: HeaderMap, State(state): State<Ar
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn query_sys_user_detail(State(state): State<Arc<AppState>>, Json(item): Json<QueryUserDetailReq>) -> impl IntoResponse {
-    info!("query sys_user_detail params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let mut x = match User::select_by_id(rb, item.id).await? {
@@ -273,8 +280,9 @@ pub async fn query_sys_user_detail(State(state): State<Arc<AppState>>, Json(item
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn query_sys_user_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryUserListReq>) -> impl IntoResponse {
-    info!("query sys_user_list params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let page = &PageRequest::new(item.page_no, item.page_size);
@@ -289,8 +297,9 @@ pub async fn query_sys_user_list(State(state): State<Arc<AppState>>, Json(item):
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(item): Json<UserLoginReq>) -> impl IntoResponse {
-    info!("user login params: {:?}, {:?}", &item, state.batis);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
     let mut conn = state.redis.get_connection()?;
 
@@ -383,7 +392,9 @@ async fn add_login_log(rb: &RBatis, name: String, status: i8, msg: &str, agent: 
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 async fn query_btn_menu(id: &i64, rb: RBatis) -> (Vec<String>, bool) {
+    info!("{function_name}:{id:?}",function_name = function_name!());
     let count = is_admin(&rb, id).await.unwrap_or_default();
     let mut btn_menu: Vec<String> = Vec::new();
     if count == 1 {
@@ -417,8 +428,9 @@ async fn query_btn_menu(id: &i64, rb: RBatis) -> (Vec<String>, bool) {
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn query_user_role(State(state): State<Arc<AppState>>, Json(item): Json<QueryUserRoleReq>) -> impl IntoResponse {
-    info!("query user_role params: {:?}", item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let role_list = Role::select_all(rb).await.map(|x| x.into_iter().map(|x| x.into()).collect::<Vec<RoleResp>>())?;
@@ -434,8 +446,9 @@ pub async fn query_user_role(State(state): State<Arc<AppState>>, Json(item): Jso
 }
 
 // 更新用户角色
+#[function_name::named]
 pub async fn update_user_role(State(state): State<Arc<AppState>>, Json(item): Json<UpdateUserRoleReq>) -> impl IntoResponse {
-    info!("update_user_role params: {:?}", item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
     let mut conn = state.redis.get_connection()?;
 
@@ -467,9 +480,10 @@ pub async fn update_user_role(State(state): State<Arc<AppState>>, Json(item): Js
 }
 
 // 查询用户菜单
+#[function_name::named]
 pub async fn query_user_menu(headers: HeaderMap, State(state): State<Arc<AppState>>) -> impl IntoResponse {
     let user_id = headers.get("user_id").unwrap().to_str().unwrap().parse::<i64>().unwrap();
-    info!("query user menu params user_id {:?}", user_id);
+    info!("{function_name}:{user_id:?}",function_name = function_name!());
 
     let rb = &state.batis;
     let mut conn = state.redis.get_connection()?;

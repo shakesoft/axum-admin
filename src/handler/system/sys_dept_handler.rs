@@ -26,11 +26,14 @@ use validator::Validate;
     request_body = DeptReq,
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
+#[function_name::named]
 pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)): Valid<Json<DeptReq>>) -> impl IntoResponse {
     // panic!("test");
     // sleep(Duration::from_secs(8)).await;
     // return AppError::interrupt();
-    info!("add sys_dept params: {:?}", &item);
+    // info!("add sys_dept params: {:?}", &item);
+    // info!("{function_name}:{item:?}",function_name = function_name!());
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     if Dept::select_by_dept_name(rb, &item.dept_name, &item.parent_id).await?.is_some() {
@@ -65,8 +68,9 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)):
     request_body = DeleteDeptReq,
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
+#[function_name::named]
 pub async fn delete_sys_dept(State(state): State<Arc<AppState>>, Json(item): Json<DeleteDeptReq>) -> impl IntoResponse {
-    info!("delete sys_dept params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     if select_dept_count(rb, &item.id).await? > 0 {
@@ -91,8 +95,9 @@ pub async fn delete_sys_dept(State(state): State<Arc<AppState>>, Json(item): Jso
     request_body = DeptReq,
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
+#[function_name::named]
 pub async fn update_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(mut item)): Valid<Json<DeptReq>>) -> impl IntoResponse {
-    info!("update sys_dept params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let id = item.id;
@@ -165,8 +170,9 @@ pub async fn update_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(mut 
     request_body = UpdateDeptStatusReq,
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
+#[function_name::named]
 pub async fn update_sys_dept_status(State(state): State<Arc<AppState>>, Json(item): Json<UpdateDeptStatusReq>) -> impl IntoResponse {
-    info!("update sys_dept_status params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let mut ids = vec![item.id];
@@ -192,8 +198,9 @@ pub async fn update_sys_dept_status(State(state): State<Arc<AppState>>, Json(ite
     request_body = QueryDeptDetailReq,
     responses((status = 200, description = "successfully", body = BaseResponse<DeptResp>))
 )]
+#[function_name::named]
 pub async fn query_sys_dept_detail(State(state): State<Arc<AppState>>, Json(item): Json<QueryDeptDetailReq>) -> impl IntoResponse {
-    info!("query sys_dept_detail params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     Dept::select_by_id(rb, &item.id).await?.map_or_else(
@@ -216,8 +223,9 @@ pub async fn query_sys_dept_detail(State(state): State<Arc<AppState>>, Json(item
     request_body = QueryDeptListReq,
     responses((status = 200, description = "successfully", body = BaseResponse<Vec<DeptResp>>))
 )]
+#[function_name::named]
 pub async fn query_sys_dept_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryDeptListReq>) -> impl IntoResponse {
-    info!("query sys_dept_list params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     Dept::select_page_dept_list(rb, &item)

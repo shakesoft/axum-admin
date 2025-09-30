@@ -24,8 +24,9 @@ use std::sync::Arc;
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn add_sys_role(State(state): State<Arc<AppState>>, Json(mut item): Json<RoleReq>) -> impl IntoResponse {
-    info!("add sys_role params: {:?}", &item);
+        info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     if Role::select_by_role_name(rb, &item.role_name).await?.is_some() {
@@ -45,9 +46,10 @@ pub async fn add_sys_role(State(state): State<Arc<AppState>>, Json(mut item): Js
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn delete_sys_role(State(state): State<Arc<AppState>>, Json(item): Json<DeleteRoleReq>) -> impl IntoResponse {
     // sleep(Duration::from_secs(10)).await;
-    info!("delete sys_role params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let ids = item.ids.clone();
@@ -84,8 +86,9 @@ pub async fn delete_sys_role(State(state): State<Arc<AppState>>, Json(item): Jso
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn update_sys_role(State(state): State<Arc<AppState>>, Json(item): Json<RoleReq>) -> impl IntoResponse {
-    info!("update sys_role params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let id = item.id;
@@ -121,8 +124,9 @@ pub async fn update_sys_role(State(state): State<Arc<AppState>>, Json(item): Jso
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn update_sys_role_status(State(state): State<Arc<AppState>>, Json(item): Json<UpdateRoleStatusReq>) -> impl IntoResponse {
-    info!("update sys_role_status params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     if item.ids.contains(&1) {
@@ -141,8 +145,9 @@ pub async fn update_sys_role_status(State(state): State<Arc<AppState>>, Json(ite
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn query_sys_role_detail(State(state): State<Arc<AppState>>, Json(item): Json<QueryRoleDetailReq>) -> impl IntoResponse {
-    info!("query sys_role_detail params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     Role::select_by_id(rb, &item.id).await?.map_or_else(
@@ -159,8 +164,9 @@ pub async fn query_sys_role_detail(State(state): State<Arc<AppState>>, Json(item
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn query_sys_role_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryRoleListReq>) -> impl IntoResponse {
-    info!("query sys_role_list params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let page = &PageRequest::new(item.page_no, item.page_size);
@@ -175,8 +181,9 @@ pub async fn query_sys_role_list(State(state): State<Arc<AppState>>, Json(item):
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn query_role_menu(State(state): State<Arc<AppState>>, Json(item): Json<QueryRoleMenuReq>) -> impl IntoResponse {
-    info!("query role_menu params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     // 查询所有菜单
@@ -217,8 +224,9 @@ pub async fn query_role_menu(State(state): State<Arc<AppState>>, Json(item): Jso
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn update_role_menu(State(state): State<Arc<AppState>>, Json(item): Json<UpdateRoleMenuReq>) -> impl IntoResponse {
-    info!("update role_menu params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let role_id = item.role_id;
 
     if role_id == 1 {
@@ -249,8 +257,9 @@ pub async fn update_role_menu(State(state): State<Arc<AppState>>, Json(item): Js
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn query_allocated_list(State(state): State<Arc<AppState>>, Json(item): Json<AllocatedListReq>) -> impl IntoResponse {
-    info!("query_allocated_list params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
 
     let rb = &state.batis;
 
@@ -277,8 +286,9 @@ pub async fn query_allocated_list(State(state): State<Arc<AppState>>, Json(item)
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn query_unallocated_list(State(state): State<Arc<AppState>>, Json(item): Json<UnallocatedListReq>) -> impl IntoResponse {
-    info!("query_unallocated_list params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
 
     let rb = &state.batis;
 
@@ -305,8 +315,9 @@ pub async fn query_unallocated_list(State(state): State<Arc<AppState>>, Json(ite
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn cancel_auth_user(State(state): State<Arc<AppState>>, Json(item): Json<CancelAuthUserReq>) -> impl IntoResponse {
-    info!("cancel_auth_user params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
 
     let rb = &state.batis;
 
@@ -318,8 +329,9 @@ pub async fn cancel_auth_user(State(state): State<Arc<AppState>>, Json(item): Js
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn batch_cancel_auth_user(State(state): State<Arc<AppState>>, Json(item): Json<CancelAuthUserAllReq>) -> impl IntoResponse {
-    info!("cancel auth_user_all params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
 
     let rb = &state.batis;
 
@@ -338,8 +350,9 @@ pub async fn batch_cancel_auth_user(State(state): State<Arc<AppState>>, Json(ite
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn batch_auth_user(State(state): State<Arc<AppState>>, Json(item): Json<SelectAuthUserAllReq>) -> impl IntoResponse {
-    info!("batch_auth_user params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let role_id = item.role_id;
 
     let rb = &state.batis;

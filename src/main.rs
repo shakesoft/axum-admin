@@ -8,6 +8,7 @@ pub mod model;
 pub mod route;
 pub mod utils;
 pub mod vo;
+mod service;
 
 use axum::{middleware as md, Router};
 use crate::route::system::sys_dept_route::build_sys_dept_route;
@@ -144,6 +145,13 @@ async fn main() {
         .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE, Method::PATCH])
         .allow_origin(tower_http::cors::Any)
         .allow_headers(tower_http::cors::Any);
+		
+		/*
+		let cors = CorsLayer::new()
+        .allow_origin("*".parse::<HeaderValue>().unwrap())
+        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
+        .allow_headers([CONTENT_TYPE, AUTHORIZATION, ACCEPT]);
+		**/
 
     // Swagger-UI
     let swagger_ui = SwaggerUi::new("/swagger-ui").url("/api-doc/openapi.json", ApiDoc::openapi());
