@@ -1,0 +1,5 @@
+struct SysLoginLogService;
+
+impl SysLoginLogService {
+    
+}

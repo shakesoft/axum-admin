@@ -1,0 +1,5 @@
+struct SysRoleService;
+
+impl SysRoleService {
+
+}

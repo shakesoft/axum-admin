@@ -1,0 +1,5 @@
+struct SysUserService;
+
+impl SysUserService{
+
+}

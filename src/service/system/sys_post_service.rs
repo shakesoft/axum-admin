@@ -1,0 +1,5 @@
+struct SysPostService;
+
+impl SysPostService {
+
+}

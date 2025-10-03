@@ -1,0 +1,5 @@
+struct SysMenuService;
+
+impl SysMenuService {
+    
+}

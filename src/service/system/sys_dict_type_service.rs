@@ -1,0 +1,5 @@
+struct SysDictTypeService;
+
+impl SysDictTypeService{
+
+}
