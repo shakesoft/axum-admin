@@ -1,9 +1,9 @@
 # justfile - Project unified command entry
-set shell := ["powershell", "-c"]
+set shell := ["pwsh", "-c"]
 # check
 check:
     cargo check &
-    cd web && pnpm lint
+    cd .. && cd antd-admin && pnpm lint
 
 # Development mode: start backend + web together
 dev:
@@ -16,7 +16,7 @@ dev-backend:
 
 # Start web (Vite dev mode)
 dev-web:
-    cd web && pnpm dev
+    cd .. && cd antd-admin && pnpm dev
 
 # Build all (production)
 build:
@@ -29,8 +29,8 @@ build-backend:
 
 # Build web production bundle
 build-web:
-    cd web && pnpm build
+    cd .. && cd antd-admin && pnpm build
 
 # Clean build outputs
 clean:
-    rm -rf /target web/dist
+    rm -rf /target ../antd-admin/dist
