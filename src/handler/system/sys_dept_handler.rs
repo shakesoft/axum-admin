@@ -3,12 +3,14 @@ use crate::common::result::{ok, ok_result_data, BaseResponse, EmptyResponse};
 use crate::model::system::sys_dept_model::{check_dept_exist_user, select_children_dept_by_id, select_dept_count, select_normal_children_dept_by_id, Dept};
 use crate::vo::system::sys_dept_vo::*;
 use crate::AppState;
+use crate::service::system::sys_dept_service::SysDeptService;
 use axum::extract::State;
 use axum::response::IntoResponse;
 use axum::Json;
 use axum_valid::Valid;
 use log::info;
 use rbatis::rbatis_codegen::ops::AsProxy;
+use rbatis::RBatis;
 use rbatis::rbdc::DateTime;
 use rbs::value;
 use std::sync::Arc;
@@ -33,7 +35,8 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)):
     // return AppError::interrupt();
     // info!("add sys_dept params: {:?}", &item);
     // info!("{function_name}:{item:?}",function_name = function_name!());
-    info!("{function_name}:{item:?}",function_name = function_name!());
+    // info!("{function_name}:{item:?}",function_name = function_name!());
+    info!("{}: {:?}", function_name!(), item);
     let rb = &state.batis;
 
     if Dept::select_by_dept_name(rb, &item.dept_name, &item.parent_id).await?.is_some() {
@@ -48,6 +51,7 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)):
             }
             let ancestors = format!("{},{}", dept.ancestors.unwrap_or_default(), &item.parent_id);
             let mut sys_dept = Dept::from(item);
+            // let mut sys_dept:Dept = item.into();
             sys_dept.ancestors = Some(ancestors);
             if let Err(e) = sys_dept.validate() {
                 return Err(AppError::validation_error(&e));
@@ -70,7 +74,8 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)):
 )]
 #[function_name::named]
 pub async fn delete_sys_dept(State(state): State<Arc<AppState>>, Json(item): Json<DeleteDeptReq>) -> impl IntoResponse {
-    info!("{function_name}:{item:?}",function_name = function_name!());
+    // info!("{function_name}:{item:?}",function_name = function_name!());
+    info!("{}: {:?}", function_name!(), item);
     let rb = &state.batis;
 
     if select_dept_count(rb, &item.id).await? > 0 {
@@ -97,7 +102,8 @@ pub async fn delete_sys_dept(State(state): State<Arc<AppState>>, Json(item): Jso
 )]
 #[function_name::named]
 pub async fn update_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(mut item)): Valid<Json<DeptReq>>) -> impl IntoResponse {
-    info!("{function_name}:{item:?}",function_name = function_name!());
+    // info!("{function_name}:{item:?}",function_name = function_name!());
+    info!("{}: {:?}", function_name!(), item);
     let rb = &state.batis;
 
     let id = item.id;
@@ -138,17 +144,19 @@ pub async fn update_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(mut 
     }
 
     if item.status == 1 && ancestors != "0" {
-        let ids = ancestors.split(",").map(|s| s.i64()).collect::<Vec<i64>>();
+        // let ids = ancestors.split(",").map(|s| s.i64()).collect::<Vec<i64>>();
+        //
+        // let update_sql = format!(
+        //     "update sys_dept set status = ? ,update_time = ? where id in ({})",
+        //     ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", ")
+        // );
+        //
+        // let mut param = vec![value!(item.status), value!(DateTime::now())];
+        // param.extend(ids.iter().map(|&id| value!(id)));
+        //
+        // rb.exec(&update_sql, param).await?;
 
-        let update_sql = format!(
-            "update sys_dept set status = ? ,update_time = ? where id in ({})",
-            ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", ")
-        );
-
-        let mut param = vec![value!(item.status), value!(DateTime::now())];
-        param.extend(ids.iter().map(|&id| value!(id)));
-
-        rb.exec(&update_sql, param).await?;
+        SysDeptService::update_dept_status(rb, &ancestors, item.status).await?;
     }
     item.ancestors = Some(ancestors.clone());
 
@@ -172,7 +180,8 @@ pub async fn update_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(mut 
 )]
 #[function_name::named]
 pub async fn update_sys_dept_status(State(state): State<Arc<AppState>>, Json(item): Json<UpdateDeptStatusReq>) -> impl IntoResponse {
-    info!("{function_name}:{item:?}",function_name = function_name!());
+    // info!("{function_name}:{item:?}",function_name = function_name!());
+    info!("{}: {:?}", function_name!(), item);
     let rb = &state.batis;
 
     let mut ids = vec![item.id];
@@ -181,11 +190,13 @@ pub async fn update_sys_dept_status(State(state): State<Arc<AppState>>, Json(ite
             ids.extend(&x.ancestors.unwrap_or_default().split(",").map(|s| s.i64()).collect::<Vec<i64>>())
         }
     }
-    let update_sql = format!("update sys_dept set status = ? where id in ({})", ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "));
 
-    let mut param = vec![value!(item.status)];
-    param.extend(ids.iter().map(|&id| value!(id)));
-    rb.exec(&update_sql, param).await.map(|_| ok())?
+    SysDeptService::update_dept_status(rb, &ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "), item.status).await.map(|_| ok())?
+
+    // let update_sql = format!("update sys_dept set status = ? where id in ({})", ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "));
+    // let mut param = vec![value!(item.status)];
+    // param.extend(ids.iter().map(|&id| value!(id)));
+    // rb.exec(&update_sql, param).await.map(|_| ok())?
 }
 /*
  *查询部门表详情

@@ -9,6 +9,7 @@ pub mod route;
 pub mod utils;
 pub mod vo;
 mod service;
+mod statemachine;
 
 use axum::{middleware as md, Router};
 use crate::route::system::sys_dept_route::build_sys_dept_route;
@@ -50,6 +51,7 @@ use axum::routing::get;
 use tower_http::cors::CorsLayer;
 use tower_http::timeout::TimeoutLayer;
 use tracing_appender::rolling;
+use crate::statemachine::state::traffic_light::TrafficLight;
 // use crate::common::daily_logfile::DailyLogFile;
 // use crate::handler::system::sys_user_handler::reset_sys_user_password;
 
@@ -116,6 +118,24 @@ async fn main() {
     //     // 初始化日志配置
     //     log4rs::init_file("src/config/log4rs.yaml", Default::default()).unwrap();
     // }
+    let light = TrafficLight::new(());
+    // Type is TrafficLight<Red>
+
+
+    let light = light.next().unwrap();
+    // Type is TrafficLight<Green>
+
+    let light = light.next().unwrap();
+    // Type is TrafficLight<Yellow>
+
+
+    let light = TrafficLight::new(());
+    let mut dynamic_light = light.into_dynamic();
+    // let dd = dynamic_light.into_yellow().unwrap();
+    // let ee = dd.into_dynamic().current_state();
+    // let cc = dynamic_light.into_green().unwrap();
+    let bb = dynamic_light.current_state();
+    println!("{}",bb);
 
     let file_appender = rolling::daily("log", "axum-admin.log");
     let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);

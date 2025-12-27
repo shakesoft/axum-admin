@@ -11,7 +11,7 @@
  Target Server Version : 80300 (8.3.0)
  File Encoding         : 65001
 
- Date: 30/09/2025 22:58:46
+ Date: 27/12/2025 21:10:52
 */
 
 SET NAMES utf8mb4;
@@ -104,14 +104,14 @@ INSERT INTO `sys_dict_data` VALUES (5, 2, '公告', '2', 'sys_notice_type', '1',
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_dict_type`;
 CREATE TABLE `sys_dict_type`  (
-  `dict_id` bigint NOT NULL AUTO_INCREMENT COMMENT '字典主键',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '字典主键',
   `dict_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '字典名称',
   `dict_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '字典类型',
   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态（0：停用，1:正常）',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备注',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
-  PRIMARY KEY (`dict_id`) USING BTREE,
+  PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `dict_type`(`dict_type` ASC) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '字典类型表' ROW_FORMAT = Dynamic;
 
@@ -145,7 +145,7 @@ CREATE TABLE `sys_login_log`  (
   `msg` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '提示消息',
   `login_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '访问时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统访问记录' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统访问记录' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_login_log
@@ -168,6 +168,10 @@ INSERT INTO `sys_login_log` VALUES (15, '18613030111', 'todo', 'todo', 'Windows 
 INSERT INTO `sys_login_log` VALUES (16, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '140.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2025-09-17 09:10:45');
 INSERT INTO `sys_login_log` VALUES (17, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '140.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2025-09-17 09:15:46');
 INSERT INTO `sys_login_log` VALUES (18, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '138.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2025-09-17 09:27:25');
+INSERT INTO `sys_login_log` VALUES (19, 'jianzhu1', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '141.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2025-10-24 23:57:26');
+INSERT INTO `sys_login_log` VALUES (20, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '141.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2025-10-24 23:58:03');
+INSERT INTO `sys_login_log` VALUES (21, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '141.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2025-10-24 23:58:15');
+INSERT INTO `sys_login_log` VALUES (22, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '143.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2025-12-27 20:25:39');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -535,7 +539,7 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, '18613030111', 'admin', 'admin', '00', '', 'xx@qq.com', '123456', 1, 1, '', '2025-09-17 09:27:26', 'Chrome', 'Win64', NULL, '超级管理员', 1, '2025-08-28 23:19:23', '2025-08-28 23:19:23');
+INSERT INTO `sys_user` VALUES (1, '18613030111', 'admin', 'admin', '00', '', 'xx@qq.com', '123456', 1, 1, '', '2025-12-27 20:25:39', 'Chrome', 'Win64', NULL, '超级管理员', 1, '2025-08-28 23:19:23', '2025-08-28 23:19:23');
 INSERT INTO `sys_user` VALUES (2, '18613030222', 'test', 'test', '00', '', '123@qq.com', '123456', 1, 1, '', NULL, '', '', NULL, '演示权限', 1, '2025-08-28 23:19:23', '2025-08-28 23:19:23');
 
 -- ----------------------------

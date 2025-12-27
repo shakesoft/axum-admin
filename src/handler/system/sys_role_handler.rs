@@ -6,6 +6,7 @@ use crate::model::system::sys_role_menu_model::{query_menu_by_role, RoleMenu};
 use crate::model::system::sys_role_model::Role;
 use crate::model::system::sys_user_model::{count_allocated_list, count_unallocated_list, select_allocated_list, select_unallocated_list};
 use crate::model::system::sys_user_role_model::{count_user_role_by_role_id, delete_user_role_by_role_id_user_id, UserRole};
+use crate::service::system::sys_role_service::SysRoleService;
 use crate::vo::system::sys_role_vo::*;
 use crate::vo::system::sys_user_vo::UserResp;
 use crate::AppState;
@@ -133,11 +134,7 @@ pub async fn update_sys_role_status(State(state): State<Arc<AppState>>, Json(ite
         return Err(AppError::BusinessError("不允许操作超级管理员角色"));
     }
 
-    let update_sql = format!("update sys_role set status = ? where id in ({})", item.ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "));
-
-    let mut param = vec![value!(item.status)];
-    param.extend(item.ids.iter().map(|&id| value!(id)));
-    rb.exec(&update_sql, param).await.map(|_| ok_result())?
+    SysRoleService::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
 }
 
 /*
@@ -335,14 +332,7 @@ pub async fn batch_cancel_auth_user(State(state): State<Arc<AppState>>, Json(ite
 
     let rb = &state.batis;
 
-    let update_sql = format!(
-        "delete from sys_user_role where role_id = ? and user_id in ({})",
-        item.user_ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", ")
-    );
-
-    let mut param = vec![value!(item.role_id)];
-    param.extend(item.user_ids.iter().map(|&id| value!(id)));
-    rb.exec(&update_sql, param).await.map(|_| ok_result())?
+    SysRoleService::batch_cancel_auth_user(rb, item.role_id, &item.user_ids).await.map(|_| ok_result())?
 }
 
 /*

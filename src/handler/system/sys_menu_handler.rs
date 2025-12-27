@@ -100,12 +100,8 @@ pub async fn update_sys_menu_status(State(state): State<Arc<AppState>>, Json(ite
     info!("update sys_menu_status params: {:?}", &item);
     let rb = &state.batis;
 
-    let ids = item.ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", ");
-    let update_sql = format!("update sys_menu set status = ? where id in ({})", ids);
-
-    let mut param = vec![value!(item.status)];
-    param.extend(item.ids.iter().map(|&id| value!(id)));
-    rb.exec(&update_sql, param).await.map(|_| ok_result())?
+    // use service function to perform the DB update
+    crate::service::system::sys_menu_service::SysMenuService::update_menu_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
 }
 
 /*
@@ -149,13 +145,20 @@ pub async fn query_sys_menu_list_simple(State(state): State<Arc<AppState>>) -> i
     let list = Menu::select_menu_list(rb).await?;
 
     let mut menu_list: Vec<MenuListSimpleDataResp> = Vec::new();
-    for x in list {
-        menu_list.push(MenuListSimpleDataResp {
-            id: x.id,               //主键
-            menu_name: x.menu_name, //菜单名称
-            parent_id: x.parent_id, //父ID
-        })
-    }
+
+    list.into_iter().map(|x| MenuListSimpleDataResp {
+        id: x.id,               //主键
+        menu_name: x.menu_name, //菜单名称
+        parent_id: x.parent_id, //父ID
+    }).for_each(|x| menu_list.push(x));
+
+    // for x in list {
+    //     menu_list.push(MenuListSimpleDataResp {
+    //         id: x.id,               //主键
+    //         menu_name: x.menu_name, //菜单名称
+    //         parent_id: x.parent_id, //父ID
+    //     })
+    // }
 
     ok_result_data(menu_list)
 }

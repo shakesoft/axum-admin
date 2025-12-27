@@ -2,6 +2,7 @@ use crate::common::error::AppError;
 use crate::common::result::{ok_result, ok_result_data, ok_result_page};
 use crate::model::system::sys_post_model::Post;
 use crate::model::system::sys_user_post_model::count_user_post_by_id;
+use crate::service::system::sys_post_service::SysPostService;
 use crate::vo::system::sys_post_vo::*;
 use crate::AppState;
 use axum::extract::State;
@@ -94,11 +95,7 @@ pub async fn update_sys_post_status(State(state): State<Arc<AppState>>, Json(ite
     info!("update sys_post_status params: {:?}", &item);
     let rb = &state.batis;
 
-    let update_sql = format!("update sys_post set status = ? where id in ({})", item.ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "));
-
-    let mut param = vec![value!(item.status)];
-    param.extend(item.ids.iter().map(|&id| value!(id)));
-    rb.exec(&update_sql, param).await.map(|_| ok_result())?
+    SysPostService::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
 }
 
 /*

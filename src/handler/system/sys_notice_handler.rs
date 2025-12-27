@@ -1,6 +1,7 @@
 use crate::common::error::AppError;
 use crate::common::result::{ok_result, ok_result_data, ok_result_page};
 use crate::model::system::sys_notice_model::Notice;
+use crate::service::system::sys_notice_service::SysNoticeService;
 use crate::vo::system::sys_notice_vo::*;
 use crate::AppState;
 use axum::extract::State;
@@ -75,12 +76,8 @@ pub async fn update_sys_notice_status(State(state): State<Arc<AppState>>, Json(i
     info!("update sys_notice_status params: {:?}", &item);
     let rb = &state.batis;
 
-    let update_sql = format!("update sys_notice set status = ? where id in ({})", item.ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "));
-
-    let mut param = vec![value!(item.status)];
-    param.extend(item.ids.iter().map(|&id| value!(id)));
-
-    rb.exec(&update_sql, param).await.map(|_| ok_result())?
+    // 使用服务层封装的数据库操作
+    SysNoticeService::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
 }
 
 /*

@@ -7,6 +7,7 @@ use crate::model::system::sys_role_model::Role;
 use crate::model::system::sys_user_model::User;
 use crate::model::system::sys_user_post_model::UserPost;
 use crate::model::system::sys_user_role_model::{is_admin, UserRole};
+use crate::service::system::sys_user_service::SysUserService;
 use crate::utils::jwt_util::JwtToken;
 use crate::utils::user_agent_util::UserAgentUtil;
 use crate::vo::system::sys_dept_vo::DeptResp;
@@ -176,11 +177,7 @@ pub async fn update_sys_user_status(State(state): State<Arc<AppState>>, Json(ite
         }
     }
 
-    let update_sql = format!("update sys_user set status = ? where id in ({})", item.ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "));
-
-    let mut param = vec![value!(item.status)];
-    param.extend(item.ids.iter().map(|&id| value!(id)));
-    rb.exec(&update_sql, param).await.map(|_| ok_result())?
+    SysUserService::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
 }
 
 /*
@@ -326,7 +323,8 @@ pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(
                 return err_result_msg("密码不正确");
             }
 
-            let (btn_menu, is_super) = query_btn_menu(&id, rb.clone()).await;
+            // use service-layer query for button menu and admin flag
+            let (btn_menu, is_super) = crate::service::system::sys_user_service::SysUserService::query_btn_menu(rb, &id).await;
 
             if btn_menu.len() == 0 {
                 add_login_log(rb, item.mobile, 0, "用户没有分配角色或者菜单,不能登录", agent).await;
@@ -384,42 +382,6 @@ async fn add_login_log(rb: &RBatis, name: String, status: i8, msg: &str, agent: 
     match LoginLog::insert(rb, &sys_login_log).await {
         Ok(_u) => info!("add_login_log success: {:?}", sys_login_log),
         Err(err) => log::error!("add_login_log error params: {:?}, error message: {:?}", sys_login_log, err),
-    }
-}
-
-/*
- *查询按钮权限
- *author：刘飞华
- *date：2024/12/12 14:41:44
- */
-#[function_name::named]
-async fn query_btn_menu(id: &i64, rb: RBatis) -> (Vec<String>, bool) {
-    info!("{function_name}:{id:?}",function_name = function_name!());
-    let count = is_admin(&rb, id).await.unwrap_or_default();
-    let mut btn_menu: Vec<String> = Vec::new();
-    if count == 1 {
-        let data = Menu::select_all(&rb).await;
-
-        for x in data.unwrap_or_default() {
-            if let Some(a) = x.api_url {
-                if a != "" {
-                    btn_menu.push(a);
-                }
-            }
-        }
-        info!("admin login: {:?}", id);
-        (btn_menu, true)
-    } else {
-        let btn_menu_map: Vec<HashMap<String, String>> = rb.query_decode("select distinct u.api_url from sys_user_role t left join sys_role usr on t.role_id = usr.id left join sys_role_menu srm on usr.id = srm.role_id left join sys_menu u on srm.menu_id = u.id where t.user_id = ?", vec![value!(id)]).await.unwrap();
-        for x in btn_menu_map {
-            if let Some(a) = x.get("api_url") {
-                if a.to_string() != "" {
-                    btn_menu.push(a.to_string());
-                }
-            }
-        }
-        info!("ordinary login: {:?}", id);
-        (btn_menu, false)
     }
 }
 
@@ -495,16 +457,8 @@ pub async fn query_user_menu(headers: HeaderMap, State(state): State<Arc<AppStat
             let key = format!("axum:admin:user:info:{}", user_id);
             let is_admin: bool = conn.hget(&key, "isAdmin").unwrap_or_default();
 
-            let sys_menu_list: Vec<Menu>;
-
-            if is_admin {
-                info!("The current user is a super administrator");
-                sys_menu_list = Menu::select_all(rb).await?;
-            } else {
-                info!("The current user is not a super administrator");
-                let sql_str = "select u.* from sys_user_role t left join sys_role usr on t.role_id = usr.id left join sys_role_menu srm on usr.id = srm.role_id left join sys_menu u on srm.menu_id = u.id where t.user_id = ?";
-                sys_menu_list = rb.query_decode(sql_str, vec![value!(user.id)]).await?;
-            }
+            // 从服务层获取菜单列表（服务层封装了 DB 查询）
+            let sys_menu_list: Vec<Menu> = SysUserService::fetch_user_menus(rb, user_id, is_admin).await?;
 
             let mut sys_menu: Vec<MenuList> = Vec::new();
             let mut btn_menu: Vec<String> = Vec::new();
@@ -540,6 +494,7 @@ pub async fn query_user_menu(headers: HeaderMap, State(state): State<Arc<AppStat
                     path: menu.menu_url.unwrap_or_default(),
                 });
             }
+
 
             let resp = QueryUserMenuResp {
                 sys_menu,

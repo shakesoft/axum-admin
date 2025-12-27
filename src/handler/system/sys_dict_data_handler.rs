@@ -1,6 +1,5 @@
 use crate::common::error::AppError;
 use crate::common::result::{ok_result, ok_result_data, ok_result_page};
-use crate::model::system::sys_dict_data_model::DictData;
 use crate::vo::system::sys_dict_data_vo::*;
 use crate::AppState;
 use axum::extract::State;
@@ -10,6 +9,8 @@ use log::info;
 use rbatis::plugin::page::PageRequest;
 use rbs::value;
 use std::sync::Arc;
+use crate::model::system::sys_dict_data_model::DictData;
+use crate::service::system::sys_dict_data_service::SysDictDataService;
 /*
  *添加字典数据
  *author：刘飞华
@@ -86,11 +87,8 @@ pub async fn update_sys_dict_data_status(State(state): State<Arc<AppState>>, Jso
     info!("update sys_dict_data_status params: {:?}", &item);
     let rb = &state.batis;
 
-    let update_sql = format!("update sys_dict_data set status = ? where id in ({})", item.ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "));
-
-    let mut param = vec![value!(item.status)];
-    param.extend(item.ids.iter().map(|&id| value!(id)));
-    rb.exec(&update_sql, param).await.map(|_| ok_result())?
+    // delegate the DB update to model helper
+    SysDictDataService::update_dict_data_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
 }
 
 /*
