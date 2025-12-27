@@ -86,6 +86,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "atomic"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a89cbf775b137e9b968e67227ef7f775587cde3fd31b0d8599dbd0f598a48340"
+dependencies = [
+ "bytemuck",
+]
+
+[[package]]
 name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -268,6 +277,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "46c5e41b57b8bba42a04676d81cb89e9ee8e859a1a66f80a5a72e1cb76b34d43"
 
 [[package]]
+name = "bytemuck"
+version = "1.24.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fbdf580320f38b612e485521afda1ee26d10cc9884efaaa750d383e13e3c5f4"
+
+[[package]]
 name = "byteorder"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -431,10 +446,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "crossbeam-queue"
+version = "0.3.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0f58bbc28f91df819d0aa2a2c00cd19754769c2fad90579b3592b1c9ba7a3115"
+dependencies = [
+ "crossbeam-utils",
+]
+
+[[package]]
 name = "crossbeam-utils"
 version = "0.8.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
+
+[[package]]
+name = "crossfire"
+version = "2.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1cdbed44ce04d3b1581f2f41713381a799fdff8cedc0abafd7ada78284063dc3"
+dependencies = [
+ "crossbeam-queue",
+ "crossbeam-utils",
+ "futures-core",
+ "parking_lot",
+]
 
 [[package]]
 name = "crunchy"
@@ -622,12 +658,13 @@ dependencies = [
 
 [[package]]
 name = "fast_pool"
-version = "0.3.7"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60e5e31750b1cab303073d061a99a88c02fb28b6aaf4d07037c3a0c8fb6cb300"
+checksum = "f9e67063ce10faa93bc59760c2e85af04adf41918e20c14b0f25d4cd5423dc43"
 dependencies = [
  "async-trait",
- "flume",
+ "atomic",
+ "crossfire",
  "futures-core",
  "tokio",
 ]
@@ -1705,9 +1742,9 @@ dependencies = [
 
 [[package]]
 name = "rbatis"
-version = "4.6.8"
+version = "4.6.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e029bd9847e588da0d91c897762940ae443d2c9f3923b4c3b318ca61907fbaea"
+checksum = "495f142e09f5130d92147fa3e8314fcd3fcb4037cfabfb04356e2c4a1867a533"
 dependencies = [
  "async-trait",
  "dark-std",
@@ -1784,9 +1821,9 @@ dependencies = [
 
 [[package]]
 name = "rbdc-mysql"
-version = "4.6.1"
+version = "4.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "733e88bcdf529ee4bca03be66bdd335877f62cc8126f94b4487b839eb99c7692"
+checksum = "f48ef5f666372bb3db7c89c04325c839dfc5ab9b2547fc95c6d934493ebbc7c7"
 dependencies = [
  "bitflags",
  "byteorder",
@@ -1811,9 +1848,9 @@ dependencies = [
 
 [[package]]
 name = "rbdc-pool-fast"
-version = "4.6.1"
+version = "4.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b604919949e5c58be5029cb6d8f2deae133c1f9bacb21390aa1c2399169d2e0"
+checksum = "78b9e217f104d980241e25c33e97c3ca588fea7a572ac5e3b064a79f3df7bcd4"
 dependencies = [
  "async-trait",
  "dark-std",
