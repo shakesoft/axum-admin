@@ -1,5 +1,0 @@
-struct SysOperateLogService;
-
-impl SysOperateLogService {
-    
-}

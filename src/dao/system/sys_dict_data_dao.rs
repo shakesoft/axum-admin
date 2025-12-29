@@ -1,9 +1,9 @@
 use rbatis::RBatis;
 use rbs::value;
 
-pub struct SysDictDataService;
+pub struct SysDictDataDao;
 
-impl SysDictDataService {
+impl SysDictDataDao {
 
     /*
  *更新字典数据状态（批量）

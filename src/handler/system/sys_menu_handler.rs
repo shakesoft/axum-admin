@@ -100,8 +100,8 @@ pub async fn update_sys_menu_status(State(state): State<Arc<AppState>>, Json(ite
     info!("update sys_menu_status params: {:?}", &item);
     let rb = &state.batis;
 
-    // use service function to perform the DB update
-    crate::service::system::sys_menu_service::SysMenuService::update_menu_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
+    // use dao function to perform the DB update
+    crate::dao::system::sys_menu_dao::SysMenuDao::update_menu_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
 }
 
 /*

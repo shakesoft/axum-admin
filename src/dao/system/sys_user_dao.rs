@@ -2,9 +2,9 @@ use rbatis::RBatis;
 use rbs::value;
 use std::collections::HashMap;
 
-pub struct SysUserService;
+pub struct SysUserDao;
 
-impl SysUserService{
+impl SysUserDao {
     // 封装更新用户状态的数据库操作（批量）
     pub async fn update_status(rb: &RBatis, ids: &Vec<i64>, status: i8) -> rbatis::Result<()> {
         let update_sql = format!("update sys_user set status = ? where id in ({})", ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "));

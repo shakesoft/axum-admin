@@ -7,7 +7,7 @@ use crate::model::system::sys_role_model::Role;
 use crate::model::system::sys_user_model::User;
 use crate::model::system::sys_user_post_model::UserPost;
 use crate::model::system::sys_user_role_model::{is_admin, UserRole};
-use crate::service::system::sys_user_service::SysUserService;
+use crate::dao::system::sys_user_dao::SysUserDao;
 use crate::utils::jwt_util::JwtToken;
 use crate::utils::user_agent_util::UserAgentUtil;
 use crate::vo::system::sys_dept_vo::DeptResp;
@@ -177,7 +177,7 @@ pub async fn update_sys_user_status(State(state): State<Arc<AppState>>, Json(ite
         }
     }
 
-    SysUserService::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
+    SysUserDao::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
 }
 
 /*
@@ -323,8 +323,8 @@ pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(
                 return err_result_msg("密码不正确");
             }
 
-            // use service-layer query for button menu and admin flag
-            let (btn_menu, is_super) = crate::service::system::sys_user_service::SysUserService::query_btn_menu(rb, &id).await;
+            // use dao-layer query for button menu and admin flag
+            let (btn_menu, is_super) = crate::dao::system::sys_user_dao::SysUserDao::query_btn_menu(rb, &id).await;
 
             if btn_menu.len() == 0 {
                 add_login_log(rb, item.mobile, 0, "用户没有分配角色或者菜单,不能登录", agent).await;
@@ -458,7 +458,7 @@ pub async fn query_user_menu(headers: HeaderMap, State(state): State<Arc<AppStat
             let is_admin: bool = conn.hget(&key, "isAdmin").unwrap_or_default();
 
             // 从服务层获取菜单列表（服务层封装了 DB 查询）
-            let sys_menu_list: Vec<Menu> = SysUserService::fetch_user_menus(rb, user_id, is_admin).await?;
+            let sys_menu_list: Vec<Menu> = SysUserDao::fetch_user_menus(rb, user_id, is_admin).await?;
 
             let mut sys_menu: Vec<MenuList> = Vec::new();
             let mut btn_menu: Vec<String> = Vec::new();

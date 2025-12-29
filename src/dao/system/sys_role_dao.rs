@@ -1,9 +1,9 @@
 use rbatis::RBatis;
 use rbs::value;
 
-pub struct SysRoleService;
+pub struct SysRoleDao;
 
-impl SysRoleService {
+impl SysRoleDao {
     // 封装更新角色状态的数据库操作
     pub async fn update_status(rb: &RBatis, ids: &Vec<i64>, status: i8) -> rbatis::Result<()> {
         let update_sql = format!("update sys_role set status = ? where id in ({})", ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "));

@@ -1,5 +1,0 @@
-struct SysLoginLogService;
-
-impl SysLoginLogService {
-    
-}

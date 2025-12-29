@@ -10,7 +10,7 @@ use rbatis::plugin::page::PageRequest;
 use rbs::value;
 use std::sync::Arc;
 use crate::model::system::sys_dict_data_model::DictData;
-use crate::service::system::sys_dict_data_service::SysDictDataService;
+use crate::dao::system::sys_dict_data_dao::SysDictDataDao;
 /*
  *添加字典数据
  *author：刘飞华
@@ -88,7 +88,7 @@ pub async fn update_sys_dict_data_status(State(state): State<Arc<AppState>>, Jso
     let rb = &state.batis;
 
     // delegate the DB update to model helper
-    SysDictDataService::update_dict_data_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
+    SysDictDataDao::update_dict_data_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
 }
 
 /*

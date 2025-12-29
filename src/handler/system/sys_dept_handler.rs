@@ -3,7 +3,7 @@ use crate::common::result::{ok, ok_result_data, BaseResponse, EmptyResponse};
 use crate::model::system::sys_dept_model::{check_dept_exist_user, select_children_dept_by_id, select_dept_count, select_normal_children_dept_by_id, Dept};
 use crate::vo::system::sys_dept_vo::*;
 use crate::AppState;
-use crate::service::system::sys_dept_service::SysDeptService;
+use crate::dao::system::sys_dept_dao::SysDeptDao;
 use axum::extract::State;
 use axum::response::IntoResponse;
 use axum::Json;
@@ -156,7 +156,7 @@ pub async fn update_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(mut 
         //
         // rb.exec(&update_sql, param).await?;
 
-        SysDeptService::update_dept_status(rb, &ancestors, item.status).await?;
+        SysDeptDao::update_dept_status(rb, &ancestors, item.status).await?;
     }
     item.ancestors = Some(ancestors.clone());
 
@@ -191,7 +191,7 @@ pub async fn update_sys_dept_status(State(state): State<Arc<AppState>>, Json(ite
         }
     }
 
-    SysDeptService::update_dept_status(rb, &ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "), item.status).await.map(|_| ok())?
+    SysDeptDao::update_dept_status(rb, &ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "), item.status).await.map(|_| ok())?
 
     // let update_sql = format!("update sys_dept set status = ? where id in ({})", ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "));
     // let mut param = vec![value!(item.status)];

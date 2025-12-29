@@ -8,8 +8,9 @@ pub mod model;
 pub mod route;
 pub mod utils;
 pub mod vo;
-mod service;
+mod dao;
 mod statemachine;
+mod service;
 
 use axum::{middleware as md, Router};
 use crate::route::system::sys_dept_route::build_sys_dept_route;

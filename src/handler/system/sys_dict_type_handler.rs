@@ -2,7 +2,7 @@ use crate::common::error::AppError;
 use crate::common::result::{ok_result, ok_result_data, ok_result_page};
 use crate::model::system::sys_dict_data_model::{count_dict_data_by_type, update_dict_data_type};
 use crate::model::system::sys_dict_type_model::DictType;
-use crate::service::system::sys_dict_type_service::{SysDictTypeService};
+use crate::dao::system::sys_dict_type_dao::{SysDictTypeDao};
 use crate::vo::system::sys_dict_type_vo::*;
 use crate::AppState;
 use axum::extract::State;
@@ -93,8 +93,8 @@ pub async fn update_sys_dict_type_status(State(state): State<Arc<AppState>>, Jso
     info!("update sys_dict_type_status params: {:?}", &item);
     let rb = &state.batis;
 
-    // delegate db operation to service layer
-    SysDictTypeService::update_dict_type_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
+    // delegate db operation to dao layer
+    SysDictTypeDao::update_dict_type_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
 }
 
 /*

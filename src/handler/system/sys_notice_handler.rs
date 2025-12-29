@@ -1,7 +1,7 @@
 use crate::common::error::AppError;
 use crate::common::result::{ok_result, ok_result_data, ok_result_page};
 use crate::model::system::sys_notice_model::Notice;
-use crate::service::system::sys_notice_service::SysNoticeService;
+use crate::dao::system::sys_notice_dao::SysNoticeDao;
 use crate::vo::system::sys_notice_vo::*;
 use crate::AppState;
 use axum::extract::State;
@@ -77,7 +77,7 @@ pub async fn update_sys_notice_status(State(state): State<Arc<AppState>>, Json(i
     let rb = &state.batis;
 
     // 使用服务层封装的数据库操作
-    SysNoticeService::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
+    SysNoticeDao::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
 }
 
 /*

@@ -2,7 +2,7 @@ use crate::common::error::AppError;
 use crate::common::result::{ok_result, ok_result_data, ok_result_page};
 use crate::model::system::sys_post_model::Post;
 use crate::model::system::sys_user_post_model::count_user_post_by_id;
-use crate::service::system::sys_post_service::SysPostService;
+use crate::dao::system::sys_post_dao::SysPostDao;
 use crate::vo::system::sys_post_vo::*;
 use crate::AppState;
 use axum::extract::State;
@@ -95,7 +95,7 @@ pub async fn update_sys_post_status(State(state): State<Arc<AppState>>, Json(ite
     info!("update sys_post_status params: {:?}", &item);
     let rb = &state.batis;
 
-    SysPostService::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
+    SysPostDao::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
 }
 
 /*

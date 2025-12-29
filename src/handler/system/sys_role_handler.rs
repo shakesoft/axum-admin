@@ -6,7 +6,7 @@ use crate::model::system::sys_role_menu_model::{query_menu_by_role, RoleMenu};
 use crate::model::system::sys_role_model::Role;
 use crate::model::system::sys_user_model::{count_allocated_list, count_unallocated_list, select_allocated_list, select_unallocated_list};
 use crate::model::system::sys_user_role_model::{count_user_role_by_role_id, delete_user_role_by_role_id_user_id, UserRole};
-use crate::service::system::sys_role_service::SysRoleService;
+use crate::dao::system::sys_role_dao::SysRoleDao;
 use crate::vo::system::sys_role_vo::*;
 use crate::vo::system::sys_user_vo::UserResp;
 use crate::AppState;
@@ -134,7 +134,7 @@ pub async fn update_sys_role_status(State(state): State<Arc<AppState>>, Json(ite
         return Err(AppError::BusinessError("不允许操作超级管理员角色"));
     }
 
-    SysRoleService::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
+    SysRoleDao::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
 }
 
 /*
@@ -332,7 +332,7 @@ pub async fn batch_cancel_auth_user(State(state): State<Arc<AppState>>, Json(ite
 
     let rb = &state.batis;
 
-    SysRoleService::batch_cancel_auth_user(rb, item.role_id, &item.user_ids).await.map(|_| ok_result())?
+    SysRoleDao::batch_cancel_auth_user(rb, item.role_id, &item.user_ids).await.map(|_| ok_result())?
 }
 
 /*
