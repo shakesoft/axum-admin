@@ -17,6 +17,7 @@ use std::sync::Arc;
 // use std::time::Duration;
 // use tokio::time::sleep;
 use validator::Validate;
+use crate::service::system::sys_dept_service::SysDeptService;
 /*
  *添加部门表
  *author：刘飞华
@@ -36,6 +37,18 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)):
     // info!("add sys_dept params: {:?}", &item);
     // info!("{function_name}:{item:?}",function_name = function_name!());
     // info!("{function_name}:{item:?}",function_name = function_name!());
+
+    let a = SysDeptService::test_closure(10,2);
+    let b  = a.0();
+    let c  = a.1();
+    let d  = a.2();
+    let e  = a.3();
+    info!("add sys_dept test add : {}",b);
+    info!("add sys_dept test sub : {}",c);
+    info!("add sys_dept test mul : {}",d);
+    info!("add sys_dept test div : {}",e);
+    println!("{}: {}: {}: {}", b,c,d,e);
+
     info!("{}: {:?}", function_name!(), item);
     let rb = &state.batis;
 
