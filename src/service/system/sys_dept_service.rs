@@ -2,6 +2,7 @@ pub struct SysDeptService;
 
 impl SysDeptService {
 
+    //闭包：将全局变量（较大作用域）封闭起来，跟函数一起打包，简称“闭包”，封闭变量，打包进函数
     //使用闭包模拟类，只不过返回值有点冗长，“行为优先的对象”
     pub fn test_closure(num1:i32,num2:i32)->(impl Fn() -> i32,impl Fn() -> i32,impl Fn() -> i32,impl Fn() -> i32) {
         //1：num1和num2相当于是类的构造函数传入的参数
