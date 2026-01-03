@@ -16,8 +16,10 @@ use crate::dao::system::sys_dict_data_dao::SysDictDataDao;
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn add_sys_dict_data(State(state): State<Arc<AppState>>, Json(mut item): Json<DictDataReq>) -> impl IntoResponse {
     info!("add sys_dict_data params: {:?}", &item);
+    info!("{} params: {:?}",function_name!(),item);
     let rb = &state.batis;
 
     if DictData::select_by_dict_label(rb, &item.dict_type, &item.dict_label).await?.is_some() {

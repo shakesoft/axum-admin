@@ -22,13 +22,6 @@ pub struct Post {
     pub update_time: Option<DateTime>, //更新时间
 }
 
-/*
- *岗位信息基本操作
- *author：刘飞华
- *date：2024/12/25 10:01:11
- */
-rbatis::crud!(Post {}, "sys_post");
-
 impl From<PostReq> for Post {
     fn from(item: PostReq) -> Self {
         let mut model = Post {
@@ -64,6 +57,14 @@ impl Into<PostResp> for Post {
         }
     }
 }
+
+/*
+ *岗位信息基本操作
+ *author：刘飞华
+ *date：2024/12/25 10:01:11
+ */
+rbatis::crud!(Post {}, "sys_post");
+
 
 /*
  *根据id查询岗位信息

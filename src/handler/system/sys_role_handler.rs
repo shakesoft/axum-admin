@@ -69,16 +69,7 @@ pub async fn delete_sys_role(State(state): State<Arc<AppState>>, Json(item): Jso
         }
     }
 
-    // RoleMenu::delete_by_map(rb, value! {"role_id": &item.ids}).await?;
-    // RoleDept::delete_by_map(rb, value! {"role_id": &item.ids}).await?;
-    // Role::delete_by_map(rb, value! {"id": &item.ids}).await.map(|_| ok_result())?
-
-    let mut tx = rb.acquire_begin().await?;
-    RoleMenu::delete_by_map(&mut tx, value! {"role_id": &item.ids}).await?;
-    RoleDept::delete_by_map(&mut tx, value! {"role_id": &item.ids}).await?;
-    // panic!("测试");
-    Role::delete_by_map(&mut tx, value! {"id": &item.ids}).await?;
-    tx.commit().await?;
+    SysRoleDao::delete_role_and_relations(rb, &item.ids).await?;
     ok_result()
 }
 

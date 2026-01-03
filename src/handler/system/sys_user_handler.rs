@@ -151,7 +151,6 @@ pub async fn update_sys_user(State(state): State<Arc<AppState>>, Json(item): Jso
 
     UserPost::delete_by_map(rb, value! {"user_id": &item.id}).await?;
     UserPost::insert_batch(rb, &user_post_list, user_post_list.len() as u64).await?;
-
     User::update_by_map(rb, &User::from(item), value! {"id": &id}).await.map(|_| ok_result())?
 }
 

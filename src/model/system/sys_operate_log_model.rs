@@ -32,13 +32,6 @@ pub struct OperateLog {
     pub cost_time: Option<i64>,           //消耗时间
 }
 
-/*
- *操作日志记录基本操作
- *author：刘飞华
- *date：2024/12/25 10:01:11
- */
-rbatis::crud!(OperateLog {}, "sys_operate_log");
-
 impl Into<OperateLogResp> for OperateLog {
     fn into(self) -> OperateLogResp {
         OperateLogResp {
@@ -62,6 +55,14 @@ impl Into<OperateLogResp> for OperateLog {
         }
     }
 }
+
+/*
+ *操作日志记录基本操作
+ *author：刘飞华
+ *date：2024/12/25 10:01:11
+ */
+rbatis::crud!(OperateLog {}, "sys_operate_log");
+
 /*
  *根据id查询操作日志记录
  *author：刘飞华

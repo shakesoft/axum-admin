@@ -27,12 +27,6 @@ pub struct DictData {
     pub update_time: Option<DateTime>, //修改时间
 }
 
-/*
- *字典数据表基本操作
- *author：刘飞华
- *date：2024/12/25 10:01:11
- */
-rbatis::crud!(DictData {}, "sys_dict_data");
 
 impl From<DictDataReq> for DictData {
     fn from(item: DictDataReq) -> Self {
@@ -77,6 +71,14 @@ impl Into<DictDataResp> for DictData {
         }
     }
 }
+
+/*
+ *字典数据表基本操作
+ *author：刘飞华
+ *date：2024/12/25 10:01:11
+ */
+rbatis::crud!(DictData {}, "sys_dict_data");
+
 
 /*
  *根据id查询字典数据表

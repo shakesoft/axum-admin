@@ -28,13 +28,6 @@ pub struct Dept {
     pub update_time: Option<DateTime>, //修改时间
 }
 
-/*
- *部门基本操作
- *author：刘飞华
- *date：2024/12/25 10:01:11
- */
-rbatis::crud!(Dept {}, "sys_dept");
-
 impl From<DeptReq> for Dept {
     fn from(item: DeptReq) -> Self {
         let mut model = Dept {
@@ -77,6 +70,14 @@ impl Into<DeptResp> for Dept {
         }
     }
 }
+
+/*
+ *部门基本操作
+ *author：刘飞华
+ *date：2024/12/25 10:01:11
+ */
+rbatis::crud!(Dept {}, "sys_dept");
+
 /*
  *根据id查询部门
  *author：刘飞华

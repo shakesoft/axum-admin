@@ -22,13 +22,6 @@ pub struct Role {
     pub update_time: Option<DateTime>, //修改时间
 }
 
-/*
- *角色信息基本操作
- *author：刘飞华
- *date：2024/12/12 14:41:44
- */
-rbatis::crud!(Role {}, "sys_role");
-
 impl From<RoleReq> for Role {
     fn from(item: RoleReq) -> Self {
         let mut model = Role {
@@ -65,6 +58,14 @@ impl Into<RoleResp> for Role {
         }
     }
 }
+
+/*
+ *角色信息基本操作
+ *author：刘飞华
+ *date：2024/12/12 14:41:44
+ */
+rbatis::crud!(Role {}, "sys_role");
+
 
 /*
  *根据id查询角色信息

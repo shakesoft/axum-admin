@@ -43,13 +43,13 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)):
     let c  = a.1();
     let d  = a.2();
     let e  = a.3();
-    info!("add sys_dept test add : {}",b);
-    info!("add sys_dept test sub : {}",c);
-    info!("add sys_dept test mul : {}",d);
-    info!("add sys_dept test div : {}",e);
-    println!("{}: {}: {}: {}", b,c,d,e);
-
+    info!("{}",b);
+    info!("{}",c);
+    info!("{}",d);
+    info!("{}",e);
+    println!("{}: {}: {}: {}", b, c, d, e);
     info!("{}: {:?}", function_name!(), item);
+    info!("{}: {item:?}",function_name!());
     let rb = &state.batis;
 
     if Dept::select_by_dept_name(rb, &item.dept_name, &item.parent_id).await?.is_some() {

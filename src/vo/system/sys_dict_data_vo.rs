@@ -16,7 +16,7 @@ pub struct DeleteDictDataReq {
 /*
 更新字典数据表请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug,Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DictDataReq {
     pub id: Option<i64>,        //字典编码

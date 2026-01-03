@@ -34,12 +34,6 @@ pub struct User {
     pub update_time: Option<DateTime>,     //修改时间
 }
 
-/*
- *用户信息基本操作
- *author：刘飞华
- *date：2024/12/12 14:41:44
- */
-rbatis::crud!(User {}, "sys_user");
 
 impl From<UserReq> for User {
     fn from(item: UserReq) -> Self {
@@ -98,6 +92,14 @@ impl Into<UserResp> for User {
         }
     }
 }
+
+/*
+ *用户信息基本操作
+ *author：刘飞华
+ *date：2024/12/12 14:41:44
+ */
+rbatis::crud!(User {}, "sys_user");
+
 /*
  *根据id查询用户信息
  *author：刘飞华

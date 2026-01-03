@@ -21,13 +21,6 @@ pub struct DictType {
     pub update_time: Option<DateTime>, //修改时间
 }
 
-/*
- *字典类型基本操作
- *author：刘飞华
- *date：2024/12/25 10:01:11
- */
-rbatis::crud!(DictType {}, "sys_dict_type");
-
 impl From<DictTypeReq> for DictType {
     fn from(item: DictTypeReq) -> Self {
         let mut model = DictType {
@@ -61,6 +54,14 @@ impl Into<DictTypeResp> for DictType {
         }
     }
 }
+
+/*
+ *字典类型基本操作
+ *author：刘飞华
+ *date：2024/12/25 10:01:11
+ */
+rbatis::crud!(DictType {}, "sys_dict_type");
+
 
 /*
  *根据id查询字典类型

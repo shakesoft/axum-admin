@@ -30,13 +30,6 @@ pub struct LoginLog {
     pub login_time: Option<DateTime>, //访问时间
 }
 
-/*
- *系统访问记录基本操作
- *author：刘飞华
- *date：2024/12/25 10:01:11
- */
-rbatis::crud!(LoginLog {}, "sys_login_log");
-
 impl Into<LoginLogResp> for LoginLog {
     fn into(self) -> LoginLogResp {
         LoginLogResp {
@@ -58,6 +51,13 @@ impl Into<LoginLogResp> for LoginLog {
         }
     }
 }
+
+/*
+ *系统访问记录基本操作
+ *author：刘飞华
+ *date：2024/12/25 10:01:11
+ */
+rbatis::crud!(LoginLog {}, "sys_login_log");
 
 /*
  *根据id查询系统访问记录

@@ -28,12 +28,6 @@ pub struct Menu {
     pub update_time: Option<DateTime>, //修改时间
 }
 
-/*
- *菜单信息基本操作
- *author：刘飞华
- *date：2024/12/12 14:41:44
- */
-rbatis::crud!(Menu {}, "sys_menu");
 
 impl From<MenuReq> for Menu {
     fn from(item: MenuReq) -> Self {
@@ -80,6 +74,14 @@ impl Into<MenuResp> for Menu {
         }
     }
 }
+
+/*
+ *菜单信息基本操作
+ *author：刘飞华
+ *date：2024/12/12 14:41:44
+ */
+rbatis::crud!(Menu {}, "sys_menu");
+
 
 /*
  *根据id查询菜单信息

@@ -22,12 +22,6 @@ pub struct Notice {
     pub update_time: Option<DateTime>, //修改时间
 }
 
-/*
- *通知公告表基本操作
- *author：刘飞华
- *date：2024/12/25 10:01:11
- */
-rbatis::crud!(Notice {}, "sys_notice");
 
 impl From<NoticeReq> for Notice {
     fn from(item: NoticeReq) -> Self {
@@ -64,6 +58,14 @@ impl Into<NoticeResp> for Notice {
         }
     }
 }
+
+/*
+ *通知公告表基本操作
+ *author：刘飞华
+ *date：2024/12/25 10:01:11
+ */
+rbatis::crud!(Notice {}, "sys_notice");
+
 /*
  *根据id查询通知公告表
  *author：刘飞华
