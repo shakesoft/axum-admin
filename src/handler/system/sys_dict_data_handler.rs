@@ -18,8 +18,7 @@ use crate::dao::system::sys_dict_data_dao::SysDictDataDao;
  */
 #[function_name::named]
 pub async fn add_sys_dict_data(State(state): State<Arc<AppState>>, Json(mut item): Json<DictDataReq>) -> impl IntoResponse {
-    info!("add sys_dict_data params: {:?}", &item);
-    info!("{} params: {:?}",function_name!(),item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     if DictData::select_by_dict_label(rb, &item.dict_type, &item.dict_label).await?.is_some() {
@@ -39,8 +38,9 @@ pub async fn add_sys_dict_data(State(state): State<Arc<AppState>>, Json(mut item
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn delete_sys_dict_data(State(state): State<Arc<AppState>>, Json(item): Json<DeleteDictDataReq>) -> impl IntoResponse {
-    info!("delete sys_dict_data params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     DictData::delete_by_map(rb, value! {"id": &item.ids}).await.map(|_| ok_result())?
@@ -51,8 +51,9 @@ pub async fn delete_sys_dict_data(State(state): State<Arc<AppState>>, Json(item)
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn update_sys_dict_data(State(state): State<Arc<AppState>>, Json(item): Json<DictDataReq>) -> impl IntoResponse {
-    info!("update sys_dict_data params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let id = item.id;
@@ -85,11 +86,11 @@ pub async fn update_sys_dict_data(State(state): State<Arc<AppState>>, Json(item)
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn update_sys_dict_data_status(State(state): State<Arc<AppState>>, Json(item): Json<UpdateDictDataStatusReq>) -> impl IntoResponse {
-    info!("update sys_dict_data_status params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
-    // delegate the DB update to model helper
     SysDictDataDao::update_dict_data_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
 }
 
@@ -98,8 +99,9 @@ pub async fn update_sys_dict_data_status(State(state): State<Arc<AppState>>, Jso
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn query_sys_dict_data_detail(State(state): State<Arc<AppState>>, Json(item): Json<QueryDictDataDetailReq>) -> impl IntoResponse {
-    info!("query sys_dict_data_detail params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     DictData::select_by_id(rb, &item.id).await?.map_or_else(
@@ -116,8 +118,9 @@ pub async fn query_sys_dict_data_detail(State(state): State<Arc<AppState>>, Json
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn query_sys_dict_data_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryDictDataListReq>) -> impl IntoResponse {
-    info!("query sys_dict_data_list params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let page = &PageRequest::new(item.page_no, item.page_size);

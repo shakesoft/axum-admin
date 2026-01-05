@@ -115,7 +115,6 @@ pub async fn delete_sys_dept(State(state): State<Arc<AppState>>, Json(item): Jso
 )]
 #[function_name::named]
 pub async fn update_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(mut item)): Valid<Json<DeptReq>>) -> impl IntoResponse {
-    // info!("{function_name}:{item:?}",function_name = function_name!());
     info!("{}: {:?}", function_name!(), item);
     let rb = &state.batis;
 
@@ -157,18 +156,6 @@ pub async fn update_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(mut 
     }
 
     if item.status == 1 && ancestors != "0" {
-        // let ids = ancestors.split(",").map(|s| s.i64()).collect::<Vec<i64>>();
-        //
-        // let update_sql = format!(
-        //     "update sys_dept set status = ? ,update_time = ? where id in ({})",
-        //     ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", ")
-        // );
-        //
-        // let mut param = vec![value!(item.status), value!(DateTime::now())];
-        // param.extend(ids.iter().map(|&id| value!(id)));
-        //
-        // rb.exec(&update_sql, param).await?;
-
         SysDeptDao::update_dept_status(rb, &ancestors, item.status).await?;
     }
     item.ancestors = Some(ancestors.clone());
@@ -205,11 +192,6 @@ pub async fn update_sys_dept_status(State(state): State<Arc<AppState>>, Json(ite
     }
 
     SysDeptDao::update_dept_status(rb, &ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "), item.status).await.map(|_| ok())?
-
-    // let update_sql = format!("update sys_dept set status = ? where id in ({})", ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "));
-    // let mut param = vec![value!(item.status)];
-    // param.extend(ids.iter().map(|&id| value!(id)));
-    // rb.exec(&update_sql, param).await.map(|_| ok())?
 }
 /*
  *查询部门表详情
@@ -226,7 +208,6 @@ pub async fn update_sys_dept_status(State(state): State<Arc<AppState>>, Json(ite
 pub async fn query_sys_dept_detail(State(state): State<Arc<AppState>>, Json(item): Json<QueryDeptDetailReq>) -> impl IntoResponse {
     info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
-
     Dept::select_by_id(rb, &item.id).await?.map_or_else(
         || Err(AppError::BusinessError("部门不存在")),
         |x| {

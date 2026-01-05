@@ -15,8 +15,9 @@ use std::sync::Arc;
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn add_sys_menu(State(state): State<Arc<AppState>>, Json(mut item): Json<MenuReq>) -> impl IntoResponse {
-    info!("add sys_menu params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     if Menu::select_by_menu_name(rb, &item.menu_name).await?.is_some() {
@@ -38,8 +39,9 @@ pub async fn add_sys_menu(State(state): State<Arc<AppState>>, Json(mut item): Js
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn delete_sys_menu(State(state): State<Arc<AppState>>, Json(item): Json<DeleteMenuReq>) -> impl IntoResponse {
-    info!("delete sys_menu params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     //有下级的时候 不能直接删除
@@ -60,8 +62,9 @@ pub async fn delete_sys_menu(State(state): State<Arc<AppState>>, Json(item): Jso
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn update_sys_menu(State(state): State<Arc<AppState>>, Json(item): Json<MenuReq>) -> impl IntoResponse {
-    info!("update sys_menu params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let id = item.id;
@@ -96,8 +99,9 @@ pub async fn update_sys_menu(State(state): State<Arc<AppState>>, Json(item): Jso
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn update_sys_menu_status(State(state): State<Arc<AppState>>, Json(item): Json<UpdateMenuStatusReq>) -> impl IntoResponse {
-    info!("update sys_menu_status params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     // use dao function to perform the DB update
@@ -109,8 +113,9 @@ pub async fn update_sys_menu_status(State(state): State<Arc<AppState>>, Json(ite
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn query_sys_menu_detail(State(state): State<Arc<AppState>>, Json(item): Json<QueryMenuDetailReq>) -> impl IntoResponse {
-    info!("query sys_menu_detail params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     Menu::select_by_id(rb, &item.id).await?.map_or_else(
@@ -127,8 +132,9 @@ pub async fn query_sys_menu_detail(State(state): State<Arc<AppState>>, Json(item
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn query_sys_menu_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryMenuListReq>) -> impl IntoResponse {
-    info!("query sys_menu_list params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     Menu::select_all(rb).await.map(|x| ok_result_data(x.into_iter().map(|x| x.into()).collect::<Vec<MenuResp>>()))?
@@ -139,7 +145,9 @@ pub async fn query_sys_menu_list(State(state): State<Arc<AppState>>, Json(item):
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+#[function_name::named]
 pub async fn query_sys_menu_list_simple(State(state): State<Arc<AppState>>) -> impl IntoResponse {
+    info!("{function_name}",function_name = function_name!());
     let rb = &state.batis;
 
     let list = Menu::select_menu_list(rb).await?;
@@ -151,14 +159,6 @@ pub async fn query_sys_menu_list_simple(State(state): State<Arc<AppState>>) -> i
         menu_name: x.menu_name, //菜单名称
         parent_id: x.parent_id, //父ID
     }).for_each(|x| menu_list.push(x));
-
-    // for x in list {
-    //     menu_list.push(MenuListSimpleDataResp {
-    //         id: x.id,               //主键
-    //         menu_name: x.menu_name, //菜单名称
-    //         parent_id: x.parent_id, //父ID
-    //     })
-    // }
 
     ok_result_data(menu_list)
 }

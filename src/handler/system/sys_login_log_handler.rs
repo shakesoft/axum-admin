@@ -15,8 +15,9 @@ use std::sync::Arc;
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn delete_sys_login_log(State(state): State<Arc<AppState>>, Json(item): Json<DeleteLoginLogReq>) -> impl IntoResponse {
-    info!("delete sys_login_log params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     LoginLog::delete_by_map(rb, value! {"id": &item.ids}).await.map(|_| ok_result())?
@@ -27,8 +28,9 @@ pub async fn delete_sys_login_log(State(state): State<Arc<AppState>>, Json(item)
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn clean_sys_login_log(State(state): State<Arc<AppState>>) -> impl IntoResponse {
-    info!("clean sys_login_log ");
+    info!("{function_name}",function_name = function_name!());
     let rb = &state.batis;
 
     clean_login_log(rb).await.map(|_| ok_result())?
@@ -39,8 +41,9 @@ pub async fn clean_sys_login_log(State(state): State<Arc<AppState>>) -> impl Int
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn query_sys_login_log_detail(State(state): State<Arc<AppState>>, Json(item): Json<QueryLoginLogDetailReq>) -> impl IntoResponse {
-    info!("query sys_login_log_detail params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     LoginLog::select_by_id(rb, &item.id).await?.map_or_else(
@@ -57,8 +60,9 @@ pub async fn query_sys_login_log_detail(State(state): State<Arc<AppState>>, Json
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn query_sys_login_log_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryLoginLogListReq>) -> impl IntoResponse {
-    info!("query sys_login_log_list params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let page = &PageRequest::new(item.page_no, item.page_size);

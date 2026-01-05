@@ -27,7 +27,7 @@ use std::sync::Arc;
  */
 #[function_name::named]
 pub async fn add_sys_role(State(state): State<Arc<AppState>>, Json(mut item): Json<RoleReq>) -> impl IntoResponse {
-        info!("{function_name}:{item:?}",function_name = function_name!());
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     if Role::select_by_role_name(rb, &item.role_name).await?.is_some() {
@@ -49,7 +49,6 @@ pub async fn add_sys_role(State(state): State<Arc<AppState>>, Json(mut item): Js
  */
 #[function_name::named]
 pub async fn delete_sys_role(State(state): State<Arc<AppState>>, Json(item): Json<DeleteRoleReq>) -> impl IntoResponse {
-    // sleep(Duration::from_secs(10)).await;
     info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 

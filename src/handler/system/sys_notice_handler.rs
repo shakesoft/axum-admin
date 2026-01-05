@@ -16,8 +16,9 @@ use std::sync::Arc;
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn add_sys_notice(State(state): State<Arc<AppState>>, Json(mut item): Json<NoticeReq>) -> impl IntoResponse {
-    info!("add sys_notice params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     if Notice::select_by_title(rb, &item.notice_title).await?.is_some() {
@@ -33,8 +34,9 @@ pub async fn add_sys_notice(State(state): State<Arc<AppState>>, Json(mut item): 
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn delete_sys_notice(State(state): State<Arc<AppState>>, Json(item): Json<DeleteNoticeReq>) -> impl IntoResponse {
-    info!("delete sys_notice params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     Notice::delete_by_map(rb, value! {"id": &item.ids}).await.map(|_| ok_result())?
@@ -45,8 +47,9 @@ pub async fn delete_sys_notice(State(state): State<Arc<AppState>>, Json(item): J
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn update_sys_notice(State(state): State<Arc<AppState>>, Json(item): Json<NoticeReq>) -> impl IntoResponse {
-    info!("update sys_notice params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let id = item.id;
@@ -72,8 +75,9 @@ pub async fn update_sys_notice(State(state): State<Arc<AppState>>, Json(item): J
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn update_sys_notice_status(State(state): State<Arc<AppState>>, Json(item): Json<UpdateNoticeStatusReq>) -> impl IntoResponse {
-    info!("update sys_notice_status params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     // 使用服务层封装的数据库操作
@@ -85,8 +89,9 @@ pub async fn update_sys_notice_status(State(state): State<Arc<AppState>>, Json(i
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn query_sys_notice_detail(State(state): State<Arc<AppState>>, Json(item): Json<QueryNoticeDetailReq>) -> impl IntoResponse {
-    info!("query sys_notice_detail params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     Notice::select_by_id(rb, &item.id).await?.map_or_else(
@@ -103,8 +108,9 @@ pub async fn query_sys_notice_detail(State(state): State<Arc<AppState>>, Json(it
  *author：刘飞华
  *date：2024/12/25 11:36:48
  */
+#[function_name::named]
 pub async fn query_sys_notice_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryNoticeListReq>) -> impl IntoResponse {
-    info!("query sys_notice_list params: {:?}", &item);
+    info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
 
     let page = &PageRequest::new(item.page_no, item.page_size);
