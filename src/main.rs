@@ -138,6 +138,17 @@ async fn main() {
     let bb = dynamic_light.current_state();
     println!("{}",bb);
 
+    // #[derive(Debug)]
+    // struct ImportantExcerpt<'a> {
+    //     part: &'a str,
+    // }
+    // let novel = String::from("Call me Ishmael. Some years ago...");
+    // let first_sentence = novel.split('.').next().expect("Could not find a '.'");
+    // let i = ImportantExcerpt {
+    //     part: first_sentence,
+    // };
+    // println!("{}",i.part);
+
     let file_appender = rolling::daily("log", "axum-admin.log");
     let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
     // let daily_writer = DailyLogFile::new("log", "axum-admin", "log");
