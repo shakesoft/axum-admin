@@ -1,5 +1,5 @@
 use crate::common::error::AppError;
-use crate::common::result::{ok_result, ok_result_data, ok_result_page};
+use crate::common::result::{ok, ok_result, ok_result_data, ok_result_page};
 use crate::model::system::sys_notice_model::Notice;
 use crate::dao::system::sys_notice_dao::SysNoticeDao;
 use crate::vo::system::sys_notice_vo::*;
@@ -119,3 +119,32 @@ pub async fn query_sys_notice_list(State(state): State<Arc<AppState>>, Json(item
         .await
         .map(|x| ok_result_page(x.records.into_iter().map(|x| x.into()).collect::<Vec<NoticeResp>>(), x.total))?
 }
+
+
+#[function_name::named]
+pub async fn query_sys_notice_request(State(state): State<Arc<AppState>>, Json(item): Json<QueryNoticeListReq>) -> impl IntoResponse {
+    info!("{function_name}:{item:?}",function_name = function_name!());
+
+
+    let body = reqwest::get("http://dev.muche365.com/enter/lutong/order-request")
+        .await.unwrap()
+        .text()
+        .await.unwrap();
+
+    //let mut body = String::new();
+    // res.read_to_string(&mut body)?;
+
+    println!("{}", body);
+
+
+    ok()
+    // let rb = &state.batis;
+
+    // let page = &PageRequest::new(item.page_no, item.page_size);
+
+    // Notice::select_sys_notice_list(rb, page, &item)
+    //     .await
+    //     .map(|x| ok_result_page(x.records.into_iter().map(|x| x.into()).collect::<Vec<NoticeResp>>(), x.total))?
+}
+
+

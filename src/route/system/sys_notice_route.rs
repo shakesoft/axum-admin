@@ -3,6 +3,7 @@ use crate::AppState;
 use axum::routing::post;
 use axum::Router;
 use std::sync::Arc;
+use reqwest::get;
 /*
  *构建通知公告表路由
  *author：刘飞华
@@ -16,5 +17,6 @@ pub fn build_sys_notice_route() -> Router<Arc<AppState>> {
         .route("/system/notice/updateNoticeStatus", post(sys_notice_handler::update_sys_notice_status))
         .route("/system/notice/queryNoticeDetail", post(sys_notice_handler::query_sys_notice_detail))
         .route("/system/notice/queryNoticeList", post(sys_notice_handler::query_sys_notice_list))
+        .route("/system/notice/request", post(sys_notice_handler::query_sys_notice_request))
     //记得在main.rs中添加路由build_sys_notice_route()
 }

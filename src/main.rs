@@ -28,7 +28,7 @@ use redis::Client;
 use route::system::sys_menu_route::build_sys_menu_route;
 use route::system::sys_role_route::build_sys_role_route;
 use route::system::sys_user_route::build_sys_user_route;
-use serde::{Deserialize};
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::time::Duration;
 use axum::body::Body;
@@ -48,6 +48,7 @@ use crate::common::error::AppError;
 // use crate::middleware::error::{ handle_middleware_error};
 // use crate::middleware::swagger::swagger_auth;
 use axum::routing::get;
+use chrono::Utc;
 // use garde::rules::ip::IpKind::Any;
 use tower_http::cors::CorsLayer;
 use tower_http::timeout::TimeoutLayer;
@@ -219,12 +220,41 @@ async fn main() {
     });
 
     // 首页路由
-    let index_router = Router::new().route("/", get(async||-> &'static str {
-        "Hello axum-admin!"
+    // let index_router = Router::new().route("/", get(async||-> &'static str {
+    //     "Hello axum-admin!"
+    // }));
+
+    let index_router = Router::new().route("/", get(async||-> String{
+        let json =json_data();
+       let body =  post_json("http://dev.muche365.com/enter/lutong/order-request",json,"1d9ae6f8e29f3b6228ad19a95c841eb4","20260123094931","974C5C9091C3BF27B7E041693EBF64CB4AB423B8").await;
+        match body {
+           Ok(b)=>{
+               let person: ResponseData = serde_json::from_str(&b).unwrap();
+               println!("{:?}", person);
+               b
+           },
+           Err(e)=>{
+               println!("Error: {}", e);
+               "Error".to_string()
+           }
+        }
+    }));
+
+    let test_router = Router::new().route("/test", get(async||-> String {
+        let body = reqwest::get("http://dev.muche365.com/enter/lutong/order-request")
+            .await.unwrap()
+            .text()
+            .await.unwrap();
+
+        //let mut body = String::new();
+        // res.read_to_string(&mut body)?;
+        info!("{body}");
+        println!("{}", body);
+        body
     }));
 
     // 构建应用路由，并合并多个子路由
-    let app = Router::new().merge(swagger_ui).merge(index_router)//.route_layer(md::from_fn(swagger_auth))
+    let app = Router::new().merge(swagger_ui).merge(index_router).merge(test_router)//.route_layer(md::from_fn(swagger_auth))
         .nest(
         "/api",
         Router::new()
@@ -261,4 +291,85 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind(config.server.addr).await.unwrap();
     // 使用监听器启动服务器
     axum::serve(listener, app).await.unwrap();
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ResponseData {
+    code: String,
+    message: String,
+}
+
+
+pub fn json_data()->&'static str{
+    let data:&'static str = r#"{
+  "accidentType": "0",
+  "carModel": "WEYWEY全新蓝山",
+  "caseCity": "上海市",
+  "caseCounty": "松江区",
+  "caseDestCity": "上海市",
+  "caseDestCounty": "嘉定区",
+  "caseDestLat": "31.303306",
+  "caseDestLng": "121.32953",
+  "caseDestLocation": "上海市嘉定区南翔地铁站",
+  "caseDestState": "上海",
+  "caseLat": "31.024269",
+  "caseLng": "121.23782",
+  "caseLocation": "上海市松江区松江体育中心地铁站华中公寓9号楼",
+  "caseState": "上海",
+  "chargeType": "01",
+  "customerName": "技术部测试",
+  "customerPhone": "12100000028",
+  "customerPhoneForDispatcher": "12100000028",
+  "customerPhoneForDriver": "12100000028",
+  "dealerCode": "CC23221",
+  "dealerHotline": "0315-5390919",
+  "dealerName": "张家港市祥瑞联发汽车贸易有限公司",
+  "dealerPhone": "03155390915",
+  "freeMiles": "200",
+  "orderNo": "19122601230949313472",
+  "plateNo": "沪AF08234",
+  "recipientName": "接车人测试",
+  "recipientPhone": "03155390916",
+  "reportTime": "2026-01-23 09:49:31",
+  "requestType": "01",
+  "rescueType": "2",
+  "reservationFlg": "0",
+  "serviceDemand": [
+    {
+      "demandName": "免路桥费",
+      "demandCode": "001"
+    },
+    {
+      "demandName": "本单在完成前，修改救援地或目的地需要凭证附件",
+      "demandCode": "005"
+    }
+  ],
+  "vinNo": "LGWFF7A55MJ066983",
+  "vipLevel": "VIP"
+}"#;
+    data
+}
+
+pub async fn post_json(
+    url: &str,
+    json_body: &str,
+    app_key: &str,
+    timestamp: &str,
+    sign: &str,
+) -> Result<String, reqwest::Error> {
+    let client = reqwest::Client::new();
+    let resp = client
+        .post(url)
+        .header("Content-Type", "application/json")
+        .header("appKey", app_key)
+        .header("timestamp", timestamp)
+        .header("sign", sign)
+        .body(json_body.to_string())
+        .send()
+        .await?
+        .error_for_status()?   // 自动检查 4xx/5xx
+        .text()
+        .await?;
+
+    Ok(resp)
 }
