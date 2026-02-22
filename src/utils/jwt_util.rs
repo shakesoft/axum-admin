@@ -4,6 +4,13 @@ use jsonwebtoken::{decode, encode, errors::ErrorKind, Algorithm, DecodingKey, En
 use serde::{Deserialize, Serialize};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+pub const JWT_EXPIRATION_SECONDS: u64 = 86400_000; // 24小时过期时间，单位为秒
+pub const JWT_SECRET: &str = "123";
+pub const JWT_ISSUER: &str = "koobe";
+pub const JWT_AUDIENCE: &str = "rust_admin";
+pub const JWT_SUBJECT: &str = "rust_admin";
+pub const JWT_JTI: &str = "ignore";
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct JwtToken {
     pub id: i64,
@@ -25,20 +32,19 @@ pub struct JwtToken {
 impl JwtToken {
     pub fn new(id: i64, username: &str) -> JwtToken {
         let now = SystemTime::now();
-        //过期时间
-        let m30 = Duration::from_secs(1800000);
         let now = now.duration_since(UNIX_EPOCH).expect("获取系统时间失败");
+        let exp = Duration::from_secs(JWT_EXPIRATION_SECONDS);//过期时间
 
         JwtToken {
             id,
             username: String::from(username),
-            aud: String::from("rust_admin"), // (audience)：受众
-            exp: (now + m30).as_secs() as usize,
+            aud: String::from(JWT_AUDIENCE), // (audience)：受众
+            exp: (now + exp).as_secs() as usize,
             iat: now.as_secs() as usize,     // (Issued At)：签发时间
-            iss: String::from("koobe"),      // (issuer)：签发人
             nbf: now.as_secs() as usize,     // (Not Before)：生效时间
-            sub: String::from("rust_admin"), // (subject)：主题
-            jti: String::from("ignore"),     // (JWT ID)：编号
+            iss: String::from(JWT_ISSUER),      // (issuer)：签发人
+            sub: String::from(JWT_SUBJECT), // (subject)：主题
+            jti: String::from(JWT_JTI),     // (JWT ID)：编号
         }
     }
 
@@ -54,18 +60,17 @@ impl JwtToken {
     /// secret: your secret string
     pub fn verify(secret: &str, token: &str) -> Result<JwtToken, AppError> {
         let mut validation = Validation::new(Algorithm::HS256);
-        validation.sub = Some("rust_admin".to_string());
-        validation.set_audience(&["rust_admin"]);
+        validation.sub = Some(JWT_SUBJECT.to_string());
+        validation.set_audience(&[JWT_AUDIENCE]);
         validation.set_required_spec_claims(&["exp", "sub", "aud"]);
         match decode::<JwtToken>(&token, &DecodingKey::from_secret(secret.as_ref()), &validation) {
             Ok(c) => Ok(c.claims),
-
             Err(err) => match *err.kind() {
                 ErrorKind::InvalidToken => return Err(JwtTokenError("InvalidToken".to_string())), // Example on how to handle a specific error
                 ErrorKind::InvalidIssuer => return Err(JwtTokenError("InvalidIssuer".to_string())), // Example on how to handle a specific error
-                ErrorKind::ExpiredSignature => return Err(JwtTokenError("token 已经超时了".to_string())), // Example on how to handle a specific error
+                ErrorKind::ExpiredSignature => return Err(JwtTokenError("Token Expire".to_string())), // Example on how to handle a specific error
                 // _ => return Err(Error::from("InvalidToken other errors")),
-                _ => Err(JwtTokenError("InvalidToken other errors".to_string())),
+                _ => Err(JwtTokenError("InvalidToken Errors".to_string())),
             },
         }
     }
@@ -73,14 +78,15 @@ impl JwtToken {
 
 #[cfg(test)]
 mod tests {
+    use crate::utils::jwt_util;
     use crate::utils::jwt_util::JwtToken;
 
     #[test]
     fn test_jwt() {
         let jwt = JwtToken::new(1, "koobe");
-        let res = jwt.create_token("123").unwrap_or_default();
+        let res = jwt.create_token(jwt_util::JWT_SECRET).unwrap_or_default();
         println!("{:?}", res);
-        let token = JwtToken::verify("123", &res);
+        let token = JwtToken::verify(jwt_util::JWT_SECRET, &res);
         println!("{:?}", token)
     }
 }

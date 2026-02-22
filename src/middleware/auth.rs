@@ -9,6 +9,7 @@ use axum::response::IntoResponse;
 use axum::{http, response, Json};
 use redis::{Client, Commands};
 use std::sync::Arc;
+use crate::utils::jwt_util;
 
 pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Next) -> Result<response::Response, StatusCode> {
     // log::info!("req {:?}", req.uri());
@@ -29,7 +30,7 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
     let authorization = auth_header.unwrap();
 
     let token = authorization.to_string().replace("Bearer ", "");
-    let jwt_token_e = JwtToken::verify("123", &token);
+    let jwt_token_e = JwtToken::verify(jwt_util::JWT_SECRET, &token);
     let jwt_token = match jwt_token_e {
         Ok(data) => data,
         Err(err) => {

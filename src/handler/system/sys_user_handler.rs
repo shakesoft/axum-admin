@@ -28,6 +28,7 @@ use rbs::value;
 use redis::Commands;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
+use crate::utils::jwt_util;
 /*
  *添加用户信息
  *author：刘飞华
@@ -330,7 +331,7 @@ pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(
                 return Err(AppError::BusinessError("用户没有分配角色或者菜单,不能登录"));
             }
 
-            let token = JwtToken::new(id, &username).create_token("123")?;
+            let token = JwtToken::new(id, &username).create_token(jwt_util::JWT_SECRET)?;
 
             let key = format!("axum:admin:user:info:{:?}", s_user.id.unwrap_or_default());
             // 存储用户权限信息

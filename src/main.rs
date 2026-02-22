@@ -12,7 +12,7 @@ pub mod dao;
 pub mod statemachine;
 pub mod service;
 
-use axum::{middleware as md, Router};
+use axum::{middleware as md, Json, Router};
 use crate::route::system::sys_dept_route::build_sys_dept_route;
 use crate::route::system::sys_dict_data_route::build_sys_dict_data_route;
 use crate::route::system::sys_dict_type_route::build_sys_dict_type_route;
@@ -220,12 +220,13 @@ async fn main() {
     });
 
     // 首页路由
-    // let index_router = Router::new().route("/", get(async||-> &'static str {
-    //     "Hello axum-admin!"
-    // }));
+    let home_router = Router::new().route("/", get(async||-> &'static str {
+        "Hello axum-admin!"
+    }));
 
-    let index_router = Router::new().route("/", get(async||-> String{
+    let index_router = Router::new().route("/index", get(async||-> String{
         let json =json_data();
+        return json.to_string();
        let body =  post_json("http://dev.muche365.com/enter/lutong/order-request",json,"1d9ae6f8e29f3b6228ad19a95c841eb4","20260123094931","974C5C9091C3BF27B7E041693EBF64CB4AB423B8").await;
         match body {
            Ok(b)=>{
@@ -240,6 +241,7 @@ async fn main() {
         }
     }));
 
+
     let test_router = Router::new().route("/test", get(async||-> String {
         let body = reqwest::get("http://dev.muche365.com/enter/lutong/order-request")
             .await.unwrap()
@@ -253,8 +255,15 @@ async fn main() {
         body
     }));
 
+    let test_router1 = Router::new().route("/test1", get(async||-> Json<ResponseData> {
+        Json(ResponseData {
+            code: "aa".to_owned(),
+            message: "Tom".to_string(),
+        })
+    }));
+
     // 构建应用路由，并合并多个子路由
-    let app = Router::new().merge(swagger_ui).merge(index_router).merge(test_router)//.route_layer(md::from_fn(swagger_auth))
+    let app = Router::new().merge(swagger_ui).merge(home_router).merge(index_router).merge(test_router).merge(test_router1)//.route_layer(md::from_fn(swagger_auth))
         .nest(
         "/api",
         Router::new()
