@@ -313,41 +313,46 @@ pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(
             Err(AppError::BusinessError("用户不存在"))
         }
         Some(mut user) => {
-            let id = user.id.unwrap();
-            if *(&user.password.ne(&item.password)) {
+            let user_id =user.id.unwrap();
+
+            //验证用户密码
+            if (&user.password.ne(&item.password)).to_owned() {
                 add_login_log(rb, item.mobile, 0, "密码不正确", agent).await;
                 return Err(AppError::BusinessError("密码不正确"));
             }
 
-            // use dao-layer query for button menu and admin flag
-            let (btn_menu, is_super) = SysUserDao::query_btn_menu(rb, &id).await;
+            //判断用户菜单权限，获取用户权限列表
+            let (btn_menu, is_super) = SysUserDao::query_btn_menu(rb, &user_id).await;
             if btn_menu.len() == 0 {
                 add_login_log(rb, item.mobile, 0, "用户没有分配角色或者菜单,不能登录", agent).await;
                 return Err(AppError::BusinessError("用户没有分配角色或者菜单,不能登录"));
             }
 
-            let jwt = JwtToken::new(id, &user.user_name);
+            //生成用户token
+            let jwt = JwtToken::new(user_id, &user.user_name);
             let expires_at =jwt.get_exp();
-            let local_time = time_util::timestamp_to_local(expires_at as i64);
-            //println!("token expires at: {}", local_time.unwrap_or_default().format("%Y-%m-%d %H:%M:%S").to_string());
+            let expires_time = time_util::timestamp_to_local(expires_at as i64);
+            //println!("token expires at: {}", expires_time.unwrap_or_default().format("%Y-%m-%d %H:%M:%S").to_string());
             let token = jwt.create_token(jwt_util::JWT_SECRET)?;
 
-            let key = format!("axum:admin:user:info:{:?}", &user.id.unwrap_or_default());
+            //存储用户权限信息到redis
+            let key = format!("axum:admin:user:info:{:?}", &user_id);
             conn.hset::<_, _, _, ()>(&key, "permissions", &btn_menu.join(","))?;// 存储用户权限信息
             conn.hset::<_, _, _, ()>(&key, "user_name", &user.user_name)?;// 存储用户名
             conn.hset::<_, _, _, ()>(&key, "is_admin", is_super)?;// 存储是否是超级管理员
             conn.hset::<_, _, _, ()>(&key, "token", &token)?;// 存储token
             conn.hset::<_, _, _, ()>(&key, "last_login", Local::now().format("%Y-%m-%d %H:%M:%S").to_string())?;// 存储登录时间
-            conn.hset::<_, _, _, ()>(&key, "expires_at", local_time.unwrap_or_default().format("%Y-%m-%d %H:%M:%S").to_string())?;// 存储到期时间
+            conn.hset::<_, _, _, ()>(&key, "expires_at", expires_time.unwrap_or_default().format("%Y-%m-%d %H:%M:%S").to_string())?;// 存储到期时间
 
             //更新用户最后登录信息
             add_login_log(rb, item.mobile, 1, "登录成功", agent.clone()).await;
             user.login_os = agent.os;
             user.login_browser = agent.browser;
             user.login_date = Some(DateTime::now());
-            User::update_by_map(rb, &user, value! {"id": &user.id}).await?;
+            User::update_by_map(rb, &user, value! {"id": &user_id}).await?;
 
-            ok_result_data(UserLoginResp{
+            //返回用户token和过期时间
+            ok_result_data(UserLoginResp {
                 token,
                 expires_at,
             })
