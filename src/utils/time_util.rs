@@ -11,3 +11,14 @@ pub fn time_to_string(t: Option<DateTime>) -> String {
         Some(x) => x.format("YYYY-MM-DD hh:mm:ss"),
     }
 }
+
+/// 安全地将 Unix 时间戳（秒）转换为 UTC DateTime
+pub fn timestamp_to_utc(timestamp: i64) -> Option<chrono::DateTime<chrono::Utc>> {
+    chrono::DateTime::from_timestamp(timestamp, 0)
+}
+
+/// 安全地将 Unix 时间戳（秒）转换为本地 DateTime
+pub fn timestamp_to_local(timestamp: i64) -> Option<chrono::DateTime<chrono::Local>> {
+    chrono::DateTime::from_timestamp(timestamp, 0)
+        .map(|utc| utc.with_timezone(&chrono::Local))
+}

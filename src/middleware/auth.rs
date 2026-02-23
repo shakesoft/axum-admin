@@ -87,7 +87,7 @@ async fn validate_and_get_user_info(redis_client: &Client, user_id: i64) -> Resu
     let key = format!("axum:admin:user:info:{}", user_id);
     let permissions_str: String = conn.hget(&key, "permissions").unwrap_or_else(|_| "".to_string());
     let token: String = conn.hget(&key, "token").map_err(|_| "无效的token".to_string())?;
-    let is_admin: bool = conn.hget(&key, "isAdmin").unwrap_or_default();
+    let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
     let permissions: Vec<String> = if permissions_str.is_empty() {
         Vec::new()
     } else {

@@ -28,7 +28,7 @@ use rbs::value;
 use redis::Commands;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
-use crate::utils::jwt_util;
+use crate::utils::{jwt_util, time_util};
 /*
  *添加用户信息
  *author：刘飞华
@@ -83,7 +83,7 @@ pub async fn delete_sys_user(headers: HeaderMap, State(state): State<Arc<AppStat
 
     for id in ids.clone() {
         let key = format!("axum:admin:user:info:{}", id);
-        let is_admin: bool = conn.hget(&key, "isAdmin").unwrap_or_default();
+        let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
 
         if is_admin {
             return Err(AppError::BusinessError("不允许操作超级管理员用户"));
@@ -112,7 +112,7 @@ pub async fn update_sys_user(State(state): State<Arc<AppState>>, Json(item): Jso
     }
 
     let key = format!("axum:admin:user:info:{}", id.unwrap_or_default());
-    let is_admin: bool = conn.hget(&key, "isAdmin").unwrap_or_default();
+    let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
 
     if is_admin {
         return Err(AppError::BusinessError("不允许操作超级管理员用户"));
@@ -170,7 +170,7 @@ pub async fn update_sys_user_status(State(state): State<Arc<AppState>>, Json(ite
 
     for id in ids {
         let key = format!("axum:admin:user:info:{}", id);
-        let is_admin: bool = conn.hget(&key, "isAdmin").unwrap_or_default();
+        let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
 
         if is_admin {
             return Err(AppError::BusinessError("不允许操作超级管理员用户"));
@@ -193,7 +193,7 @@ pub async fn reset_sys_user_password(State(state): State<Arc<AppState>>, Json(it
     let mut conn = state.redis.get_connection()?;
 
     let key = format!("axum:admin:user:info:{}", item.id.clone());
-    let is_admin: bool = conn.hget(&key, "isAdmin").unwrap_or_default();
+    let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
 
     if is_admin {
         return Err(AppError::BusinessError("不允许操作超级管理员用户"));
@@ -312,45 +312,45 @@ pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(
             add_login_log(rb, item.mobile, 0, "用户不存在", agent).await;
             Err(AppError::BusinessError("用户不存在"))
         }
-        Some(user) => {
-            let mut s_user = user.clone();
+        Some(mut user) => {
             let id = user.id.unwrap();
-            let username = user.user_name;
-            let password = user.password;
-
-            if password.ne(&item.password) {
+            if *(&user.password.ne(&item.password)) {
                 add_login_log(rb, item.mobile, 0, "密码不正确", agent).await;
-                return err_result_msg("密码不正确");
+                return Err(AppError::BusinessError("密码不正确"));
             }
 
             // use dao-layer query for button menu and admin flag
-            let (btn_menu, is_super) = crate::dao::system::sys_user_dao::SysUserDao::query_btn_menu(rb, &id).await;
-
+            let (btn_menu, is_super) = SysUserDao::query_btn_menu(rb, &id).await;
             if btn_menu.len() == 0 {
                 add_login_log(rb, item.mobile, 0, "用户没有分配角色或者菜单,不能登录", agent).await;
                 return Err(AppError::BusinessError("用户没有分配角色或者菜单,不能登录"));
             }
 
-            let token = JwtToken::new(id, &username).create_token(jwt_util::JWT_SECRET)?;
+            let jwt = JwtToken::new(id, &user.user_name);
+            let expires_at =jwt.get_exp();
+            let local_time = time_util::timestamp_to_local(expires_at as i64);
+            //println!("token expires at: {}", local_time.unwrap_or_default().format("%Y-%m-%d %H:%M:%S").to_string());
+            let token = jwt.create_token(jwt_util::JWT_SECRET)?;
 
-            let key = format!("axum:admin:user:info:{:?}", s_user.id.unwrap_or_default());
-            // 存储用户权限信息
-            conn.hset::<_, _, _, ()>(&key, "permissions", &btn_menu.join(","))?;
-            // 存储用户名
-            conn.hset::<_, _, _, ()>(&key, "user_name", &s_user.user_name)?;
-            // 存储是否是超级管理员
-            conn.hset::<_, _, _, ()>(&key, "isAdmin", is_super)?;
-            // 存储token
-            conn.hset::<_, _, _, ()>(&key, "token", &token)?;
-            // 存储登录时间
-            conn.hset::<_, _, _, ()>(&key, "last_login", Local::now().format("%Y-%m-%d %H:%M:%S").to_string())?;
+            let key = format!("axum:admin:user:info:{:?}", &user.id.unwrap_or_default());
+            conn.hset::<_, _, _, ()>(&key, "permissions", &btn_menu.join(","))?;// 存储用户权限信息
+            conn.hset::<_, _, _, ()>(&key, "user_name", &user.user_name)?;// 存储用户名
+            conn.hset::<_, _, _, ()>(&key, "is_admin", is_super)?;// 存储是否是超级管理员
+            conn.hset::<_, _, _, ()>(&key, "token", &token)?;// 存储token
+            conn.hset::<_, _, _, ()>(&key, "last_login", Local::now().format("%Y-%m-%d %H:%M:%S").to_string())?;// 存储登录时间
+            conn.hset::<_, _, _, ()>(&key, "expires_at", local_time.unwrap_or_default().format("%Y-%m-%d %H:%M:%S").to_string())?;// 存储到期时间
 
+            //更新用户最后登录信息
             add_login_log(rb, item.mobile, 1, "登录成功", agent.clone()).await;
-            s_user.login_os = agent.os;
-            s_user.login_browser = agent.browser;
-            s_user.login_date = Some(DateTime::now());
-            User::update_by_map(rb, &s_user, value! {"id": &s_user.id}).await?;
-            ok_result_data(token)
+            user.login_os = agent.os;
+            user.login_browser = agent.browser;
+            user.login_date = Some(DateTime::now());
+            User::update_by_map(rb, &user, value! {"id": &user.id}).await?;
+
+            ok_result_data(UserLoginResp{
+                token,
+                expires_at,
+            })
         }
     }
 }
@@ -419,7 +419,7 @@ pub async fn update_user_role(State(state): State<Arc<AppState>>, Json(item): Js
     let len = item.role_ids.len();
 
     let key = format!("axum:admin:user:info:{}", user_id);
-    let is_admin: bool = conn.hget(&key, "isAdmin").unwrap_or_default();
+    let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
 
     if is_admin {
         return Err(AppError::BusinessError("不允许操作超级管理员用户"));
@@ -455,7 +455,7 @@ pub async fn query_user_menu(headers: HeaderMap, State(state): State<Arc<AppStat
         None => Err(AppError::BusinessError("用户不存在")),
         Some(user) => {
             let key = format!("axum:admin:user:info:{}", user_id);
-            let is_admin: bool = conn.hget(&key, "isAdmin").unwrap_or_default();
+            let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
 
             // 从服务层获取菜单列表（服务层封装了 DB 查询）
             let sys_menu_list: Vec<Menu> = SysUserDao::fetch_user_menus(rb, user_id, is_admin).await?;

@@ -49,6 +49,10 @@ impl JwtToken {
         }
     }
 
+    pub fn get_exp(&self) -> usize {
+        self.exp
+    }
+
     /// create token
     /// secret: your secret string
     pub fn create_token(&self, secret: &str) -> Result<String, AppError> {

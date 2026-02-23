@@ -109,6 +109,13 @@ pub struct UserLoginReq {
     pub password: String, //密码
 }
 
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserLoginResp {
+    pub token: String, //登录成功后返回token
+    pub expires_at: usize, //token过期时间
+}
+
 /*
 查询用户菜单响应参数
 */
