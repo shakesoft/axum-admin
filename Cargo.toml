@@ -21,7 +21,7 @@ rbdc-mysql={version="4.7.0"}
 rbdc-pool-fast={version="4.7.0"}
 rbdc-mssql = {version="4.7.0"}
 #rbdc-pool-deadpool = "4.5.7"
-
+nameof = "1.3.0"
 log = "0.4"
 log4rs = "1.0"
 jsonwebtoken = "9.3.0"

@@ -3,8 +3,9 @@ use crate::common::error::AppError::JwtTokenError;
 use jsonwebtoken::{decode, encode, errors::ErrorKind, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use nameof::name_of;
 
-pub const JWT_EXPIRATION_SECONDS: u64 = 86400_000; // 24小时过期时间，单位为秒
+pub const JWT_EXPIRATION_SECONDS: u64 = 86400; // 24小时过期时间，单位为秒
 pub const JWT_SECRET: &str = "123";
 pub const JWT_ISSUER: &str = "koobe";
 pub const JWT_AUDIENCE: &str = "rust_admin";
@@ -42,9 +43,9 @@ impl JwtToken {
             exp: (now + exp).as_secs() as usize,
             iat: now.as_secs() as usize,     // (Issued At)：签发时间
             nbf: now.as_secs() as usize,     // (Not Before)：生效时间
-            iss: String::from(JWT_ISSUER),      // (issuer)：签发人
-            sub: String::from(JWT_SUBJECT), // (subject)：主题
-            jti: String::from(JWT_JTI),     // (JWT ID)：编号
+            iss: String::from(JWT_ISSUER),   // (issuer)：签发人
+            sub: String::from(JWT_SUBJECT),  // (subject)：主题
+            jti: String::from(JWT_JTI),      // (JWT ID)：编号
         }
     }
 
@@ -60,16 +61,16 @@ impl JwtToken {
     /// secret: your secret string
     pub fn verify(secret: &str, token: &str) -> Result<JwtToken, AppError> {
         let mut validation = Validation::new(Algorithm::HS256);
+        validation.leeway = 60;
         validation.sub = Some(JWT_SUBJECT.to_string());
         validation.set_audience(&[JWT_AUDIENCE]);
-        validation.set_required_spec_claims(&["exp", "sub", "aud"]);
+        validation.set_required_spec_claims(&[name_of!(exp in JwtToken),name_of!(sub in JwtToken),name_of!(aud in JwtToken)]);
         match decode::<JwtToken>(&token, &DecodingKey::from_secret(secret.as_ref()), &validation) {
             Ok(c) => Ok(c.claims),
             Err(err) => match *err.kind() {
-                ErrorKind::InvalidToken => return Err(JwtTokenError("InvalidToken".to_string())), // Example on how to handle a specific error
-                ErrorKind::InvalidIssuer => return Err(JwtTokenError("InvalidIssuer".to_string())), // Example on how to handle a specific error
-                ErrorKind::ExpiredSignature => return Err(JwtTokenError("Token Expire".to_string())), // Example on how to handle a specific error
-                // _ => return Err(Error::from("InvalidToken other errors")),
+                ErrorKind::InvalidToken => Err(JwtTokenError("InvalidToken".to_string())),
+                ErrorKind::InvalidIssuer => Err(JwtTokenError("InvalidIssuer".to_string())),
+                ErrorKind::ExpiredSignature => Err(JwtTokenError("Token Expired".to_string())),
                 _ => Err(JwtTokenError("InvalidToken Errors".to_string())),
             },
         }
