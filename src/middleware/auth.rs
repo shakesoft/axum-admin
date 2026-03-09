@@ -21,7 +21,7 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
 
     if auth_header.is_none() {
         let json = Json(BaseResponse {
-            msg: "请求头缺少 Authorization 字段".to_string(),
+            msg: "用户未认证，请求头缺少字段[Authorization]".to_string(),
             code: 401,
             data: Some("None".to_string()),
         });

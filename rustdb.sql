@@ -11,7 +11,7 @@
  Target Server Version : 80300 (8.3.0)
  File Encoding         : 65001
 
- Date: 27/12/2025 21:10:52
+ Date: 26/02/2026 07:16:30
 */
 
 SET NAMES utf8mb4;
@@ -35,12 +35,12 @@ CREATE TABLE `sys_dept`  (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '部门表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 36 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '部门表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_dept
 -- ----------------------------
-INSERT INTO `sys_dept` VALUES (1, 0, '0', '测试科技', 1, 'admin', '18613030352', '1002219331@qq.com', 1, 1, '2025-08-28 23:18:10', '2025-09-13 12:36:56');
+INSERT INTO `sys_dept` VALUES (1, 0, '0', '测试科技', 1, 'admin', '18613030352', '1002219331@qq.com', 1, 1, '2025-08-28 23:18:10', '2026-02-23 17:37:55');
 INSERT INTO `sys_dept` VALUES (2, 1, '0,1', '深圳总公司', 1, '1', '1', 'xx@qq.com', 1, 1, '2025-08-28 23:18:10', '2025-08-28 23:18:10');
 INSERT INTO `sys_dept` VALUES (3, 1, '0,1', '长沙分公司', 2, '1', '1', 'xx@qq.com', 1, 1, '2025-08-28 23:18:10', '2025-08-28 23:18:10');
 INSERT INTO `sys_dept` VALUES (4, 2, '0,1,2', '研发部门', 1, '1', '1', 'xx@qq.com', 1, 1, '2025-08-28 23:18:10', '2025-08-28 23:18:10');
@@ -69,6 +69,12 @@ INSERT INTO `sys_dept` VALUES (26, 1, '0,1', '12321334', 1, '12321', '1380013800
 INSERT INTO `sys_dept` VALUES (27, 1, '0,1', '121', 1, '1312312', '13800138000', '55@qq.com', 1, 1, '2025-09-17 06:21:36', '2025-09-17 06:21:35');
 INSERT INTO `sys_dept` VALUES (28, 1, '0,1', '123123', 1123, '123', '11111111111', '11@11.com', 1, 1, '2025-09-17 09:16:27', '2025-09-17 09:16:27');
 INSERT INTO `sys_dept` VALUES (29, 1, '0,1', '1231211w', 1, '12312', '13800138000', '138@qq.com', 1, 1, '2025-09-17 09:17:16', '2025-09-17 09:17:15');
+INSERT INTO `sys_dept` VALUES (30, 1, '0,1', '123ss', 1, '1233', '13800138000', '12312@qq.com', 1, 1, '2025-12-30 07:24:49', '2025-12-30 07:24:48');
+INSERT INTO `sys_dept` VALUES (31, 1, '0,1', '88542', 1, '58451', '13700137000', '1215@qq.com', 1, 1, '2025-12-30 07:26:55', '2025-12-30 07:26:54');
+INSERT INTO `sys_dept` VALUES (32, 1, '0,1', '99665', 1, '99665', '13800138000', '996585@qq.com', 1, 1, '2025-12-30 07:31:34', '2025-12-30 07:31:33');
+INSERT INTO `sys_dept` VALUES (33, 1, '0,1', '1112222', 1, '3333', '13800138000', '13522@qq.com', 1, 1, '2026-01-02 08:35:07', '2026-01-02 08:35:06');
+INSERT INTO `sys_dept` VALUES (34, 1, '0,1', '12312322ed', 1, '123123', '13800138000', '1231233@qq.com', 1, 1, '2026-01-02 08:47:44', '2026-02-23 17:37:55');
+INSERT INTO `sys_dept` VALUES (35, 1, '0,1', '22wweeqq', 1, 'aadd', '13800138000', 'dd23432@qq.com', 1, 1, '2026-01-05 11:54:40', '2026-01-05 11:54:39');
 
 -- ----------------------------
 -- Table structure for sys_dict_data
@@ -145,7 +151,7 @@ CREATE TABLE `sys_login_log`  (
   `msg` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '提示消息',
   `login_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '访问时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统访问记录' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 91 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统访问记录' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_login_log
@@ -172,6 +178,74 @@ INSERT INTO `sys_login_log` VALUES (19, 'jianzhu1', 'todo', 'todo', 'Windows NT 
 INSERT INTO `sys_login_log` VALUES (20, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '141.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2025-10-24 23:58:03');
 INSERT INTO `sys_login_log` VALUES (21, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '141.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2025-10-24 23:58:15');
 INSERT INTO `sys_login_log` VALUES (22, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '143.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2025-12-27 20:25:39');
+INSERT INTO `sys_login_log` VALUES (23, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '141.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-01-02 08:34:45');
+INSERT INTO `sys_login_log` VALUES (24, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '143.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-01-02 08:46:18');
+INSERT INTO `sys_login_log` VALUES (25, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '143.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '密码不正确', '2026-01-04 20:09:34');
+INSERT INTO `sys_login_log` VALUES (26, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '143.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '密码不正确', '2026-01-04 20:09:36');
+INSERT INTO `sys_login_log` VALUES (27, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '143.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '密码不正确', '2026-01-04 20:09:37');
+INSERT INTO `sys_login_log` VALUES (28, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '143.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '密码不正确', '2026-01-04 20:09:38');
+INSERT INTO `sys_login_log` VALUES (29, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '143.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '密码不正确', '2026-01-04 20:09:38');
+INSERT INTO `sys_login_log` VALUES (30, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '143.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '密码不正确', '2026-01-04 20:09:38');
+INSERT INTO `sys_login_log` VALUES (31, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '143.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-01-04 20:09:43');
+INSERT INTO `sys_login_log` VALUES (32, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-23 06:00:35');
+INSERT INTO `sys_login_log` VALUES (33, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-23 06:00:36');
+INSERT INTO `sys_login_log` VALUES (34, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-23 06:00:37');
+INSERT INTO `sys_login_log` VALUES (35, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-23 06:00:38');
+INSERT INTO `sys_login_log` VALUES (36, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-23 06:00:39');
+INSERT INTO `sys_login_log` VALUES (37, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-23 06:00:39');
+INSERT INTO `sys_login_log` VALUES (38, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-23 06:00:39');
+INSERT INTO `sys_login_log` VALUES (39, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-23 06:00:40');
+INSERT INTO `sys_login_log` VALUES (40, '18613030111', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-23 06:00:40');
+INSERT INTO `sys_login_log` VALUES (41, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-23 06:00:47');
+INSERT INTO `sys_login_log` VALUES (42, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-23 17:10:14');
+INSERT INTO `sys_login_log` VALUES (43, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 03:25:46');
+INSERT INTO `sys_login_log` VALUES (44, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 03:34:09');
+INSERT INTO `sys_login_log` VALUES (45, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 03:35:03');
+INSERT INTO `sys_login_log` VALUES (46, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 03:36:25');
+INSERT INTO `sys_login_log` VALUES (47, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 03:44:44');
+INSERT INTO `sys_login_log` VALUES (48, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 03:44:51');
+INSERT INTO `sys_login_log` VALUES (49, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 03:45:02');
+INSERT INTO `sys_login_log` VALUES (50, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 03:45:55');
+INSERT INTO `sys_login_log` VALUES (51, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 03:46:54');
+INSERT INTO `sys_login_log` VALUES (52, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 03:48:42');
+INSERT INTO `sys_login_log` VALUES (53, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-25 03:50:16');
+INSERT INTO `sys_login_log` VALUES (54, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 03:51:15');
+INSERT INTO `sys_login_log` VALUES (55, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:03:51');
+INSERT INTO `sys_login_log` VALUES (56, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:04:58');
+INSERT INTO `sys_login_log` VALUES (57, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:05:34');
+INSERT INTO `sys_login_log` VALUES (58, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:22:16');
+INSERT INTO `sys_login_log` VALUES (59, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:22:40');
+INSERT INTO `sys_login_log` VALUES (60, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:25:51');
+INSERT INTO `sys_login_log` VALUES (61, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:26:05');
+INSERT INTO `sys_login_log` VALUES (62, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:28:07');
+INSERT INTO `sys_login_log` VALUES (63, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:33:24');
+INSERT INTO `sys_login_log` VALUES (64, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:35:25');
+INSERT INTO `sys_login_log` VALUES (65, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:36:38');
+INSERT INTO `sys_login_log` VALUES (66, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:37:07');
+INSERT INTO `sys_login_log` VALUES (67, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:37:51');
+INSERT INTO `sys_login_log` VALUES (68, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:50:57');
+INSERT INTO `sys_login_log` VALUES (69, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:51:06');
+INSERT INTO `sys_login_log` VALUES (70, 'adfadsf', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-24 04:53:39');
+INSERT INTO `sys_login_log` VALUES (71, 'adfadsf', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-24 04:53:40');
+INSERT INTO `sys_login_log` VALUES (72, 'adfadsf', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-24 04:53:40');
+INSERT INTO `sys_login_log` VALUES (73, 'adfadsf', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-24 04:53:41');
+INSERT INTO `sys_login_log` VALUES (74, 'adfadsf', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-24 04:53:41');
+INSERT INTO `sys_login_log` VALUES (75, 'adfadsf', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-24 04:53:41');
+INSERT INTO `sys_login_log` VALUES (76, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 04:53:44');
+INSERT INTO `sys_login_log` VALUES (77, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 05:00:14');
+INSERT INTO `sys_login_log` VALUES (78, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 05:01:57');
+INSERT INTO `sys_login_log` VALUES (79, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 05:10:24');
+INSERT INTO `sys_login_log` VALUES (80, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 05:10:56');
+INSERT INTO `sys_login_log` VALUES (81, 'jianzhu1', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-24 05:11:11');
+INSERT INTO `sys_login_log` VALUES (82, 'jianzhu1', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-24 05:11:12');
+INSERT INTO `sys_login_log` VALUES (83, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 05:11:16');
+INSERT INTO `sys_login_log` VALUES (84, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 05:12:54');
+INSERT INTO `sys_login_log` VALUES (85, 'jianzhu1', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-24 05:13:42');
+INSERT INTO `sys_login_log` VALUES (86, 'jianzhu1', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 0, '用户不存在', '2026-02-24 05:13:43');
+INSERT INTO `sys_login_log` VALUES (87, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 05:13:48');
+INSERT INTO `sys_login_log` VALUES (88, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 05:17:18');
+INSERT INTO `sys_login_log` VALUES (89, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 05:22:19');
+INSERT INTO `sys_login_log` VALUES (90, 'admin', 'todo', 'todo', 'Windows NT 10.0', 'Chrome', '145.0.0.0', 'Win64', 'x64', 'AppleWebKit/537.36', 'KHTML, like Gecko', 'Safari/537.36', 1, '登录成功', '2026-02-24 09:52:21');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -198,7 +272,7 @@ CREATE TABLE `sys_menu`  (
 -- ----------------------------
 -- Records of sys_menu
 -- ----------------------------
-INSERT INTO `sys_menu` VALUES (1, '首页', 1, 1, 1, 1, 0, '/home', '', 'DashboardOutlined', '首页', '2025-08-28 23:18:50', '2025-08-28 23:18:50');
+INSERT INTO `sys_menu` VALUES (1, '首页', 1, 1, 1, 1, 0, '/home', '', 'DashboardOutlined', '首页', '2025-08-28 23:18:50', '2025-12-27 21:32:53');
 INSERT INTO `sys_menu` VALUES (2, '权限管理', 1, 1, 1, 2, 0, '/system', '', 'SettingOutlined', '权限管理', '2025-08-28 23:18:50', '2025-08-28 23:18:50');
 INSERT INTO `sys_menu` VALUES (3, '用户管理', 2, 1, 1, 1, 2, '/system/user', '', 'UserOutlined', '用户信息管理', '2025-08-28 23:18:50', '2025-08-28 23:18:50');
 INSERT INTO `sys_menu` VALUES (4, '添加用户信息', 3, 1, 1, 1, 3, '', '/api/system/user/addUser', '', '添加用户信息', '2025-08-28 23:18:50', '2025-08-28 23:18:50');
@@ -306,7 +380,7 @@ CREATE TABLE `sys_notice`  (
 -- Records of sys_notice
 -- ----------------------------
 INSERT INTO `sys_notice` VALUES (1, '测试通知1', 1, '这是一条测试通知内容', 1, '', '2025-08-28 23:18:56', '2025-08-28 23:18:56');
-INSERT INTO `sys_notice` VALUES (2, '测试公告2', 2, '这是一条测试公告内容', 1, '', '2025-08-28 23:18:56', '2025-08-28 23:18:56');
+INSERT INTO `sys_notice` VALUES (2, '测试公告2', 2, '这是一条测试公告内容', 1, '', '2025-08-28 23:18:56', '2026-02-23 17:38:36');
 
 -- ----------------------------
 -- Table structure for sys_operate_log
@@ -358,7 +432,7 @@ CREATE TABLE `sys_post`  (
 -- ----------------------------
 INSERT INTO `sys_post` VALUES (1, 'ceo', '董事长', 1, 1, '', '2025-08-28 23:19:05', '2025-08-28 23:19:05');
 INSERT INTO `sys_post` VALUES (2, 'se', '项目经理', 2, 1, '', '2025-08-28 23:19:05', '2025-08-28 23:19:05');
-INSERT INTO `sys_post` VALUES (3, 'hr', '人力资源', 3, 1, '', '2025-08-28 23:19:05', '2025-08-28 23:19:05');
+INSERT INTO `sys_post` VALUES (3, 'hr', '人力资源', 3, 1, '', '2025-08-28 23:19:05', '2026-02-23 17:38:03');
 INSERT INTO `sys_post` VALUES (4, 'user', '普通员工', 1, 1, '', '2025-08-28 23:19:05', '2025-08-28 23:19:05');
 
 -- ----------------------------
@@ -384,7 +458,7 @@ CREATE TABLE `sys_role`  (
 -- Records of sys_role
 -- ----------------------------
 INSERT INTO `sys_role` VALUES (1, '超级管理员', 'admin', 1, 1, '全部权限', 1, '2025-08-28 23:19:10', '2025-08-28 23:19:10');
-INSERT INTO `sys_role` VALUES (2, '演示角色', 'query', 1, 1, '仅有查看功能', 1, '2025-08-28 23:19:10', '2025-09-13 14:49:14');
+INSERT INTO `sys_role` VALUES (2, '演示角色', 'query', 1, 1, '仅有查看功能', 1, '2025-08-28 23:19:10', '2025-12-27 21:18:04');
 INSERT INTO `sys_role` VALUES (3, '121', 'dev', 1, 0, '121211', 1, '2025-08-28 23:19:10', '2025-08-28 23:19:10');
 INSERT INTO `sys_role` VALUES (4, '123', '1312', 1, 1, '1321', 1, '2025-09-14 08:47:13', '2025-09-14 08:47:13');
 INSERT INTO `sys_role` VALUES (5, '12343343', '123123', 1, 1, '12312', 1, '2025-09-17 09:28:07', '2025-09-17 09:28:06');
@@ -413,100 +487,100 @@ CREATE TABLE `sys_role_menu`  (
   `menu_id` bigint NOT NULL COMMENT '菜单ID',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 116 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '菜单角色关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 203 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '菜单角色关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_role_menu
 -- ----------------------------
 INSERT INTO `sys_role_menu` VALUES (27, 3, 1, '2025-09-14 00:54:21');
 INSERT INTO `sys_role_menu` VALUES (28, 3, 87, '2025-09-14 00:54:21');
-INSERT INTO `sys_role_menu` VALUES (29, 2, 1, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (30, 2, 87, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (31, 2, 2, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (32, 2, 3, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (33, 2, 15, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (34, 2, 29, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (35, 2, 37, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (36, 2, 44, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (37, 2, 51, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (38, 2, 58, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (39, 2, 65, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (40, 2, 4, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (41, 2, 5, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (42, 2, 6, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (43, 2, 7, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (44, 2, 8, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (45, 2, 9, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (46, 2, 10, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (47, 2, 11, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (48, 2, 12, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (49, 2, 13, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (50, 2, 14, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (51, 2, 16, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (52, 2, 17, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (53, 2, 18, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (54, 2, 19, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (55, 2, 20, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (56, 2, 21, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (57, 2, 22, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (58, 2, 23, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (59, 2, 24, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (60, 2, 25, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (61, 2, 26, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (62, 2, 27, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (63, 2, 28, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (64, 2, 30, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (65, 2, 31, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (66, 2, 32, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (67, 2, 33, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (68, 2, 34, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (69, 2, 35, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (70, 2, 36, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (71, 2, 38, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (72, 2, 39, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (73, 2, 40, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (74, 2, 41, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (75, 2, 42, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (76, 2, 43, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (77, 2, 45, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (78, 2, 46, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (79, 2, 47, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (80, 2, 48, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (81, 2, 49, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (82, 2, 50, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (83, 2, 52, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (84, 2, 53, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (85, 2, 54, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (86, 2, 55, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (87, 2, 56, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (88, 2, 57, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (89, 2, 59, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (90, 2, 60, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (91, 2, 61, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (92, 2, 62, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (93, 2, 63, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (94, 2, 64, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (95, 2, 66, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (96, 2, 67, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (97, 2, 68, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (98, 2, 69, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (99, 2, 70, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (100, 2, 71, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (101, 2, 72, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (102, 2, 73, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (103, 2, 80, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (104, 2, 74, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (105, 2, 75, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (106, 2, 76, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (107, 2, 77, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (108, 2, 78, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (109, 2, 79, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (110, 2, 81, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (111, 2, 82, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (112, 2, 83, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (113, 2, 84, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (114, 2, 85, '2025-09-14 00:54:25');
-INSERT INTO `sys_role_menu` VALUES (115, 2, 86, '2025-09-14 00:54:25');
+INSERT INTO `sys_role_menu` VALUES (116, 2, 1, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (117, 2, 87, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (118, 2, 2, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (119, 2, 3, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (120, 2, 15, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (121, 2, 29, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (122, 2, 37, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (123, 2, 44, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (124, 2, 51, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (125, 2, 58, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (126, 2, 65, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (127, 2, 4, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (128, 2, 5, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (129, 2, 6, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (130, 2, 7, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (131, 2, 8, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (132, 2, 9, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (133, 2, 10, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (134, 2, 11, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (135, 2, 12, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (136, 2, 13, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (137, 2, 14, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (138, 2, 16, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (139, 2, 17, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (140, 2, 18, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (141, 2, 19, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (142, 2, 20, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (143, 2, 21, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (144, 2, 22, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (145, 2, 23, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (146, 2, 24, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (147, 2, 25, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (148, 2, 26, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (149, 2, 27, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (150, 2, 28, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (151, 2, 30, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (152, 2, 31, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (153, 2, 32, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (154, 2, 33, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (155, 2, 34, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (156, 2, 35, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (157, 2, 36, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (158, 2, 38, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (159, 2, 39, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (160, 2, 40, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (161, 2, 41, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (162, 2, 42, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (163, 2, 43, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (164, 2, 45, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (165, 2, 46, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (166, 2, 47, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (167, 2, 48, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (168, 2, 49, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (169, 2, 50, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (170, 2, 52, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (171, 2, 53, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (172, 2, 54, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (173, 2, 55, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (174, 2, 56, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (175, 2, 57, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (176, 2, 59, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (177, 2, 60, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (178, 2, 61, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (179, 2, 62, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (180, 2, 63, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (181, 2, 64, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (182, 2, 66, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (183, 2, 67, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (184, 2, 68, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (185, 2, 69, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (186, 2, 70, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (187, 2, 71, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (188, 2, 72, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (189, 2, 73, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (190, 2, 80, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (191, 2, 74, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (192, 2, 75, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (193, 2, 76, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (194, 2, 77, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (195, 2, 78, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (196, 2, 79, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (197, 2, 81, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (198, 2, 82, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (199, 2, 83, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (200, 2, 84, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (201, 2, 85, '2025-12-27 21:18:10');
+INSERT INTO `sys_role_menu` VALUES (202, 2, 86, '2025-12-27 21:18:10');
 
 -- ----------------------------
 -- Table structure for sys_user
@@ -539,8 +613,8 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, '18613030111', 'admin', 'admin', '00', '', 'xx@qq.com', '123456', 1, 1, '', '2025-12-27 20:25:39', 'Chrome', 'Win64', NULL, '超级管理员', 1, '2025-08-28 23:19:23', '2025-08-28 23:19:23');
-INSERT INTO `sys_user` VALUES (2, '18613030222', 'test', 'test', '00', '', '123@qq.com', '123456', 1, 1, '', NULL, '', '', NULL, '演示权限', 1, '2025-08-28 23:19:23', '2025-08-28 23:19:23');
+INSERT INTO `sys_user` VALUES (1, 'admin', 'admin', 'admin', '00', '', 'xx@qq.com', '123456', 1, 1, '', '2026-02-24 09:52:22', 'Chrome', 'Win64', NULL, '超级管理员', 1, '2025-08-28 23:19:23', '2026-01-02 08:46:02');
+INSERT INTO `sys_user` VALUES (2, 'test', 'test', 'test', '01', 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png', '123@qq.com', '', 1, 1, '', NULL, '', '', NULL, '演示权限', 1, '2025-08-28 23:19:23', '2026-01-02 08:46:04');
 
 -- ----------------------------
 -- Table structure for sys_user_post

@@ -42,3 +42,7 @@ tower = { version = "0.5.2", features = ["timeout"] }
 tower-http = { version = "0.6.6", features = ["catch-panic", "timeout", "trace", "validate-request","cors"] }
 uuid = { version = "1.17.0", features = ["v4"] }
 function_name = "0.3.0"
+
+aspect-core = "0.1"
+aspect-macros = "0.1"
+aspect-std = "0.1"  # Optional: production-ready aspects

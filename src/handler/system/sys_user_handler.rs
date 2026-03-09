@@ -28,6 +28,8 @@ use rbs::value;
 use redis::Commands;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
+use aspect_macros::aspect;
+use crate::aop::logger::logger::Logger;
 use crate::utils::{jwt_util, time_util};
 /*
  *添加用户信息
@@ -277,7 +279,9 @@ pub async fn query_sys_user_detail(State(state): State<Arc<AppState>>, Json(item
  *author：刘飞华
  *date：2024/12/12 14:41:44
  */
+
 #[function_name::named]
+#[aspect(Logger)]
 pub async fn query_sys_user_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryUserListReq>) -> impl IntoResponse {
     info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;

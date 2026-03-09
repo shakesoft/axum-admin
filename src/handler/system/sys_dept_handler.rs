@@ -14,9 +14,13 @@ use rbatis::RBatis;
 use rbatis::rbdc::DateTime;
 use rbs::value;
 use std::sync::Arc;
+use aspect_macros::aspect;
+use aspect_std::LoggingAspect;
 // use std::time::Duration;
 // use tokio::time::sleep;
 use validator::Validate;
+use crate::aop::logger::logger::{Logger};
+use crate::aop::logger::timer::Timer;
 use crate::service::system::sys_dept_service::SysDeptService;
 /*
  *添加部门表
@@ -29,7 +33,9 @@ use crate::service::system::sys_dept_service::SysDeptService;
     request_body = DeptReq,
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
-#[function_name::named]
+#[aspect(Logger)]
+// #[aspect(Timer)]
+// #[function_name::named]
 pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)): Valid<Json<DeptReq>>) -> impl IntoResponse {
     // panic!("test");
     // sleep(Duration::from_secs(8)).await;
@@ -43,13 +49,13 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)):
     let c  = a.1();
     let d  = a.2();
     let e  = a.3();
-    info!("{}",b);
-    info!("{}",c);
-    info!("{}",d);
-    info!("{}",e);
-    println!("{}: {}: {}: {}", b, c, d, e);
-    info!("{}: {:?}", function_name!(), item);
-    info!("{}: {item:?}",function_name!());
+    // info!("{}",b);
+    // info!("{}",c);
+    // info!("{}",d);
+    // info!("{}",e);
+    // println!("{}: {}: {}: {}", b, c, d, e);
+    // info!("{}: {:?}", function_name!(), item);
+    // info!("{}: {item:?}",function_name!());
     let rb = &state.batis;
 
     if Dept::select_by_dept_name(rb, &item.dept_name, &item.parent_id).await?.is_some() {

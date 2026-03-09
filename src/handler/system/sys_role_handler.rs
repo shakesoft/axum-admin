@@ -18,6 +18,10 @@ use rbatis::plugin::page::PageRequest;
 use rbatis::rbdc::DateTime;
 use rbs::value;
 use std::sync::Arc;
+use aspect_macros::aspect;
+use crate::aop::logger::logger::Logger;
+use crate::aop::logger::timer::Timer;
+
 // use std::time::Duration;
 // use tokio::time::sleep;
 /*
@@ -152,6 +156,7 @@ pub async fn query_sys_role_detail(State(state): State<Arc<AppState>>, Json(item
  *date：2024/12/12 14:41:44
  */
 #[function_name::named]
+#[aspect(Logger)]
 pub async fn query_sys_role_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryRoleListReq>) -> impl IntoResponse {
     info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
