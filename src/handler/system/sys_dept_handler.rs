@@ -14,13 +14,9 @@ use rbatis::RBatis;
 use rbatis::rbdc::DateTime;
 use rbs::value;
 use std::sync::Arc;
-use aspect_macros::aspect;
-use aspect_std::LoggingAspect;
 // use std::time::Duration;
 // use tokio::time::sleep;
 use validator::Validate;
-use crate::aop::logger::logger::{Logger};
-use crate::aop::logger::timer::Timer;
 use crate::service::system::sys_dept_service::SysDeptService;
 /*
  *添加部门表
@@ -33,8 +29,6 @@ use crate::service::system::sys_dept_service::SysDeptService;
     request_body = DeptReq,
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
-#[aspect(Logger)]
-// #[aspect(Timer)]
 // #[function_name::named]
 pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)): Valid<Json<DeptReq>>) -> impl IntoResponse {
     // panic!("test");

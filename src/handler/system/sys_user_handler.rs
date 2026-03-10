@@ -28,8 +28,10 @@ use rbs::value;
 use redis::Commands;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
-use aspect_macros::aspect;
-use crate::aop::logger::logger::Logger;
+use aspect_macros::{aspect, async_aspect};
+use aspect_std::TimingAspect;
+use crate::aop::logger::logger::{Logger, Logger1};
+use crate::aop::logger::timer::Timer;
 use crate::utils::{jwt_util, time_util};
 /*
  *添加用户信息
@@ -285,12 +287,17 @@ pub async fn query_sys_user_detail(State(state): State<Arc<AppState>>, Json(item
 pub async fn query_sys_user_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryUserListReq>) -> impl IntoResponse {
     info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
-
+    let num = add(1, 2).await;
     let page = &PageRequest::new(item.page_no, item.page_size);
 
     User::select_sys_user_list(rb, page, &item)
         .await
         .map(|x| ok_result_page(x.records.into_iter().map(|x| x.into()).collect::<Vec<UserResp>>(), x.total))?
+}
+
+#[async_aspect(Logger1)]
+async fn add(num1: i32, num2: i32) -> i32 {
+    num1 + num2
 }
 
 /*

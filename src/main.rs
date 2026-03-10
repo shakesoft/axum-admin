@@ -59,9 +59,19 @@ use crate::workflow::state::traffic_light::TrafficLight;
 // use crate::handler::system::sys_user_handler::reset_sys_user_password;
 
 // 定义应用状态结构体，包含数据库连接池
+#[derive(Debug)]
 pub struct AppState {
     pub batis: RBatis,
     pub redis: Client,
+}
+
+impl AppState {
+    /// 返回一些安全的诊断信息（不依赖内部类型的 Debug 实现）
+    pub fn diag(&self) -> String {
+        let b_ptr = &self.batis as *const _ as *const ();
+        let r_ptr = &self.redis as *const _ as *const ();
+        format!("AppState diag: batis_ptr={:p}, redis_ptr={:p}", b_ptr, r_ptr)
+    }
 }
 
 // 配置结构体，包含服务器和数据库配置

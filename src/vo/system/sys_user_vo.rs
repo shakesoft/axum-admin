@@ -56,7 +56,7 @@ pub struct QueryUserDetailReq {
 /*
 查询用户信息列表请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryUserListReq {
     pub page_no: u64,
