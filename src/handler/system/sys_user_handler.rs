@@ -30,7 +30,7 @@ use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use aspect_macros::{aspect, async_aspect};
 use aspect_std::TimingAspect;
-use crate::aop::logger::logger::{Logger, Logger1};
+use crate::aop::logger::logger::{Logger};
 use crate::aop::logger::timer::Timer;
 use crate::utils::{jwt_util, time_util};
 /*
@@ -295,7 +295,7 @@ pub async fn query_sys_user_list(State(state): State<Arc<AppState>>, Json(item):
         .map(|x| ok_result_page(x.records.into_iter().map(|x| x.into()).collect::<Vec<UserResp>>(), x.total))?
 }
 
-#[async_aspect(Logger1)]
+// #[async_aspect(Logger1)]
 async fn add(num1: i32, num2: i32) -> i32 {
     num1 + num2
 }

@@ -14,6 +14,8 @@ use rbatis::RBatis;
 use rbatis::rbdc::DateTime;
 use rbs::value;
 use std::sync::Arc;
+use aspect_macros::{aspect, async_aspect};
+use aspect_std::{LoggingAspect, TimingAspect};
 // use std::time::Duration;
 // use tokio::time::sleep;
 use validator::Validate;
@@ -228,7 +230,9 @@ pub async fn query_sys_dept_detail(State(state): State<Arc<AppState>>, Json(item
     request_body = QueryDeptListReq,
     responses((status = 200, description = "successfully", body = BaseResponse<Vec<DeptResp>>))
 )]
+
 #[function_name::named]
+// #[aspect(TimingAspect::new())]
 pub async fn query_sys_dept_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryDeptListReq>) -> impl IntoResponse {
     info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;

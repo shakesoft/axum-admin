@@ -88,12 +88,12 @@ checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
 [[package]]
 name = "aspect-core"
 version = "0.1.0"
-source = "git+https://github.com/shakesoft/aspect-rs?branch=master#d752c1e59611559938970f30e52aca0468826811"
+source = "git+https://github.com/shakesoft/aspect-rs?branch=master#9fed3a5b6c4ca6c93cdf40b139673dd8e834586b"
 
 [[package]]
 name = "aspect-macros"
 version = "0.1.0"
-source = "git+https://github.com/shakesoft/aspect-rs?branch=master#d752c1e59611559938970f30e52aca0468826811"
+source = "git+https://github.com/shakesoft/aspect-rs?branch=master#9fed3a5b6c4ca6c93cdf40b139673dd8e834586b"
 dependencies = [
  "aspect-core",
  "proc-macro2",
@@ -104,7 +104,7 @@ dependencies = [
 [[package]]
 name = "aspect-std"
 version = "0.1.0"
-source = "git+https://github.com/shakesoft/aspect-rs?branch=master#d752c1e59611559938970f30e52aca0468826811"
+source = "git+https://github.com/shakesoft/aspect-rs?branch=master#9fed3a5b6c4ca6c93cdf40b139673dd8e834586b"
 dependencies = [
  "aspect-core",
  "log",
