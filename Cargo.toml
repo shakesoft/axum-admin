@@ -43,9 +43,9 @@ tower-http = { version = "0.6.6", features = ["catch-panic", "timeout", "trace",
 uuid = { version = "1.17.0", features = ["v4"] }
 function_name = "0.3.0"
 
-aspect-core = { git = "https://github.com/shakesoft/aspect-rs", branch = "master", package = "aspect-core" }
-aspect-macros = { git = "https://github.com/shakesoft/aspect-rs", branch = "master", package = "aspect-macros" }
-aspect-std = { git = "https://github.com/shakesoft/aspect-rs", branch = "master", package = "aspect-std" }
+aspect-core = { git = "https://github.com/shakesoft/meta-sharp", branch = "main", package = "aspect-core" }
+aspect-macros = { git = "https://github.com/shakesoft/meta-sharp", branch = "main", package = "aspect-macros" }
+aspect-std = { git = "https://github.com/shakesoft/meta-sharp", branch = "main", package = "aspect-std" }
 
 [dev-dependencies]
 env_logger = "0.10"

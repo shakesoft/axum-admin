@@ -14,7 +14,7 @@ use rbatis::RBatis;
 use rbatis::rbdc::DateTime;
 use rbs::value;
 use std::sync::Arc;
-use aspect_macros::{aspect, async_aspect};
+use aspect_macros::{aspect};
 use aspect_std::{LoggingAspect, TimingAspect};
 // use std::time::Duration;
 // use tokio::time::sleep;

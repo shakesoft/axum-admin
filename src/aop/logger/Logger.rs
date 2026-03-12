@@ -1,15 +1,16 @@
+use std::any::Any;
+use std::future::Future;
 use std::sync::Arc;
-use aspect_core::{
-    Aspect, JoinPoint,
-};
+use aspect_core::{Aspect, AspectError, AsyncAspect, AsyncJoinPoint, AsyncProceedingJoinPoint, JoinPoint, ProceedingJoinPoint};
 use log::info;
+use tokio::time::Instant;
 use crate::AppState;
 use crate::vo::system::sys_user_vo::QueryUserListReq;
 
 #[derive(Default)]
 pub struct Logger;
-impl Aspect for Logger {
-    fn before(&self, ctx: &JoinPoint) {
+impl AsyncAspect for Logger {
+    async fn before(&self, ctx: &AsyncJoinPoint) {
         // Safely try to get the first argument as Arc<AppState> and log presence instead of attempting to format non-Display types
         let arg0 = ctx.args.get(0).and_then(|b| b.downcast_ref::<Arc<AppState>>());
         if let Some(app_state) = arg0 {
@@ -26,29 +27,23 @@ impl Aspect for Logger {
         } else {
             info!("Logger.before: arg1 missing or not QueryUserListReq");
         }
-
         info!("{}: {},{},{},{}", ctx.function_name, ctx.module_path, ctx.location.file, ctx.location.line, ctx.args.iter().count());
     }
-}
 
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use aspect_core::joinpoint::{JoinPoint, Location};
-
-    #[test]
-    fn logger_before_inspection() {
-        let _ = env_logger::builder().is_test(true).try_init();
-
-        let jp = JoinPoint::new(
-            "add",
-            "crate::handler::system::sys_user_handler",
-            Location { file: "src/handler/system/sys_user_handler.rs", line: 1 },
-            vec![Box::new("1".to_string()), Box::new("2".to_string())],
-        );
-
-        let logger = Logger::default();
-        logger.before(&jp);
+    async fn after(&self, _ctx: &AsyncJoinPoint, _result: &(dyn Any + Send + Sync))  {
+        info!("Logger.after: function completed");
     }
+
+    // async fn around(&self, pjp: AsyncProceedingJoinPoint<'_>) -> Result<Box<dyn Any + Send + Sync>, AspectError>  {
+    //     let start = Instant::now();
+    //     let function_name = pjp.context().function_name;
+    //     let result = pjp.proceed().await;
+    //     let elapsed = start.elapsed();
+    //     println!("{} took {:?}", function_name, elapsed);
+    //     match &result {
+    //         Ok(val) => println!("{} executed successfully", function_name),
+    //         Err(e) => println!("{} execution failed: {:?}", function_name, e),
+    //     };
+    //     result
+    // }
 }
