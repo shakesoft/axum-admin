@@ -297,12 +297,12 @@ pub async fn query_sys_user_list(State(state): State<Arc<AppState>>, Json(item):
         .map(|x| ok_result_page(x.records.into_iter().map(|x| x.into()).collect::<Vec<UserResp>>(), x.total))?
 }
 
-// #[aspect(Timer)]
+#[aspect(Timer)]
 async fn add2(num1:i32,num2:i32)->i32{
     num1+num2
 }
 
-// #[aspect(Logger)]
+#[aspect(Logger)]
 async fn add(num1: i32, num2: i32) -> i32 {
     let res = add2(num1,num2).await;
     num1 + num2 +res
