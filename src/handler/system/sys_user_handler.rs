@@ -314,6 +314,7 @@ async fn add(num1: i32, num2: i32) -> i32 {
  *date：2024/12/12 14:41:44
  */
 #[function_name::named]
+#[aspect(Timer)]
 pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(item): Json<UserLoginReq>) -> impl IntoResponse {
     info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;

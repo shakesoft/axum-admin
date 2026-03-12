@@ -103,7 +103,7 @@ pub struct UserResp {
 /*
 登录请求参数
 */
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct UserLoginReq {
     pub mobile: String,   //手机
     pub password: String, //密码
