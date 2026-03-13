@@ -20,6 +20,7 @@ impl AsyncAspect for Logger {
         let arg1 = ctx.args.get(1).and_then(|b| b.downcast_ref::<QueryUserListReq>());
         if let Some(q) = arg1 {
             info!("Logger.before: page_no = {}", q.page_no);
+            info!("{function_name}:{q:?}",function_name = ctx.function_name);
         } else {
             info!("Logger.before: arg1 missing or not QueryUserListReq");
         }
@@ -30,17 +31,17 @@ impl AsyncAspect for Logger {
         info!("Logger.after: function completed");
     }
 
-    async fn around(&self, pjp: AsyncProceedingJoinPoint<'_>) -> Result<Box<dyn Any + Send + Sync>, AspectError> {
-        let start = Instant::now();
-        let function_name = pjp.context().function_name;
-        info!("Logger.around enter: {}", function_name);
-        let result = pjp.proceed().await;
-        let elapsed = start.elapsed();
-        info!("{} took {:?}", function_name, elapsed);
-        match &result {
-            Ok(_) => info!("{} executed successfully", function_name),
-            Err(e) => info!("{} execution failed: {:?}", function_name, e),
-        };
-        result
-    }
+    // async fn around(&self, pjp: AsyncProceedingJoinPoint<'_>) -> Result<Box<dyn Any + Send + Sync>, AspectError> {
+    //     let start = Instant::now();
+    //     let function_name = pjp.context().function_name;
+    //     info!("Logger.around enter: {}", function_name);
+    //     let result = pjp.proceed().await;
+    //     let elapsed = start.elapsed();
+    //     info!("{} took {:?}", function_name, elapsed);
+    //     match &result {
+    //         Ok(_) => info!("{} executed successfully", function_name),
+    //         Err(e) => info!("{} execution failed: {:?}", function_name, e),
+    //     };
+    //     result
+    // }
 }

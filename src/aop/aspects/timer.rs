@@ -19,3 +19,15 @@ impl AsyncAspect for Timer {
         result
     }
 }
+
+
+// impl Aspect for Timer {
+//     fn around(&self, pjp: ProceedingJoinPoint) -> Result<Box<dyn Any>, AspectError>  {
+//         let start = Instant::now();
+//         let function_name = pjp.context().function_name;
+//         let result = pjp.proceed();
+//         let elapsed = start.elapsed();
+//         info!("{} took {:?}", function_name, elapsed);
+//         result
+//     }
+// }

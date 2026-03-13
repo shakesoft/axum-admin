@@ -29,8 +29,11 @@ use redis::Commands;
 use std::collections::{HashMap, HashSet};
 use std::any::Any;
 use std::sync::Arc;
+use std::time::Duration;
 use aspect_macros::aspect;
 use aspect_std::TimingAspect;
+use aspect_std::LoggingAspect;
+use aspect_std::RateLimitAspect;
 use crate::aop::aspects::logger::Logger;
 use crate::aop::aspects::timer::Timer;
 use crate::utils::{jwt_util, time_util};
@@ -284,8 +287,10 @@ pub async fn query_sys_user_detail(State(state): State<Arc<AppState>>, Json(item
  */
 
 #[function_name::named]
-#[aspect(Logger)]
 #[aspect(Timer)]
+#[aspect(Logger)]
+#[aspect(LoggingAspect::new())]
+// #[aspect(RateLimitAspect::new(1, Duration::from_secs(60)))]
 pub async fn query_sys_user_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryUserListReq>) -> impl IntoResponse {
     info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
@@ -297,12 +302,14 @@ pub async fn query_sys_user_list(State(state): State<Arc<AppState>>, Json(item):
         .map(|x| ok_result_page(x.records.into_iter().map(|x| x.into()).collect::<Vec<UserResp>>(), x.total))?
 }
 
-#[aspect(Timer)]
+// #[aspect(Logger)]
+// #[aspect(Timer)]
 async fn add2(num1:i32,num2:i32)->i32{
     num1+num2
 }
 
-#[aspect(Logger)]
+// #[aspect(Logger)]
+// #[aspect(Logger)]
 async fn add(num1: i32, num2: i32) -> i32 {
     let res = add2(num1,num2).await;
     num1 + num2 +res
