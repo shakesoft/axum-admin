@@ -16,7 +16,7 @@ dev-backend:
 
 # Start web (Vite dev mode)
 dev-web:
-    cd .. && cd antd-admin && pnpm dev
+    cd ./ && cd antd-admin && pnpm dev
 
 # Build all (production)
 build:
@@ -29,7 +29,7 @@ build-backend:
 
 # Build web production bundle
 build-web:
-    cd .. && cd antd-admin && pnpm build
+    cd ./ && cd antd-admin && pnpm build
 
 # Clean build outputs
 clean:
