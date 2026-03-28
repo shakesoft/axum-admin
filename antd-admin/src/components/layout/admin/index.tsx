@@ -134,7 +134,7 @@ const Admin: React.FC = () => {
                         {routesElement}
                     </div>
                 </Content>
-                <Footer style={{textAlign: 'center'}}>推荐使用谷歌浏览器，可以获得更佳页面操作体验</Footer>
+                {/*<Footer style={{textAlign: 'center'}}>推荐使用谷歌浏览器，可以获得更佳页面操作体验</Footer>*/}
             </Layout>
         </Layout>
     );
