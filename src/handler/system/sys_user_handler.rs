@@ -36,6 +36,8 @@ use aspect_std::LoggingAspect;
 use aspect_std::RateLimitAspect;
 use crate::aop::aspects::logger::Logger;
 use crate::aop::aspects::timer::Timer;
+use crate::service::system::sys_login_log_service::SysLoginLogService;
+use crate::service::system::sys_user_service::SysUserService;
 use crate::utils::{jwt_util, time_util};
 /*
  *添加用户信息
@@ -335,84 +337,27 @@ pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(
 
     match user_result {
         None => {
-            add_login_log(rb, item.mobile, 0, "用户不存在", agent).await;
-            Err(AppError::BusinessError("用户不存在"))
+            SysLoginLogService::add_login_log(rb, item.mobile, 0, "用户名或密码不正确", agent).await;
+            Err(AppError::BusinessError("用户名或密码不正确"))
         }
         Some(mut user) => {
-            let user_id =user.id.unwrap();
-
             //验证用户密码
             if (&user.password.ne(&item.password)).to_owned() {
-                add_login_log(rb, item.mobile, 0, "密码不正确", agent).await;
+                SysLoginLogService::add_login_log(rb, item.mobile, 0, "密码不正确", agent).await;
                 return Err(AppError::BusinessError("密码不正确"));
             }
 
-            //判断用户菜单权限，获取用户权限列表
-            let (btn_menu, is_super) = SysUserDao::query_btn_menu(rb, &user_id).await;
-            if btn_menu.len() == 0 {
-                add_login_log(rb, item.mobile, 0, "用户没有分配角色或者菜单,不能登录", agent).await;
-                return Err(AppError::BusinessError("用户没有分配角色或者菜单,不能登录"));
-            }
+            // create token, cache session, update user，logging
+            let resp = SysUserService::on_successful_login(
+                rb,
+                &mut conn,
+                &mut user,
+                item.mobile,
+                agent,
+            ).await?;
 
-            //生成用户token
-            let jwt = JwtToken::new(user_id, &user.user_name);
-            let expires_at =jwt.get_exp();
-            let expires_time = time_util::timestamp_to_local(expires_at as i64);
-            //println!("token expires at: {}", expires_time.unwrap_or_default().format("%Y-%m-%d %H:%M:%S").to_string());
-            let token = jwt.create_token(jwt_util::JWT_SECRET)?;
-
-            //存储用户权限信息到redis
-            let key = format!("axum:admin:user:info:{:?}", &user_id);
-            conn.hset::<_, _, _, ()>(&key, "permissions", &btn_menu.join(","))?;// 存储用户权限信息
-            conn.hset::<_, _, _, ()>(&key, "user_name", &user.user_name)?;// 存储用户名
-            conn.hset::<_, _, _, ()>(&key, "is_admin", is_super)?;// 存储是否是超级管理员
-            conn.hset::<_, _, _, ()>(&key, "token", &token)?;// 存储token
-            conn.hset::<_, _, _, ()>(&key, "last_login", Local::now().format("%Y-%m-%d %H:%M:%S").to_string())?;// 存储登录时间
-            conn.hset::<_, _, _, ()>(&key, "expires_at", expires_time.unwrap_or_default().format("%Y-%m-%d %H:%M:%S").to_string())?;// 存储到期时间
-
-            //更新用户最后登录信息
-            add_login_log(rb, item.mobile, 1, "登录成功", agent.clone()).await;
-            user.login_os = agent.os;
-            user.login_browser = agent.browser;
-            user.login_date = Some(DateTime::now());
-            User::update_by_map(rb, &user, value! {"id": &user_id}).await?;
-
-            //返回用户token和过期时间
-            ok_result_data(UserLoginResp {
-                token,
-                expires_at,
-            })
+            ok_result_data(resp)
         }
-    }
-}
-
-/*
- *添加登录日志
- *author：刘飞华
- *date：2025/01/02 17:01:13
- */
-async fn add_login_log(rb: &RBatis, name: String, status: i8, msg: &str, agent: UserAgentUtil) {
-    let sys_login_log = LoginLog {
-        id: None,                             //访问ID
-        login_name: name,                     //登录账号
-        ipaddr: "todo".to_string(),           //登录IP地址
-        login_location: "todo".to_string(),   //登录地点
-        platform: agent.platform,             //平台信息
-        browser: agent.browser,               //浏览器类型
-        version: agent.version,               //浏览器版本
-        os: agent.os,                         //操作系统
-        arch: agent.arch,                     //体系结构信息
-        engine: agent.engine,                 //渲染引擎信息
-        engine_details: agent.engine_details, //渲染引擎详细信息
-        extra: agent.extra,                   //其他信息（可选）
-        status,                               //登录状态(0:失败,1:成功)
-        msg: msg.to_string(),                 //提示消息
-        login_time: None,                     //访问时间
-    };
-
-    match LoginLog::insert(rb, &sys_login_log).await {
-        Ok(_u) => info!("add_login_log success: {:?}", sys_login_log),
-        Err(err) => log::error!("add_login_log error params: {:?}, error message: {:?}", sys_login_log, err),
     }
 }
 

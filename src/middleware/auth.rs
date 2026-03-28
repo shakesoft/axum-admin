@@ -7,18 +7,26 @@ use axum::http::StatusCode;
 use axum::middleware::Next;
 use axum::response::IntoResponse;
 use axum::{http, response, Json};
-use redis::{Client, Commands};
+use redis::{Client};
 use std::sync::Arc;
+use log::info;
 use crate::utils::jwt_util;
+use crate::service::system::sys_user_service::SysUserService;
 
+#[function_name::named]
 pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Next) -> Result<response::Response, StatusCode> {
-    // log::info!("req {:?}", req.uri());
-    let path = req.uri().to_string();
-    if path.eq("/system/user/login") {
+    let path = req.uri().path();
+    info!("{function_name}:request_uri {uri:?}",function_name = function_name!(),uri = path);
+    let ignore_paths = vec![
+        "/system/user/login",
+        "/system/user/register",
+        "/system/user/logout",
+    ];
+    if ignore_paths.iter().any(|ignore_path| path.starts_with(ignore_path)) {
         return Ok(next.run(req).await);
     }
-    let auth_header = req.headers().get(http::header::AUTHORIZATION).and_then(|header| header.to_str().ok());
 
+    let auth_header = req.headers().get(http::header::AUTHORIZATION).and_then(|header| header.to_str().ok());
     if auth_header.is_none() {
         let json = Json(BaseResponse {
             msg: "用户未认证，请求头缺少字段[Authorization]".to_string(),
@@ -27,11 +35,11 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
         });
         return Ok((StatusCode::UNAUTHORIZED, json).into_response());
     }
-    let authorization = auth_header.unwrap();
 
+    let authorization = auth_header.unwrap();
     let token = authorization.to_string().replace("Bearer ", "");
-    let jwt_token_e = JwtToken::verify(jwt_util::JWT_SECRET, &token);
-    let jwt_token = match jwt_token_e {
+    let jwt_token_error = JwtToken::verify(jwt_util::JWT_SECRET, &token);
+    let jwt_token = match jwt_token_error {
         Ok(data) => data,
         Err(err) => {
             let er = match err {
@@ -47,6 +55,12 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
         }
     };
 
+    fn has_permission(permissions: &[String], path: &str) -> bool {
+        permissions.iter().any(|permission| {
+            permission.strip_prefix("/api").unwrap_or(permission) == path
+        })
+    }
+
     match validate_and_get_user_info(&state.redis, jwt_token.id).await {
         Ok((user_id, permissions, token_1, is_admin)) => {
             if token_1 != token {
@@ -57,13 +71,13 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
                 });
                 return Ok((StatusCode::UNAUTHORIZED, json).into_response());
             }
-            if is_admin || has_permission(&permissions, &path) {
+            if is_admin || has_permission(&permissions, path) {
                 req.headers_mut().insert("user_id", user_id.to_string().parse().unwrap());
                 req.extensions_mut().insert(permissions);
                 Ok(next.run(req).await)
             } else {
                 let json = Json(BaseResponse {
-                    msg: format!("用户还没有授权url:{}", path),
+                    msg: format!("用户未授权访问url:{}", path),
                     code: 401,
                     data: Some("None".to_string()),
                 });
@@ -81,31 +95,15 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
     }
 }
 
-async fn validate_and_get_user_info(redis_client: &Client, user_id: i64) -> Result<(i64, Vec<String>, String, bool), String> {
-    let mut conn = redis_client.get_connection().map_err(|_| "Redis连接失败".to_string())?;
+async fn validate_and_get_user_info(redis_client: &Client, user_id: i64) -> Result<(i64, Vec<String>, String, bool), AppError> {
+    let mut conn = redis_client.get_connection().map_err(AppError::RedisError)?;
 
-    let key = format!("axum:admin:user:info:{}", user_id);
-    let permissions_str: String = conn.hget(&key, "permissions").unwrap_or_else(|_| "".to_string());
-    let token: String = conn.hget(&key, "token").map_err(|_| "无效的token".to_string())?;
-    let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
+    // Fetch session fields from Redis via service method, which handles key existence and field retrieval
+    let (permissions_str, token, is_admin) = SysUserService::fetch_session_info(&mut conn, user_id).await?;
     let permissions: Vec<String> = if permissions_str.is_empty() {
         Vec::new()
     } else {
         permissions_str.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect()
     };
     Ok((user_id, permissions, token, is_admin))
-}
-
-fn has_permission(permissions: &[String], path: &str) -> bool {
-    permissions.iter().any(|permission| {
-        // 确保权限路径以 /api 开头
-        if permission.starts_with("/api") {
-            // 移除 /api 前缀进行比较
-            let permission_path = &permission[4..]; // 跳过 "/api" 的4个字符
-            permission_path == path
-        } else {
-            // 如果权限路径不以 /api 开头，直接比较
-            permission == path
-        }
-    })
 }
