@@ -74,7 +74,7 @@ impl JwtToken {
             Err(err) => match *err.kind() {
                 ErrorKind::InvalidToken => Err(JwtTokenError("InvalidToken".to_string())),
                 ErrorKind::InvalidIssuer => Err(JwtTokenError("InvalidIssuer".to_string())),
-                ErrorKind::ExpiredSignature => Err(JwtTokenError("Token Expired".to_string())),
+                ErrorKind::ExpiredSignature => Err(JwtTokenError("TokenExpired".to_string())),
                 _ => Err(JwtTokenError("InvalidToken Errors".to_string())),
             },
         }

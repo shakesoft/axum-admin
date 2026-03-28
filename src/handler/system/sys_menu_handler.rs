@@ -10,6 +10,7 @@ use axum::Json;
 use log::info;
 use rbs::value;
 use std::sync::Arc;
+use crate::dao::system::sys_menu_dao::SysMenuDao;
 /*
  *添加菜单信息
  *author：刘飞华
@@ -105,7 +106,7 @@ pub async fn update_sys_menu_status(State(state): State<Arc<AppState>>, Json(ite
     let rb = &state.batis;
 
     // use dao function to perform the DB update
-    crate::dao::system::sys_menu_dao::SysMenuDao::update_menu_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
+    SysMenuDao::update_menu_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
 }
 
 /*

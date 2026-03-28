@@ -55,12 +55,6 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
         }
     };
 
-    fn has_permission(permissions: &[String], path: &str) -> bool {
-        permissions.iter().any(|permission| {
-            permission.strip_prefix("/api").unwrap_or(permission) == path
-        })
-    }
-
     match validate_and_get_user_info(&state.redis, jwt_token.id).await {
         Ok((user_id, permissions, token_1, is_admin)) => {
             if token_1 != token {
@@ -71,9 +65,16 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
                 });
                 return Ok((StatusCode::UNAUTHORIZED, json).into_response());
             }
+
+            let has_permission = |permissions: &[String], path: &str| -> bool {
+                permissions.iter().any(|permission| {
+                    permission.strip_prefix("/api").unwrap_or(permission) == path
+                })
+            };
+
             if is_admin || has_permission(&permissions, path) {
-                req.headers_mut().insert("user_id", user_id.to_string().parse().unwrap());
-                req.extensions_mut().insert(permissions);
+                req.headers_mut().insert("user_id", user_id.to_string().parse().unwrap());//存储用户Id
+                req.extensions_mut().insert(permissions);//存储用户功能权限
                 Ok(next.run(req).await)
             } else {
                 let json = Json(BaseResponse {

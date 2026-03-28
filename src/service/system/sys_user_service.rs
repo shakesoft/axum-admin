@@ -7,8 +7,11 @@ use crate::vo::system::sys_user_vo::UserLoginResp;
 use rbatis::RBatis;
 use rbatis::rbdc::DateTime;
 use chrono::Local;
+use log::info;
+use rbs::value;
 use redis::Commands;
 use crate::dao::system::sys_user_dao::SysUserDao;
+use crate::model::system::sys_user_role_model::UserRole;
 use crate::utils::user_agent_util::UserAgentUtil;
 
 pub struct SysUserService;
@@ -30,12 +33,16 @@ impl SysUserService {
 	) -> Result<UserLoginResp, AppError> {
 		let user_id =user.id.unwrap();
 
-		//判断用户菜单权限，获取用户权限列表
+		//获取用户权限列表
 		let (btn_menu, is_super) = SysUserDao::query_btn_menu(rb, &user_id).await;
 		if btn_menu.len() == 0 {
 			SysLoginLogService::add_login_log(rb, mobile, 0, "用户没有分配角色或者菜单,不能登录", agent).await;
 			return Err(AppError::BusinessError("用户没有分配角色或者菜单,不能登录"));
 		}
+
+		//获取用户角色列表
+		let vec_user_role = UserRole::select_by_map(rb, value! {"user_id": user_id}).await?;
+		let vec_role_id = vec_user_role.into_iter().map(|x| x.role_id.to_string()).collect::<Vec<String>>();
 
 		// generate token
 		let jwt = JwtToken::new(user_id, &user.user_name);
@@ -46,6 +53,7 @@ impl SysUserService {
 		// persist session info to redis
 		let key = format!("axum:admin:user:info:{:?}", &user_id);
 		conn.hset::<_, _, _, ()>(&key, "permissions", &btn_menu.join(","))?; // permissions
+		conn.hset::<_, _, _, ()>(&key, "roles", &vec_role_id.join(","))?; // role ids
 		conn.hset::<_, _, _, ()>(&key, "user_name", &user.user_name)?; // user name
 		conn.hset::<_, _, _, ()>(&key, "is_admin", is_super)?; // is super
 		conn.hset::<_, _, _, ()>(&key, "token", &token)?; // token
@@ -78,9 +86,12 @@ impl SysUserService {
 			return Err(AppError::BusinessError("用户未登录"));
 		}
 
-		let permissions_str: String = conn.hget(&key, "permissions").unwrap_or_else(|_| "".to_string());
 		let token: String = conn.hget(&key, "token").map_err(AppError::RedisError)?;
 		let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
+		let permissions_str: String = conn.hget(&key, "permissions").unwrap_or_else(|_| "".to_string());
+		let roles_str: String = conn.hget(&key, "roles").unwrap_or_else(|_| "".to_string());
+		let expires_at: String = conn.hget(&key, "expires_at").unwrap_or_else(|_| "".to_string());
+		info!("Fetched session info for user_id {}: token={}, is_admin={}, permissions={}, roles={}, expires_at={}", user_id, token, is_admin, permissions_str,roles_str, expires_at);
 		Ok((permissions_str, token, is_admin))
 	}
 }
