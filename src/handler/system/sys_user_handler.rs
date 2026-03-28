@@ -341,22 +341,21 @@ pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(
             Err(AppError::BusinessError("用户名或密码不正确"))
         }
         Some(mut user) => {
-            //验证用户密码
             if (&user.password.ne(&item.password)).to_owned() {
-                SysLoginLogService::add_login_log(rb, item.mobile, 0, "密码不正确", agent).await;
-                return Err(AppError::BusinessError("密码不正确"));
+                SysLoginLogService::add_login_log(rb, item.mobile, 0, "用户名或密码不正确", agent).await;
+                Err(AppError::BusinessError("用户名或密码不正确"))
             }
-
-            // create token, cache session, update user，logging
-            let resp = SysUserService::user_login_successful(
-                rb,
-                &mut conn,
-                &mut user,
-                item.mobile,
-                agent,
-            ).await?;
-
-            ok_result_data(resp)
+            else {
+                // create token, cache session, update user，logging
+                let resp = SysUserService::user_login_successful(
+                    rb,
+                    &mut conn,
+                    &mut user,
+                    item.mobile,
+                    agent,
+                ).await?;
+                ok_result_data(resp)
+            }
         }
     }
 }
