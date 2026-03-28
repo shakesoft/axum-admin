@@ -20,9 +20,7 @@ const {Header, Content, Footer, Sider} = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-
 function getMyItem(label: React.ReactNode, key: React.Key, icon?: React.ReactNode, parentId?: number, id?: number): MyMenuItem {
-
     return {label, key, icon, parentId, id} as MyMenuItem;
 }
 
