@@ -21,7 +21,7 @@ impl SysUserService {
 	/// - store permission and session info into redis
 	/// - write a successful login log
 	/// - update the user's last login info in the database
-	pub async fn on_successful_login(
+	pub async fn user_login_successful(
 		rb: &RBatis,
 		conn: &mut redis::Connection,
 		user: &mut User,

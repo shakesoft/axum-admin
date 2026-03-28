@@ -348,7 +348,7 @@ pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(
             }
 
             // create token, cache session, update user，logging
-            let resp = SysUserService::on_successful_login(
+            let resp = SysUserService::user_login_successful(
                 rb,
                 &mut conn,
                 &mut user,
