@@ -6,7 +6,7 @@ use crate::AppState;
 use crate::dao::system::sys_dept_dao::SysDeptDao;
 use axum::extract::State;
 use axum::response::IntoResponse;
-use axum::Json;
+use axum::{Extension, Json};
 use axum_valid::Valid;
 use log::info;
 use rbatis::rbatis_codegen::ops::AsProxy;
@@ -20,6 +20,7 @@ use aspect_std::{LoggingAspect, TimingAspect};
 // use tokio::time::sleep;
 use validator::Validate;
 use crate::service::system::sys_dept_service::SysDeptService;
+use crate::vo::system::sys_user_vo::UserSession;
 /*
  *添加部门表
  *author：刘飞华
@@ -88,9 +89,11 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)):
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
 #[function_name::named]
-pub async fn delete_sys_dept(State(state): State<Arc<AppState>>, Json(item): Json<DeleteDeptReq>) -> impl IntoResponse {
+pub async fn delete_sys_dept(State(state): State<Arc<AppState>>,Extension(session): Extension<UserSession>, Json(item): Json<DeleteDeptReq>) -> impl IntoResponse {
     // info!("{function_name}:{item:?}",function_name = function_name!());
     info!("{}: {:?}", function_name!(), item);
+    let user_id = &session.user_id;
+    let permissons = &session.permissions;
     let rb = &state.batis;
 
     if select_dept_count(rb, &item.id).await? > 0 {

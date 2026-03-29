@@ -13,6 +13,7 @@ pub mod workflow;
 pub mod service;
 mod aop;
 
+use std::net::SocketAddr;
 use axum::{middleware as md, Json, Router};
 use crate::route::system::sys_dept_route::build_sys_dept_route;
 use crate::route::system::sys_dict_data_route::build_sys_dict_data_route;
@@ -225,9 +226,18 @@ async fn main() {
 
     // 全局异常捕获中间件
     let panic = CatchPanicLayer::custom(|panic_info: Box<dyn std::any::Any + Send>| {
-        // 这里可以上报日志、监控或做其他操作
-        error!("Custom panic hook: {panic_info:?}");
-        AppError::default().into_response()
+        error!("Custom panic hook: {panic_info:?}");// 这里可以上报日志、监控或做其他操作
+        AppError::default().into_response() // 保持原有的响应行为
+        // let any_ref: &(dyn std::any::Any + 'static) = &*panic_info;
+        // let panic_message = if let Some(s) = any_ref.downcast_ref::<&str>() {
+        //     s.to_string()
+        // } else if let Some(s) = any_ref.downcast_ref::<String>() {
+        //     s.clone()
+        // } else {
+        //     format!("{:?}", any_ref)
+        // };
+        // let backtrace = std::backtrace::Backtrace::capture();
+        // error!("panic occurred: {}\nBacktrace:\n{:?}", panic_message, backtrace);
     });
 
     // 首页路由
@@ -310,7 +320,7 @@ async fn main() {
     // 创建TCP监听器
     let listener = tokio::net::TcpListener::bind(config.server.addr).await.unwrap();
     // 使用监听器启动服务器
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await.unwrap();
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -6,6 +6,8 @@ use crate::vo::system::sys_dept_vo::DeptResp;
 use crate::vo::system::sys_role_vo::RoleResp;
 use rbatis::rbdc::DateTime;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use validator::Validate;
 /*
 删除用户信息请求参数
 */
@@ -103,9 +105,12 @@ pub struct UserResp {
 /*
 登录请求参数
 */
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone,Validate,ToSchema)]
 pub struct UserLoginReq {
+    #[validate(length(min = 2, max = 30, message = "手机号码不能为空"))]
     pub mobile: String,   //手机
+
+    #[validate(length(min = 2, max = 30, message = "用户密码不能为空且长度为2-30"))]
     pub password: String, //密码
 }
 
@@ -113,7 +118,17 @@ pub struct UserLoginReq {
 #[serde(rename_all = "camelCase")]
 pub struct UserLoginResp {
     pub token: String, //登录成功后返回token
-    pub expires_at: usize, //token过期时间
+    pub expires_at: usize, //token过期时间，时间戳
+}
+
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserSession {
+    pub user_id: i64,
+    pub permissions: Vec<String>,
+    pub roles: Vec<String>,
+    pub is_admin: bool,
 }
 
 /*

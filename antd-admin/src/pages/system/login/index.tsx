@@ -30,7 +30,7 @@ const Login: React.FC = () => {
         <div className='container'>
             <div className={'header'}>
                 <img src={logo} alt="logo"/>
-                <h1>React 项目: 后台管理系统</h1></div>
+                <h1>React项目: 企信管理系统</h1></div>
             <div className={'content'}>
                 <Form
                     name="normal_login"

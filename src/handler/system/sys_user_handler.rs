@@ -14,7 +14,8 @@ use crate::vo::system::sys_dept_vo::DeptResp;
 use crate::vo::system::sys_role_vo::RoleResp;
 use crate::vo::system::sys_user_vo::*;
 use crate::AppState;
-use axum::extract::State;
+use axum::extract::{State, ConnectInfo};
+use std::net::SocketAddr;
 use axum::http::HeaderMap;
 use axum::response::IntoResponse;
 use axum::Json;
@@ -34,6 +35,7 @@ use aspect_macros::aspect;
 use aspect_std::TimingAspect;
 use aspect_std::LoggingAspect;
 use aspect_std::RateLimitAspect;
+use axum_valid::Valid;
 use crate::aop::aspects::logger::Logger;
 use crate::aop::aspects::timer::Timer;
 use crate::service::system::sys_login_log_service::SysLoginLogService;
@@ -323,7 +325,12 @@ async fn add(num1: i32, num2: i32) -> i32 {
  */
 #[function_name::named]
 #[aspect(Timer)]
-pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(item): Json<UserLoginReq>) -> impl IntoResponse {
+pub async fn login(
+    headers: HeaderMap,
+    ConnectInfo(remote_addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<AppState>>,
+    Valid(Json(item)): Valid<Json<UserLoginReq>>,
+) -> impl IntoResponse {
     info!("{function_name}:{item:?}",function_name = function_name!());
     let rb = &state.batis;
     let mut conn = state.redis.get_connection()?;
@@ -346,6 +353,15 @@ pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(
                 Err(AppError::BusinessError("用户名或密码不正确"))
             }
             else {
+                // determine client IP: prefer X-Forwarded-For (first IP), then X-Real-IP, otherwise use the TCP peer address
+                let client_ip = if let Some(v) = headers.get("X-Forwarded-For") {
+                    v.to_str().ok().map(|s| s.split(',').next().unwrap_or("").trim().to_string()).unwrap_or_default()
+                } else if let Some(v) = headers.get("X-Real-IP") {
+                    v.to_str().ok().map(|s| s.to_string()).unwrap_or_default()
+                } else {
+                    remote_addr.ip().to_string()
+                };
+
                 // create token, cache session, update user，logging
                 let resp = SysUserService::user_login_successful(
                     rb,
@@ -353,6 +369,7 @@ pub async fn login(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(
                     &mut user,
                     item.mobile,
                     agent,
+                    client_ip,
                 ).await?;
                 ok_result_data(resp)
             }
