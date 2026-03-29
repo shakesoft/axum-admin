@@ -1,5 +1,4 @@
 import axios, {AxiosInstance, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
-
 import {showMessage} from "./status";
 import {message} from 'antd';
 import {storageUtils} from "../utils/storageUtils";
@@ -25,14 +24,6 @@ export const axiosInstance: AxiosInstance = axios.create({
 // axios实例拦截响应
 axiosInstance.interceptors.response.use(
     (response: AxiosResponse) => {
-        // if (response.headers.authorization) {
-        //     localStorage.setItem('app_token', response.headers.authorization);
-        // } else {
-        //     if (response.data && response.data.token) {
-        //         localStorage.setItem('app_token', response.data.token);
-        //     }
-        // }
-
         if (response.status === 200) {
             let {data} = response.data;
             if (Object.prototype.toString.call(data) === '[object Object]' && data.list) {
@@ -57,13 +48,10 @@ axiosInstance.interceptors.response.use(
             } else {
                 message.error(showMessage(response.status));
             }
-            // if (response.status === 401) {
-            //     storageUtils.logout()
-            //     window.location.href = "/app/login";
-            // }
             return Promise.reject(response.data);
         } else {
             message.error('网络连接异常,请稍后再试!');
+            return Promise.reject('网络连接异常,请稍后再试!');
         }
     }
 );
