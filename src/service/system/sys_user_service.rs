@@ -35,7 +35,7 @@ impl SysUserService {
 		let user_id =user.id.unwrap();
 
 		//获取用户权限列表
-		let (btn_menu, is_super) = SysUserDao::query_btn_menu(rb, &user_id).await;
+		let (btn_menu, is_admin) = SysUserDao::query_btn_menu(rb, &user_id).await;
 		if btn_menu.len() == 0 {
 			SysLoginLogService::add_login_log(rb, mobile, 0, "用户没有分配角色或者菜单,不能登录", agent).await;
 			return Err(AppError::BusinessError("用户没有分配角色或者菜单,不能登录"));
@@ -56,7 +56,7 @@ impl SysUserService {
 		conn.hset::<_, _, _, ()>(&key, "permissions", &btn_menu.join(","))?; // permissions
 		conn.hset::<_, _, _, ()>(&key, "roles", &vec_role_id.join(","))?; // role ids
 		conn.hset::<_, _, _, ()>(&key, "user_name", &user.user_name)?; // user name
-		conn.hset::<_, _, _, ()>(&key, "is_admin", is_super)?; // is super
+		conn.hset::<_, _, _, ()>(&key, "is_admin", is_admin)?; // is super
 		conn.hset::<_, _, _, ()>(&key, "token", &token)?; // token
 		conn.hset::<_, _, _, ()>(&key, "last_login", Local::now().format("%Y-%m-%d %H:%M:%S").to_string())?;
 		conn.hset::<_, _, _, ()>(&key, "expires_at", expires_time.unwrap_or_default().format("%Y-%m-%d %H:%M:%S").to_string())?;

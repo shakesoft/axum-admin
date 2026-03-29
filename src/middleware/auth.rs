@@ -8,7 +8,6 @@ use axum::middleware::Next;
 use axum::response::IntoResponse;
 use axum::{http, response, Json};
 use redis::{Client};
-use std::collections::HashSet;
 use std::sync::Arc;
 use log::info;
 use crate::utils::jwt_util;
@@ -77,7 +76,7 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
             if is_admin || has_permission(&permissions,path) {
                 req.headers_mut().insert("user_id", user_id.to_string().parse().unwrap());//存储用户Id
                 // req.extensions_mut().insert(permissions);//存储用户功能权限
-                req.extensions_mut().insert(UserSession {
+                req.extensions_mut().insert(UserSession {//存储用户会话
                     user_id,
                     permissions,
                     roles,

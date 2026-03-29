@@ -51,6 +51,7 @@ use crate::common::error::AppError;
 // use crate::middleware::swagger::swagger_auth;
 use axum::routing::get;
 use chrono::Utc;
+use reqwest::StatusCode;
 // use garde::rules::ip::IpKind::Any;
 use tower_http::cors::CorsLayer;
 use tower_http::timeout::TimeoutLayer;
@@ -202,7 +203,7 @@ async fn main() {
     let swagger_ui = SwaggerUi::new("/swagger-ui").url("/api-doc/openapi.json", ApiDoc::openapi());
 
     // 请求超时中间件
-    let timeout = TimeoutLayer::new(Duration::from_secs(3));
+    let timeout = TimeoutLayer::with_status_code(StatusCode::REQUEST_TIMEOUT,Duration::from_secs(6));
 
     // 请求追踪中间件
     let trace = TraceLayer::new_for_http()
@@ -228,16 +229,6 @@ async fn main() {
     let panic = CatchPanicLayer::custom(|panic_info: Box<dyn std::any::Any + Send>| {
         error!("Custom panic hook: {panic_info:?}");// 这里可以上报日志、监控或做其他操作
         AppError::default().into_response() // 保持原有的响应行为
-        // let any_ref: &(dyn std::any::Any + 'static) = &*panic_info;
-        // let panic_message = if let Some(s) = any_ref.downcast_ref::<&str>() {
-        //     s.to_string()
-        // } else if let Some(s) = any_ref.downcast_ref::<String>() {
-        //     s.clone()
-        // } else {
-        //     format!("{:?}", any_ref)
-        // };
-        // let backtrace = std::backtrace::Backtrace::capture();
-        // error!("panic occurred: {}\nBacktrace:\n{:?}", panic_message, backtrace);
     });
 
     // 首页路由
