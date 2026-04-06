@@ -9,7 +9,9 @@ export function handleError(error: unknown): void {
     return;
   }
   const data = (response as { data: unknown }).data as Record<string, unknown>;
-  if ( data.error && typeof data.error === "object" && "validationErrors" in data.error && Array.isArray((data.error as Record<string, unknown>).validationErrors) && (data.error as Record<string, unknown[]>).validationErrors.length > 0 ) {
+  if ( data.error && typeof data.error === "object" && "validationErrors" in data.error
+      && Array.isArray((data.error as Record<string, unknown>).validationErrors)
+      && (data.error as Record<string, unknown[]>).validationErrors.length > 0 ) { //服务端验证错误
     let validationErrorMessage = "";
     const validationErrors = (data.error as Record<string, unknown[]>)
       .validationErrors;
@@ -29,12 +31,12 @@ export function handleError(error: unknown): void {
     if (validationErrorMessage) {
       message.error(validationErrorMessage);
     }
-  } else if ( data.error && typeof data.error === "object" && "message" in data.error) {
+  } else if ( data.error && typeof data.error === "object" && "message" in data.error) { //服务端自定义错误消息
     const msg = (data.error as Record<string, unknown>).message;
     if (typeof msg === "string") {
       message.error(msg);
     }
-  } else if (!data.success) {
+  } else if (!data.success) { //服务端未成功响应但没有提供错误消息
     const errorObj = data.error as Record<string, unknown> | undefined;
     const details = errorObj?.details;
     if (typeof details === "string") {
