@@ -1,6 +1,6 @@
 import {message} from 'antd';
 
-export function handleAbpError(error: unknown): void {
+export function handleError(error: unknown): void {
   if (!error || typeof error !== "object" || !("response" in error)) {
     return;
   }

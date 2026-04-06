@@ -1,7 +1,7 @@
 import AppConsts from "./app-consts";
 import axios, { AxiosInstance } from "axios";
 import {message} from 'antd';
-import { handleAbpError } from "./error-handler";
+import { handleError } from "./error-handler";
 import {storageUtils} from "@/utils/storageUtils.ts";
 
 let _instance: AxiosInstance | null = null;
@@ -28,7 +28,7 @@ export function apiHttp(): AxiosInstance {
         return r;
       },
       (error) => {
-        handleAbpError(error);
+        handleError(error);
         return Promise.reject(error);
       },
     );
