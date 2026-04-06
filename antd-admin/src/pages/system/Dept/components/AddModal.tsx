@@ -44,7 +44,7 @@ const AddModal: React.FC<AddModalProps> = ({open, onCreate, onCancel}) => {
                 <FormItem
                     name="parentId"
                     label="上级部门"
-                    rules={[{required: true, message: '请输入上级部门!'}]}
+                    rules={[{required: false, message: '请输入上级部门!'}]}
                 >
                     <TreeSelect
                         style={{width: '100%'}}
@@ -59,42 +59,42 @@ const AddModal: React.FC<AddModalProps> = ({open, onCreate, onCancel}) => {
                 <FormItem
                     name="deptName"
                     label="部门名称"
-                    rules={[{required: true, message: '请输入部门名称!'}]}
+                    rules={[{required: false, message: '请输入部门名称!'}]}
                 >
                     <Input id="create-deptName" placeholder={'请输入部门名称!'}/>
                 </FormItem>
                 <FormItem
                     name="sort"
                     label="显示顺序"
-                    rules={[{required: true, message: '请输入显示顺序!'}]}
+                    rules={[{required: false, message: '请输入显示顺序!'}]}
                 >
                     <InputNumber style={{width: 255}}/>
                 </FormItem>
                 <FormItem
                     name="leader"
                     label="负责人"
-                    rules={[{required: true, message: '请输入负责人!'}]}
+                    rules={[{required: false, message: '请输入负责人!'}]}
                 >
                     <Input id="create-leader" placeholder={'请输入负责人!'}/>
                 </FormItem>
                 <FormItem
                     name="phone"
                     label="联系电话"
-                    rules={[{required: true, message: '请输入联系电话!'}]}
+                    rules={[{required: false, message: '请输入联系电话!'}]}
                 >
                     <Input id="create-phone" placeholder={'请输入联系电话!'}/>
                 </FormItem>
                 <FormItem
                     name="email"
                     label="邮箱"
-                    rules={[{required: true, message: '请输入邮箱!'}]}
+                    rules={[{required: false, message: '请输入邮箱!'}]}
                 >
                     <Input id="create-email" placeholder={'请输入邮箱!'}/>
                 </FormItem>
                 <FormItem
                     name="status"
                     label="部门状态"
-                    rules={[{required: true, message: '请输入部门状态!'}]}
+                    rules={[{required: false, message: '请输入部门状态!'}]}
                 >
                     <Radio.Group>
                         <Radio value={1}>正常</Radio>
