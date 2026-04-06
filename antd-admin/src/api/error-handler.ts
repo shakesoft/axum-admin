@@ -9,7 +9,9 @@ export function handleError(error: unknown): void {
     return;
   }
   const data = (response as { data: unknown }).data as Record<string, unknown>;
-  if ( data.error && typeof data.error === "object" && "validationErrors" in data.error
+  if ( data.error
+      && typeof data.error === "object"
+      && "validationErrors" in data.error
       && Array.isArray((data.error as Record<string, unknown>).validationErrors)
       && (data.error as Record<string, unknown[]>).validationErrors.length > 0 ) { //服务端验证错误
     let validationErrorMessage = "";
