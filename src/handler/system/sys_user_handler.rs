@@ -1,5 +1,5 @@
 use crate::common::error::AppError;
-use crate::common::result::{err_result_msg, ok_result, ok_result_data, ok_result_page};
+use crate::common::result::{ok_result, ok_result_data, ok_result_page};
 use crate::model::system::sys_dept_model::Dept;
 use crate::model::system::sys_login_log_model::LoginLog;
 use crate::model::system::sys_menu_model::Menu;

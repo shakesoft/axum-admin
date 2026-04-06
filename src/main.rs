@@ -269,7 +269,7 @@ async fn main() {
 
     let test_router1 = Router::new().route("/test1", get(async||-> Json<ResponseData> {
         Json(ResponseData {
-            code: "aa".to_owned(),
+            code: "1".to_owned(),
             message: "Tom".to_string(),
         })
     }));
