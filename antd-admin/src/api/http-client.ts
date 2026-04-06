@@ -4,6 +4,13 @@ import {message} from 'antd';
 import { handleError } from "./error-handler";
 import {storageUtils} from "@/utils/storageUtils.ts";
 
+export interface IResponse {
+  code: number | string;
+  data: any;
+  msg: string;
+  total: number
+}
+
 let _instance: AxiosInstance | null = null;
 
 export function apiHttp(): AxiosInstance {

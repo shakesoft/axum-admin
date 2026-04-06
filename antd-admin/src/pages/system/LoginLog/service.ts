@@ -1,6 +1,6 @@
-import {axiosInstance, IResponse} from "@/api/ajax.ts";
 import {LoginLogListParam} from "./data";
 import {message} from "antd";
+import {apiHttp, IResponse} from "@/api/http-client.ts";
 
 
 /**
@@ -9,7 +9,7 @@ import {message} from "antd";
  * @return {Promise}
  */
 export const removeLoginLog = (ids: number[]): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/loginLog/deleteLoginLog', {ids}).then(res => res.data);
+    return apiHttp().post('/api/system/loginLog/deleteLoginLog', {ids}).then(res => res.data);
 };
 
 /**
@@ -18,7 +18,7 @@ export const removeLoginLog = (ids: number[]): Promise<IResponse> => {
  * @return {Promise}
  */
 export const cleanLoginLog = (): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/loginLog/cleanLoginLog', {}).then(res => res.data);
+    return apiHttp().post('/api/system/loginLog/cleanLoginLog', {}).then(res => res.data);
 };
 
 /**
@@ -28,7 +28,7 @@ export const cleanLoginLog = (): Promise<IResponse> => {
  * @return {Promise}
  */
 export const queryLoginLogDetail = (params: { id: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/loginLog/queryLoginLogDetail', params).then(res => res.data);
+    return apiHttp().post('/api/system/loginLog/queryLoginLogDetail', params).then(res => res.data);
 };
 
 
@@ -38,7 +38,7 @@ export const queryLoginLogDetail = (params: { id: number }): Promise<IResponse> 
  * @return {Promise}
  */
 export const queryLoginLogList = (params: LoginLogListParam): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/loginLog/queryLoginLogList', params).then(res => res.data);
+    return apiHttp().post('/api/system/loginLog/queryLoginLogList', params).then(res => res.data);
 };
 
 

@@ -1,5 +1,5 @@
-import {axiosInstance, IResponse} from "@/api/ajax.ts";
 import {ILogin} from "./data";
+import {apiHttp, IResponse} from "@/api/http-client.ts";
 
 /**
  * @description: 用户登录
@@ -7,5 +7,5 @@ import {ILogin} from "./data";
  * @return {Promise}
  */
 export const reqLogin = (params: ILogin): Promise<IResponse> => {
-    return axiosInstance.post('api/system/user/login', params).then(res => res.data);
+    return apiHttp().post('api/system/user/login', params).then(res => res.data);
 };

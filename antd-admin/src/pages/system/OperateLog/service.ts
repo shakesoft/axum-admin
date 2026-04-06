@@ -1,6 +1,6 @@
-import {axiosInstance, IResponse} from "@/api/ajax.ts";
 import {OperateLogListParam} from "./data";
 import {message} from "antd";
+import apiHttp, {IResponse} from "@/api/http-client.ts";
 
 
 /**
@@ -9,7 +9,7 @@ import {message} from "antd";
  * @return {Promise}
  */
 export const removeOperateLog = (ids: number[]): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/operateLog/deleteOperateLog', {ids}).then(res => res.data);
+    return apiHttp().post('/api/system/operateLog/deleteOperateLog', {ids}).then(res => res.data);
 };
 
 /**
@@ -18,7 +18,7 @@ export const removeOperateLog = (ids: number[]): Promise<IResponse> => {
  * @return {Promise}
  */
 export const cleanOperateLog = (): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/operateLog/cleanOperateLog', {}).then(res => res.data);
+    return apiHttp().post('/api/system/operateLog/cleanOperateLog', {}).then(res => res.data);
 };
 
 
@@ -28,7 +28,7 @@ export const cleanOperateLog = (): Promise<IResponse> => {
  * @return {Promise}
  */
 export const queryOperateLogDetail = (params: { id: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/operateLog/queryOperateLogDetail', params).then(res => res.data);
+    return apiHttp().post('/api/system/operateLog/queryOperateLogDetail', params).then(res => res.data);
 };
 
 
@@ -38,7 +38,7 @@ export const queryOperateLogDetail = (params: { id: number }): Promise<IResponse
  * @return {Promise}
  */
 export const queryOperateLogList = (params: OperateLogListParam): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/operateLog/queryOperateLogList', params).then(res => res.data);
+    return apiHttp().post('/api/system/operateLog/queryOperateLogList', params).then(res => res.data);
 };
 
 

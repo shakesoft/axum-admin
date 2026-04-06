@@ -1,6 +1,6 @@
-import {axiosInstance, IResponse} from "@/api/ajax.ts";
 import {DictTypeListParam, DictTypeVo} from "./data";
 import {message} from "antd";
+import {apiHttp, IResponse} from "@/api/http-client.ts";
 
 /**
  * @description: 添加字典类型表
@@ -8,7 +8,7 @@ import {message} from "antd";
  * @return {Promise}
  */
 export const addDictType = (params: DictTypeVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dictType/addDictType', params).then(res => res.data);
+    return apiHttp().post('/api/system/dictType/addDictType', params).then(res => res.data);
 };
 
 /**
@@ -17,7 +17,7 @@ export const addDictType = (params: DictTypeVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const removeDictType = (ids: number[]): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dictType/deleteDictType', {ids}).then(res => res.data);
+    return apiHttp().post('/api/system/dictType/deleteDictType', {ids}).then(res => res.data);
 };
 
 
@@ -27,7 +27,7 @@ export const removeDictType = (ids: number[]): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateDictType = (params: DictTypeVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dictType/updateDictType', params).then(res => res.data);
+    return apiHttp().post('/api/system/dictType/updateDictType', params).then(res => res.data);
 };
 
 /**
@@ -37,7 +37,7 @@ export const updateDictType = (params: DictTypeVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateDictTypeStatus = (params: { ids: number[], dictTypeStatus: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dictType/updateDictTypeStatus', params).then(res => res.data);
+    return apiHttp().post('/api/system/dictType/updateDictTypeStatus', params).then(res => res.data);
 };
 
 /**
@@ -46,7 +46,7 @@ export const updateDictTypeStatus = (params: { ids: number[], dictTypeStatus: nu
  * @return {Promise}
  */
 export const queryDictTypeDetail = (params: { id: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dictType/queryDictTypeDetail', params).then(res => res.data);
+    return apiHttp().post('/api/system/dictType/queryDictTypeDetail', params).then(res => res.data);
 };
 
 
@@ -56,7 +56,7 @@ export const queryDictTypeDetail = (params: { id: number }): Promise<IResponse> 
  * @return {Promise}
  */
 export const queryDictTypeList = (params: DictTypeListParam): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dictType/queryDictTypeList', params).then(res => res.data);
+    return apiHttp().post('/api/system/dictType/queryDictTypeList', params).then(res => res.data);
 };
 
 

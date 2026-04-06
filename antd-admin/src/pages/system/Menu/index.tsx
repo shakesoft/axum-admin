@@ -8,8 +8,8 @@ import AddMenuModal from "./components/AddModal.tsx";
 import UpdateMenuModal from "./components/UpdateModal.tsx";
 import {addMenu, handleResp, queryMenuList, removeMenu, updateMenu} from "./service";
 import {tree} from "@/utils/treeUtils.ts";
-import {IResponse} from "@/api/ajax.ts";
 import DetailModal from "./components/DetailModal.tsx";
+import {IResponse} from "@/api/http-client.ts";
 
 const SysMenu: React.FC = () => {
     const [isShowAddModal, setShowAddModal] = useState<boolean>(false);

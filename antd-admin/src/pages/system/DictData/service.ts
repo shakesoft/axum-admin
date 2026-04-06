@@ -1,6 +1,6 @@
-import {axiosInstance, IResponse} from "@/api/ajax.ts";
 import {DictDataListParam, DictDataVo} from "./data";
 import {message} from "antd";
+import {apiHttp, IResponse} from "@/api/http-client.ts";
 
 /**
  * @description: 添加字典数据表
@@ -8,7 +8,7 @@ import {message} from "antd";
  * @return {Promise}
  */
 export const addDictData = (params: DictDataVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dictData/addDictData', params).then(res => res.data);
+    return apiHttp().post('/api/system/dictData/addDictData', params).then(res => res.data);
 };
 
 /**
@@ -17,7 +17,7 @@ export const addDictData = (params: DictDataVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const removeDictData = (ids: number[]): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dictData/deleteDictData', {ids}).then(res => res.data);
+    return apiHttp().post('/api/system/dictData/deleteDictData', {ids}).then(res => res.data);
 };
 
 
@@ -27,7 +27,7 @@ export const removeDictData = (ids: number[]): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateDictData = (params: DictDataVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dictData/updateDictData', params).then(res => res.data);
+    return apiHttp().post('/api/system/dictData/updateDictData', params).then(res => res.data);
 };
 
 /**
@@ -37,7 +37,7 @@ export const updateDictData = (params: DictDataVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateDictDataStatus = (params: { ids: number[], dictDataStatus: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dictData/updateDictDataStatus', params).then(res => res.data);
+    return apiHttp().post('/api/system/dictData/updateDictDataStatus', params).then(res => res.data);
 };
 
 /**
@@ -46,7 +46,7 @@ export const updateDictDataStatus = (params: { ids: number[], dictDataStatus: nu
  * @return {Promise}
  */
 export const queryDictDataDetail = (params: { id: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dictData/queryDictDataDetail', params).then(res => res.data);
+    return apiHttp().post('/api/system/dictData/queryDictDataDetail', params).then(res => res.data);
 };
 
 
@@ -56,7 +56,7 @@ export const queryDictDataDetail = (params: { id: number }): Promise<IResponse> 
  * @return {Promise}
  */
 export const queryDictDataList = (params: DictDataListParam): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dictData/queryDictDataList', params).then(res => res.data);
+    return apiHttp().post('/api/system/dictData/queryDictDataList', params).then(res => res.data);
 };
 
 

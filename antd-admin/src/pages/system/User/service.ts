@@ -1,6 +1,6 @@
-import {axiosInstance, IResponse} from "@/api/ajax.ts";
 import {UserListParam, UserRoleListParam, UserVo} from "./data";
 import {message} from "antd";
+import apiHttp, {IResponse} from "@/api/http-client.ts";
 
 /**
  * @description: 添加用户信息
@@ -8,7 +8,7 @@ import {message} from "antd";
  * @return {Promise}
  */
 export const addUser = (params: UserVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/user/addUser', params).then(res => res.data);
+    return apiHttp().post('/api/system/user/addUser', params).then(res => res.data);
 };
 
 /**
@@ -17,7 +17,7 @@ export const addUser = (params: UserVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const removeUser = (params: { ids: number[] }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/user/deleteUser', params).then(res => res.data);
+    return apiHttp().post('/api/system/user/deleteUser', params).then(res => res.data);
 };
 
 
@@ -27,7 +27,7 @@ export const removeUser = (params: { ids: number[] }): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateUser = (params: UserVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/user/updateUser', params).then(res => res.data);
+    return apiHttp().post('/api/system/user/updateUser', params).then(res => res.data);
 };
 
 /**
@@ -37,7 +37,7 @@ export const updateUser = (params: UserVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateUserStatus = (params: { ids: number[], status: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/user/updateUserStatus', params).then(res => res.data);
+    return apiHttp().post('/api/system/user/updateUserStatus', params).then(res => res.data);
 };
 
 /**
@@ -46,7 +46,7 @@ export const updateUserStatus = (params: { ids: number[], status: number }): Pro
  * @return {Promise}
  */
 export const queryUserDetail = (params: { id: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/user/queryUserDetail', params).then(res => res.data);
+    return apiHttp().post('/api/system/user/queryUserDetail', params).then(res => res.data);
 };
 
 
@@ -56,7 +56,7 @@ export const queryUserDetail = (params: { id: number }): Promise<IResponse> => {
  * @return {Promise}
  */
 export const queryUserList = (params: UserListParam): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/user/queryUserList', params).then(res => res.data);
+    return apiHttp().post('/api/system/user/queryUserList', params).then(res => res.data);
 };
 
 /**
@@ -65,7 +65,7 @@ export const queryUserList = (params: UserListParam): Promise<IResponse> => {
  * @return {Promise}
  */
 export const query_user_role = (param: UserRoleListParam): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/user/queryUserRole', param).then(res => res.data);
+    return apiHttp().post('/api/system/user/queryUserRole', param).then(res => res.data);
 };
 
 /**
@@ -74,7 +74,7 @@ export const query_user_role = (param: UserRoleListParam): Promise<IResponse> =>
  * @return {Promise}
  */
 export const update_user_role = (userId: Number, roleIds: Number[]): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/user/updateUserRole', {
+    return apiHttp().post('/api/system/user/updateUserRole', {
         userId: userId,
         roleIds: roleIds
     }).then(res => res.data);

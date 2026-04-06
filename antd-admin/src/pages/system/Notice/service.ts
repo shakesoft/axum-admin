@@ -1,6 +1,6 @@
-import {axiosInstance, IResponse} from "@/api/ajax.ts";
 import {NoticeListParam, NoticeVo} from "./data";
 import {message} from "antd";
+import {apiHttp, IResponse} from "@/api/http-client.ts";
 
 /**
  * @description: 添加通知公告表
@@ -8,7 +8,7 @@ import {message} from "antd";
  * @return {Promise}
  */
 export const addNotice = (params: NoticeVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/notice/addNotice', params).then(res => res.data);
+    return apiHttp().post('/api/system/notice/addNotice', params).then(res => res.data);
 };
 
 /**
@@ -17,7 +17,7 @@ export const addNotice = (params: NoticeVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const removeNotice = (ids: number[]): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/notice/deleteNotice', {ids}).then(res => res.data);
+    return apiHttp().post('/api/system/notice/deleteNotice', {ids}).then(res => res.data);
 };
 
 
@@ -27,7 +27,7 @@ export const removeNotice = (ids: number[]): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateNotice = (params: NoticeVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/notice/updateNotice', params).then(res => res.data);
+    return apiHttp().post('/api/system/notice/updateNotice', params).then(res => res.data);
 };
 
 /**
@@ -36,7 +36,7 @@ export const updateNotice = (params: NoticeVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const queryNoticeDetail = (params: { id: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/notice/queryNoticeDetail', params).then(res => res.data);
+    return apiHttp().post('/api/system/notice/queryNoticeDetail', params).then(res => res.data);
 };
 
 
@@ -46,7 +46,7 @@ export const queryNoticeDetail = (params: { id: number }): Promise<IResponse> =>
  * @return {Promise}
  */
 export const queryNoticeList = (params: NoticeListParam): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/notice/queryNoticeList', params).then(res => res.data);
+    return apiHttp().post('/api/system/notice/queryNoticeList', params).then(res => res.data);
 };
 
 

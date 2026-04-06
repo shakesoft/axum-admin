@@ -1,4 +1,4 @@
-import {axiosInstance, IResponse} from "@/api/ajax.ts";
+import {apiHttp, IResponse} from "@/api/http-client";
 import {PostListParam, PostVo} from "./data";
 import {message} from "antd";
 
@@ -8,7 +8,7 @@ import {message} from "antd";
  * @return {Promise}
  */
 export const addPost = (params: PostVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/post/addPost', params).then(res => res.data);
+    return apiHttp().post('/api/system/post/addPost', params).then(res => res.data);
 };
 
 /**
@@ -17,7 +17,7 @@ export const addPost = (params: PostVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const removePost = (ids: number[]): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/post/deletePost', {ids}).then(res => res.data);
+    return apiHttp().post('/api/system/post/deletePost', {ids}).then(res => res.data);
 };
 
 
@@ -27,7 +27,7 @@ export const removePost = (ids: number[]): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updatePost = (params: PostVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/post/updatePost', params).then(res => res.data);
+    return apiHttp().post('/api/system/post/updatePost', params).then(res => res.data);
 };
 
 /**
@@ -37,7 +37,7 @@ export const updatePost = (params: PostVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updatePostStatus = (params: { ids: number[], postStatus: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/post/updatePostStatus', params).then(res => res.data);
+    return apiHttp().post('/api/system/post/updatePostStatus', params).then(res => res.data);
 };
 
 /**
@@ -46,7 +46,7 @@ export const updatePostStatus = (params: { ids: number[], postStatus: number }):
  * @return {Promise}
  */
 export const queryPostDetail = (params: { id: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/post/queryPostDetail', params).then(res => res.data);
+    return apiHttp().post('/api/system/post/queryPostDetail', params).then(res => res.data);
 };
 
 
@@ -56,7 +56,7 @@ export const queryPostDetail = (params: { id: number }): Promise<IResponse> => {
  * @return {Promise}
  */
 export const queryPostList = (params: PostListParam): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/post/queryPostList', params).then(res => res.data);
+    return apiHttp().post('/api/system/post/queryPostList', params).then(res => res.data);
 };
 
 

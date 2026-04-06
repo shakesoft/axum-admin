@@ -1,7 +1,7 @@
-import {axiosInstance, IResponse} from "@/api/ajax.ts";
 import {DeptListParam, DeptVo} from "./data";
 import {message} from "antd";
 import {tree} from "@/utils/treeUtils.ts";
+import apiHttp, {IResponse} from "@/api/http-client.ts";
 
 /**
  * @description: 添加部门表
@@ -9,7 +9,7 @@ import {tree} from "@/utils/treeUtils.ts";
  * @return {Promise}
  */
 export const addDept = (params: DeptVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dept/addDept', params).then(res => res.data);
+    return apiHttp().post('/api/system/dept/addDept', params).then(res => res.data);
 };
 
 /**
@@ -18,7 +18,7 @@ export const addDept = (params: DeptVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const removeDept = (id: number): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dept/deleteDept', {id}).then(res => res.data);
+    return apiHttp().post('/api/system/dept/deleteDept', {id}).then(res => res.data);
 };
 
 
@@ -28,7 +28,7 @@ export const removeDept = (id: number): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateDept = (params: DeptVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dept/updateDept', params).then(res => res.data);
+    return apiHttp().post('/api/system/dept/updateDept', params).then(res => res.data);
 };
 
 /**
@@ -38,7 +38,7 @@ export const updateDept = (params: DeptVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateDeptStatus = (params: { ids: number[], deptStatus: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dept/updateDeptStatus', params).then(res => res.data);
+    return apiHttp().post('/api/system/dept/updateDeptStatus', params).then(res => res.data);
 };
 
 /**
@@ -47,7 +47,7 @@ export const updateDeptStatus = (params: { ids: number[], deptStatus: number }):
  * @return {Promise}
  */
 export const queryDeptDetail = (params: { id: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/dept/queryDeptDetail', params).then(res => res.data);
+    return apiHttp().post('/api/system/dept/queryDeptDetail', params).then(res => res.data);
 };
 
 
@@ -57,7 +57,7 @@ export const queryDeptDetail = (params: { id: number }): Promise<IResponse> => {
  * @return {Promise}
  */
 export const queryDeptList = async (params: DeptListParam): Promise<DeptVo[]> => {
-    const res = await axiosInstance.post('/api/system/dept/queryDeptList', params);
+    const res = await apiHttp().post('/api/system/dept/queryDeptList', params);
     let {code, msg, data} = res.data
     if (code === 0) {
         return tree(data, 0, "parentId")

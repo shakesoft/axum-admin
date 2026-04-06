@@ -1,6 +1,6 @@
-import {axiosInstance, IResponse} from "@/api/ajax.ts";
 import {MenuListParam, MenuVo} from "./data";
 import {message} from "antd";
+import apiHttp, {IResponse} from "@/api/http-client.ts";
 
 /**
  * @description: 添加菜单信息
@@ -8,7 +8,7 @@ import {message} from "antd";
  * @return {Promise}
  */
 export const addMenu = (params: MenuVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/menu/addMenu', params).then(res => res.data);
+    return apiHttp().post('/api/system/menu/addMenu', params).then(res => res.data);
 };
 
 /**
@@ -17,7 +17,7 @@ export const addMenu = (params: MenuVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const removeMenu = (id: number): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/menu/deleteMenu', {id}).then(res => res.data);
+    return apiHttp().post('/api/system/menu/deleteMenu', {id}).then(res => res.data);
 };
 
 
@@ -27,7 +27,7 @@ export const removeMenu = (id: number): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateMenu = (params: MenuVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/menu/updateMenu', params).then(res => res.data);
+    return apiHttp().post('/api/system/menu/updateMenu', params).then(res => res.data);
 };
 
 /**
@@ -37,7 +37,7 @@ export const updateMenu = (params: MenuVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateMenuStatus = (params: { ids: number[], menuStatus: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/menu/updateMenuStatus', params).then(res => res.data);
+    return apiHttp().post('/api/system/menu/updateMenuStatus', params).then(res => res.data);
 };
 
 /**
@@ -46,7 +46,7 @@ export const updateMenuStatus = (params: { ids: number[], menuStatus: number }):
  * @return {Promise}
  */
 export const queryMenuDetail = (params: { id: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/menu/queryMenuDetail', params).then(res => res.data);
+    return apiHttp().post('/api/system/menu/queryMenuDetail', params).then(res => res.data);
 };
 
 
@@ -56,7 +56,7 @@ export const queryMenuDetail = (params: { id: number }): Promise<IResponse> => {
  * @return {Promise}
  */
 export const queryMenuList = (params: MenuListParam): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/menu/queryMenuList', {params}).then(res => res.data);
+    return apiHttp().post('/api/system/menu/queryMenuList', {params}).then(res => res.data);
 };
 
 /**
@@ -65,7 +65,7 @@ export const queryMenuList = (params: MenuListParam): Promise<IResponse> => {
  * @return {Promise}
  */
 export const queryMenuListSimple = (): Promise<IResponse> => {
-    return axiosInstance.get('/api/system/menu/queryMenuListSimple').then(res => res.data);
+    return apiHttp().get('/api/system/menu/queryMenuListSimple').then(res => res.data);
 };
 
 /**

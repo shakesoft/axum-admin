@@ -1,6 +1,6 @@
-import {axiosInstance, IResponse} from "@/api/ajax.ts";
 import {QueryUserListParam, RoleListParam, RoleVo} from "./data";
 import {message} from "antd";
+import apiHttp, {IResponse} from "@/api/http-client.ts";
 
 /**
  * @description: 添加角色信息
@@ -8,7 +8,7 @@ import {message} from "antd";
  * @return {Promise}
  */
 export const addRole = (params: RoleVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/addRole', params).then(res => res.data);
+    return apiHttp().post('/api/system/role/addRole', params).then(res => res.data);
 };
 
 /**
@@ -17,7 +17,7 @@ export const addRole = (params: RoleVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const removeRole = (params: { ids: number[] }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/deleteRole', params).then(res => res.data);
+    return apiHttp().post('/api/system/role/deleteRole', params).then(res => res.data);
 };
 
 
@@ -27,7 +27,7 @@ export const removeRole = (params: { ids: number[] }): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateRole = (params: RoleVo): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/updateRole', params).then(res => res.data);
+    return apiHttp().post('/api/system/role/updateRole', params).then(res => res.data);
 };
 
 /**
@@ -37,7 +37,7 @@ export const updateRole = (params: RoleVo): Promise<IResponse> => {
  * @return {Promise}
  */
 export const updateRoleStatus = (params: { ids: number[], status: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/updateRoleStatus', params).then(res => res.data);
+    return apiHttp().post('/api/system/role/updateRoleStatus', params).then(res => res.data);
 };
 
 /**
@@ -46,7 +46,7 @@ export const updateRoleStatus = (params: { ids: number[], status: number }): Pro
  * @return {Promise}
  */
 export const queryRoleDetail = (params: { id: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/queryRoleDetail', params).then(res => res.data);
+    return apiHttp().post('/api/system/role/queryRoleDetail', params).then(res => res.data);
 };
 
 
@@ -56,7 +56,7 @@ export const queryRoleDetail = (params: { id: number }): Promise<IResponse> => {
  * @return {Promise}
  */
 export const queryRoleList = (params: RoleListParam): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/queryRoleList', params).then(res => res.data);
+    return apiHttp().post('/api/system/role/queryRoleList', params).then(res => res.data);
 };
 
 /**
@@ -65,7 +65,7 @@ export const queryRoleList = (params: RoleListParam): Promise<IResponse> => {
  * @return {Promise}
  */
 export const query_role_menu = (roleId: Number): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/queryRoleMenu', {roleId: roleId}).then(res => res.data);
+    return apiHttp().post('/api/system/role/queryRoleMenu', {roleId: roleId}).then(res => res.data);
 };
 
 /**
@@ -74,7 +74,7 @@ export const query_role_menu = (roleId: Number): Promise<IResponse> => {
  * @return {Promise}
  */
 export const update_role_menu = (roleId: Number, menuIds: Number[]): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/updateRoleMenu', {
+    return apiHttp().post('/api/system/role/updateRoleMenu', {
         roleId: roleId,
         menuIds: menuIds
     }).then(res => res.data);
@@ -86,7 +86,7 @@ export const update_role_menu = (roleId: Number, menuIds: Number[]): Promise<IRe
  * @return {Promise}
  */
 export const query_allocated_list = (param: QueryUserListParam): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/queryAllocatedList', param).then(res => res.data);
+    return apiHttp().post('/api/system/role/queryAllocatedList', param).then(res => res.data);
 };
 
 /**
@@ -95,7 +95,7 @@ export const query_allocated_list = (param: QueryUserListParam): Promise<IRespon
  * @return {Promise}
  */
 export const query_unallocated_list = (param: QueryUserListParam): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/queryUnallocatedList', param).then(res => res.data);
+    return apiHttp().post('/api/system/role/queryUnallocatedList', param).then(res => res.data);
 };
 
 /**
@@ -104,7 +104,7 @@ export const query_unallocated_list = (param: QueryUserListParam): Promise<IResp
  * @return {Promise}
  */
 export const cancel_auth_user = (param: { userId: number, roleId: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/cancelAuthUser', param).then(res => res.data);
+    return apiHttp().post('/api/system/role/cancelAuthUser', param).then(res => res.data);
 };
 
 /**
@@ -113,7 +113,7 @@ export const cancel_auth_user = (param: { userId: number, roleId: number }): Pro
  * @return {Promise}
  */
 export const batch_cancel_auth_user = (param: { userIds: number[], roleId: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/batchCancelAuthUser', param).then(res => res.data);
+    return apiHttp().post('/api/system/role/batchCancelAuthUser', param).then(res => res.data);
 };
 
 /**
@@ -122,7 +122,7 @@ export const batch_cancel_auth_user = (param: { userIds: number[], roleId: numbe
  * @return {Promise}
  */
 export const batch_auth_user = (param: { userIds: number[], roleId: number }): Promise<IResponse> => {
-    return axiosInstance.post('/api/system/role/batchAuthUser', param).then(res => res.data);
+    return apiHttp().post('/api/system/role/batchAuthUser', param).then(res => res.data);
 };
 
 /**
