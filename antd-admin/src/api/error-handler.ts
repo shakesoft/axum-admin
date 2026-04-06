@@ -4,20 +4,12 @@ export function handleError(error: unknown): void {
   if (!error || typeof error !== "object" || !("response" in error)) {
     return;
   }
-
   const response = (error as { response?: unknown }).response;
   if (!response || typeof response !== "object" || !("data" in response)) {
     return;
   }
   const data = (response as { data: unknown }).data as Record<string, unknown>;
-
-  if (
-    data.error &&
-    typeof data.error === "object" &&
-    "validationErrors" in data.error &&
-    Array.isArray((data.error as Record<string, unknown>).validationErrors) &&
-    (data.error as Record<string, unknown[]>).validationErrors.length > 0
-  ) {
+  if ( data.error && typeof data.error === "object" && "validationErrors" in data.error && Array.isArray((data.error as Record<string, unknown>).validationErrors) && (data.error as Record<string, unknown[]>).validationErrors.length > 0 ) {
     let validationErrorMessage = "";
     const validationErrors = (data.error as Record<string, unknown[]>)
       .validationErrors;
@@ -37,11 +29,7 @@ export function handleError(error: unknown): void {
     if (validationErrorMessage) {
       message.error(validationErrorMessage);
     }
-  } else if (
-    data.error &&
-    typeof data.error === "object" &&
-    "message" in data.error
-  ) {
+  } else if ( data.error && typeof data.error === "object" && "message" in data.error) {
     const msg = (data.error as Record<string, unknown>).message;
     if (typeof msg === "string") {
       message.error(msg);

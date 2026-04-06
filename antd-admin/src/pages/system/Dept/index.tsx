@@ -8,12 +8,15 @@ import UpdateModal from "./components/UpdateModal";
 import AdvancedSearchForm from "./components/SearchForm";
 import DetailModal from "./components/DetailModal";
 import {addDept, handleResp, queryDeptList, removeDept, updateDept} from "./service";
+import {DeleteDeptReq, DeptServiceProxy} from "@/api/generated/service-proxies.ts";
+import {useServiceProxy} from "@/api/service-proxy-factory.ts";
 
 
 const Dept: React.FC = () => {
     const [isShowAddModal, setShowAddModal] = useState<boolean>(false);
     const [isShowEditModal, setShowEditModal] = useState<boolean>(false);
     const [isShowDetailModal, setShowDetailModal] = useState<boolean>(false);
+    const deptService = useServiceProxy(DeptServiceProxy, []);
     const [deptListData, setDeptListData] = useState<DeptVo[]>([]);
     const [currentDept, setCurrentDept] = useState<DeptVo>({
         id: 0,
@@ -81,6 +84,14 @@ const Dept: React.FC = () => {
 
     const showModal = () => {
         setShowAddModal(true);
+    };
+
+    const testHandler =  async () => {
+        let input: DeleteDeptReq = {
+            id: 1
+        } as DeleteDeptReq;
+        let result = await deptService.deleteDept(input);
+        console.log(result);
     };
 
     const handleAddOk = async (param: DeptVo) => {
@@ -164,6 +175,7 @@ const Dept: React.FC = () => {
             <div>
                 <Space size={100}>
                     <Button type="primary" icon={<PlusOutlined/>} onClick={showModal}>新建</Button>
+                    <Button type="primary" icon={<PlusOutlined/>} onClick={testHandler}>测试</Button>
                     <AdvancedSearchForm search={handleSearchOk} reSet={handleResetOk}></AdvancedSearchForm>
                 </Space>
             </div>

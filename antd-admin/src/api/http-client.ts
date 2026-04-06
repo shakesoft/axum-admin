@@ -16,13 +16,7 @@ export function apiHttp(): AxiosInstance {
     _instance.interceptors.response.use(
       (r) => {
         const d = r?.data as Record<string, unknown>;
-        if (
-          d &&
-          typeof d === "object" &&
-          d.__abp &&
-          "result" in d &&
-          (d.success === undefined || d.success === true)
-        ) {
+        if ( d && typeof d === "object" && d.__abp && "result" in d &&(d.success === undefined || d.success === true)) {
           r.data = d.result;
         }
         return r;
