@@ -4,6 +4,7 @@ use axum::response::{IntoResponse, Response};
 use axum::Json;
 use redis::RedisError;
 use thiserror::Error;
+use validator::ValidationErrors;
 
 #[derive(Error, Debug)]
 pub enum AppError {
@@ -29,11 +30,34 @@ pub enum AppError {
     #[error("验证异常: {0}")]
     ValidationError(String),
 
+    #[error("验证异常")]
+    ValidationErrors,
+
     #[error("内部异常: {0}")]
     InternalError(&'static str),
 }
 
 pub type AppResult<T> = Result<T, AppError>;
+
+impl From<ValidationErrors> for AppError {
+    fn from(errors: ValidationErrors) -> Self {
+        let errors = errors
+            .field_errors()
+            .iter()
+            .flat_map(|(_, errors)| {
+                errors.iter().map(|error| {
+                    if let Some(message) = &error.message {
+                        message.clone().into_owned()
+                    } else {
+                        "Invalid value".to_string()
+                    }
+                })
+            })
+            .collect::<Vec<String>>()
+            .join(", ");
+        AppError::ValidationError(errors)
+    }
+}
 
 #[async_trait]
 impl IntoResponse for AppError {
@@ -60,6 +84,9 @@ impl IntoResponse for AppError {
             AppError::ValidationError(_msg) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
             },
+            AppError::ValidationErrors => {
+                (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
+            },
             AppError::InternalError(_msg) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
             },
@@ -74,22 +101,5 @@ impl AppError {
     }
     pub fn interrupt() -> AppResult<Json<BaseResponse<()>>> {
         Err(AppError::default())
-    }
-
-    pub fn build_validation_error_message(e: &validator::ValidationErrors) -> String {
-        e.field_errors().iter().map(|(field, errors)| {
-            let messages: Vec<String> = errors.iter().map(|error| {
-                if let Some(message) = &error.message {
-                    message.to_string()
-                } else {
-                    format!("字段 '{}' 验证失败", field)
-                }
-            }).collect();
-            messages.join(", ")
-        }).collect::<Vec<String>>().join("; ")
-    }
-
-    pub fn validation_error(e: &validator::ValidationErrors) -> AppError {
-        AppError::ValidationError(Self::build_validation_error_message(e))
     }
 }

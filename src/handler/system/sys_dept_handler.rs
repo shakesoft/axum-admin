@@ -70,7 +70,7 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)):
             // let mut sys_dept:Dept = item.into();
             sys_dept.ancestors = Some(ancestors);
             if let Err(e) = sys_dept.validate() {
-                return Err(AppError::validation_error(&e));
+                return Err(e.into());
             }
             Dept::insert(rb, &sys_dept).await.map(|_| ok())?
         }
@@ -167,7 +167,7 @@ pub async fn update_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(mut 
 
     let data = Dept::from(item);
     if let Err(e) = data.validate() {
-        return Err(AppError::validation_error(&e));
+        return Err(e.into());
     }
     Dept::update_by_map(rb, &data, value! {"id":  &id}).await.map(|_| ok())?
 }
