@@ -30,14 +30,9 @@ pub enum AppError {
     #[error("验证异常: {0}")]
     ValidationError(String),
 
-    #[error("验证异常")]
-    ValidationErrors,
-
     #[error("内部异常: {0}")]
     InternalError(&'static str),
 }
-
-pub type AppResult<T> = Result<T, AppError>;
 
 impl From<ValidationErrors> for AppError {
     fn from(errors: ValidationErrors) -> Self {
@@ -58,6 +53,8 @@ impl From<ValidationErrors> for AppError {
         AppError::ValidationError(errors)
     }
 }
+
+pub type AppResult<T> = Result<T, AppError>;
 
 #[async_trait]
 impl IntoResponse for AppError {
@@ -82,9 +79,6 @@ impl IntoResponse for AppError {
                 (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
             },
             AppError::ValidationError(_msg) => {
-                (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
-            },
-            AppError::ValidationErrors => {
                 (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
             },
             AppError::InternalError(_msg) => {
