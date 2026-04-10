@@ -1,4 +1,5 @@
 use crate::common::error::{AppError};
+use crate::common::extractor::ValidatedJson;
 use crate::common::result::{ok, ok_result_data, BaseResponse, EmptyResponse};
 use crate::model::system::sys_dept_model::{check_dept_exist_user, select_children_dept_by_id, select_dept_count, select_normal_children_dept_by_id, Dept};
 use crate::vo::system::sys_dept_vo::*;
@@ -7,7 +8,6 @@ use crate::dao::system::sys_dept_dao::SysDeptDao;
 use axum::extract::State;
 use axum::response::IntoResponse;
 use axum::{Extension, Json};
-use axum_valid::Valid;
 use log::info;
 use rbatis::rbatis_codegen::ops::AsProxy;
 use rbatis::RBatis;
@@ -33,7 +33,7 @@ use crate::vo::system::sys_user_vo::UserSession;
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
 // #[function_name::named]
-pub async fn add_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(item)): Valid<Json<DeptReq>>) -> impl IntoResponse {
+pub async fn add_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(item): ValidatedJson<DeptReq>) -> impl IntoResponse {
     // panic!("test");
     // sleep(Duration::from_secs(8)).await;
     // return AppError::interrupt();
@@ -119,7 +119,7 @@ pub async fn delete_sys_dept(State(state): State<Arc<AppState>>,Extension(sessio
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
 #[function_name::named]
-pub async fn update_sys_dept(State(state): State<Arc<AppState>>, Valid(Json(mut item)): Valid<Json<DeptReq>>) -> impl IntoResponse {
+pub async fn update_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(mut item): ValidatedJson<DeptReq>) -> impl IntoResponse {
     info!("{}: {:?}", function_name!(), item);
     let rb = &state.batis;
 

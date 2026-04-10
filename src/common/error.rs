@@ -1,4 +1,5 @@
 use crate::common::result::BaseResponse;
+use axum::extract::rejection::JsonRejection;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
@@ -54,6 +55,12 @@ impl From<ValidationErrors> for AppError {
     }
 }
 
+impl From<JsonRejection> for AppError {
+    fn from(error: JsonRejection) -> Self {
+        AppError::ValidationError(error.body_text())
+    }
+}
+
 pub type AppResult<T> = Result<T, AppError>;
 
 #[async_trait]
@@ -79,7 +86,7 @@ impl IntoResponse for AppError {
                 (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
             },
             AppError::ValidationError(_msg) => {
-                (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
+                (StatusCode::BAD_REQUEST, Json(response)).into_response()
             },
             AppError::InternalError(_msg) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
