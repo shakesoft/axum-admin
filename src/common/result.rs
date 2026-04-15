@@ -5,6 +5,8 @@ use serde::Serialize;
 use std::fmt::Debug;
 use utoipa::{ToSchema};
 
+const SUCCESS_CODE:i32 = 0;
+
 // 统一返回vo
 #[derive(Serialize, Debug, Clone,ToSchema)]
 pub struct BaseResponse<T> {
@@ -33,7 +35,7 @@ pub struct ResponsePage<T> {
 pub fn ok() -> AppResult<Json<EmptyResponse>> {
     Ok(Json(EmptyResponse {
         msg: "操作成功".to_string(),
-        code: 0,
+        code: SUCCESS_CODE,
         data: Some(()),
     }))
 }
@@ -45,7 +47,7 @@ pub fn ok_result() -> AppResult<Json<BaseResponse<String>>> {
 pub fn ok_result_msg(msg: &str) -> AppResult<Json<BaseResponse<String>>> {
     Ok(Json(BaseResponse {
         msg: msg.to_string(),
-        code: 0,
+        code: SUCCESS_CODE,
         data: Some("None".to_string()),
     }))
 }
@@ -53,7 +55,7 @@ pub fn ok_result_msg(msg: &str) -> AppResult<Json<BaseResponse<String>>> {
 pub fn ok_result_data<T>(data: T) -> AppResult<Json<BaseResponse<T>>> {
     Ok(Json(BaseResponse {
         msg: "操作成功".to_string(),
-        code: 0,
+        code: SUCCESS_CODE,
         data: Some(data),
     }))
 }
@@ -61,7 +63,7 @@ pub fn ok_result_data<T>(data: T) -> AppResult<Json<BaseResponse<T>>> {
 pub fn ok_result_page<T>(data: T, total: u64) -> AppResult<Json<ResponsePage<T>>> {
     Ok(Json(ResponsePage {
         msg: "操作成功".to_string(),
-        code: 0,
+        code: SUCCESS_CODE,
         success: true,
         data: Some(data),
         total,
