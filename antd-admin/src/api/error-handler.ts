@@ -9,9 +9,6 @@ export function handleError(error: unknown): void {
     return;
   }
   const data = (response as { data: unknown }).data as Record<string, unknown>;
-  // console.log('error',error);
-  // console.log('response',response);
-  // console.log('data',data);
   if(data.code!=0) {
     if (data.data
         &&typeof data.data === "object"
