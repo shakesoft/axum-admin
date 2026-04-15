@@ -21,15 +21,14 @@ struct ValidationErrorData {
 
 #[derive(Error, Debug)]
 pub enum AppError {
-    // #[error("Failed to complete an HTTP request")]
-    // Http { #[from] source: reqwest::Error },
     #[error("Failed to read the cache file")]
     DiskCacheRead { source: std::io::Error },
     
-    // #[error("Failed to update the cache file")]
-    // DiskCacheWrite { source: std::io::Error },
     #[error("jwt：{0}")]
     JwtTokenError(String),
+
+    #[error("授权访问错误：{0}")]
+    AuthorizationError(String),
 
     #[error("数据库错误: {0}")]
     DbError(#[from] rbatis::Error),
@@ -77,51 +76,15 @@ pub type AppResult<T> = Result<T, AppError>;
 #[async_trait]
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
+        let status_code = self.status_code();
+        let app_code = self.app_code();
+        let message = self.response_message();
+
         match self {
-            AppError::DbError(error) => {
-                let response = BaseResponse {
-                    msg: AppError::DbError(error).to_string(),
-                    code: 1,
-                    data: Some("None".to_string()),
-                };
-                (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
-            },
-            AppError::RedisError(error) => {
-                let response = BaseResponse {
-                    msg: AppError::RedisError(error).to_string(),
-                    code: 1,
-                    data: Some("None".to_string()),
-                };
-                (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
-            },
-            AppError::DiskCacheRead { source } => {
-                let response = BaseResponse {
-                    msg: AppError::DiskCacheRead { source }.to_string(),
-                    code: 1,
-                    data: Some("None".to_string()),
-                };
-                (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
-            },
-            AppError::JwtTokenError(msg) => {
-                let response = BaseResponse {
-                    msg: AppError::JwtTokenError(msg).to_string(),
-                    code: 1,
-                    data: Some("None".to_string()),
-                };
-                (StatusCode::UNAUTHORIZED, Json(response)).into_response()
-            },
-            AppError::BusinessError(msg) => {
-                let response = BaseResponse {
-                    msg: AppError::BusinessError(msg).to_string(),
-                    code: 1,
-                    data: Some("None".to_string()),
-                };
-                (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
-            },
             AppError::ValidationError(messages) => {
                 let response = BaseResponse {
-                    msg: "参数校验失败".to_string(),
-                    code: 1,
+                    msg: message,
+                    code: app_code,
                     data: Some(ValidationErrorData {
                         validation_errors: messages
                             .into_iter()
@@ -129,15 +92,15 @@ impl IntoResponse for AppError {
                             .collect(),
                     }),
                 };
-                (StatusCode::BAD_REQUEST, Json(response)).into_response()
+                (status_code, Json(response)).into_response()
             },
-            AppError::InternalError(msg) => {
+            _ => {
                 let response = BaseResponse {
-                    msg: AppError::InternalError(msg).to_string(),
-                    code: 1,
+                    msg: message,
+                    code: app_code,
                     data: Some("None".to_string()),
                 };
-                (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
+                (status_code, Json(response)).into_response()
             },
         }
     }
@@ -145,6 +108,39 @@ impl IntoResponse for AppError {
 
 
 impl AppError {
+    fn app_code(&self) -> i32 {
+        match self {
+            AppError::DiskCacheRead { .. } => 2003,
+            AppError::JwtTokenError(_) => 1002,
+            AppError::AuthorizationError(_) => 1001,
+            AppError::DbError(_) => 2001,
+            AppError::RedisError(_) => 2002,
+            AppError::BusinessError(_) => 1003,
+            AppError::ValidationError(_) => 1001,
+            AppError::InternalError(_) => 9001,
+        }
+    }
+
+    fn status_code(&self) -> StatusCode {
+        match self {
+            AppError::JwtTokenError(_) => StatusCode::UNAUTHORIZED,
+            AppError::ValidationError(_) => StatusCode::BAD_REQUEST,
+            AppError::BusinessError(_)=> StatusCode::FORBIDDEN,
+            AppError::AuthorizationError(_) => StatusCode::UNAUTHORIZED,
+            AppError::DbError(_)
+            | AppError::RedisError(_)
+            | AppError::DiskCacheRead { .. }
+            | AppError::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+
+    fn response_message(&self) -> String {
+        match self {
+            AppError::ValidationError(_) => "参数校验失败".to_string(),
+            _ => self.to_string(),
+        }
+    }
+
     pub fn default() -> AppError {
         AppError::InternalError("服务器发生内部异常，请稍后再试")
     }

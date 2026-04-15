@@ -29,12 +29,7 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
 
     let auth_header = req.headers().get(http::header::AUTHORIZATION).and_then(|header| header.to_str().ok());
     if auth_header.is_none() {
-        let json = Json(BaseResponse {
-            msg: "用户未认证，请求头缺少字段[Authorization]".to_string(),
-            code: 401,
-            data: Some("None".to_string()),
-        });
-        return Ok((StatusCode::UNAUTHORIZED, json).into_response());
+        return Ok(AppError::JwtTokenError("用户未认证，请求头缺少字段[Authorization]".to_string()).into_response());
     }
 
     let authorization = auth_header.unwrap();
@@ -47,24 +42,14 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
                 AppError::JwtTokenError(s) => s,
                 _ => "no math error".to_string(),
             };
-            let json = Json(BaseResponse {
-                msg: er,
-                code: 401,
-                data: Some("None".to_string()),
-            });
-            return Ok((StatusCode::UNAUTHORIZED, json).into_response());
+            return Ok(AppError::JwtTokenError(er).into_response());
         }
     };
 
     match validate_and_get_user_info(&state.redis, jwt_token.id).await {
         Ok((user_id, permissions,roles, redis_token, is_admin)) => {
             if redis_token != token {
-                let json = Json(BaseResponse {
-                    msg: "无效的token".to_string(),
-                    code: 401,
-                    data: Some("None".to_string()),
-                });
-                return Ok((StatusCode::UNAUTHORIZED, json).into_response());
+                return Ok(AppError::JwtTokenError("无效的token".to_string()).into_response());
             }
 
             let has_permission = |permissions: &[String], path: &str| -> bool {
@@ -84,21 +69,16 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
                 });//存储用户功能权限
                 Ok(next.run(req).await)
             } else {
-                let json = Json(BaseResponse {
-                    msg: format!("用户未授权访问url:{}", path),
-                    code: 401,
-                    data: Some("None".to_string()),
-                });
-                Ok((StatusCode::UNAUTHORIZED, json).into_response())
+                Ok(AppError::AuthorizationError(format!("用户未授权访问url:{}", path)).into_response())
             }
         }
         Err(e) => {
-            let json = Json(BaseResponse {
-                msg: e.to_string(),
-                code: 401,
-                data: Some("None".to_string()),
-            });
-            Ok((StatusCode::UNAUTHORIZED, json).into_response())
+            match e {
+                AppError::BusinessError(msg) if msg == "用户没有登录" => {
+                    Ok(AppError::JwtTokenError(msg.to_string()).into_response())
+                }
+                _ => Ok(e.into_response()),
+            }
         }
     }
 }

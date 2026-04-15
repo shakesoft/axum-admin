@@ -1,4 +1,4 @@
-use crate::common::error::AppResult;
+use crate::common::error::{AppResult};
 use axum::Json;
 use rbatis::rbdc::DateTime;
 use serde::Serialize;
@@ -65,14 +65,6 @@ pub fn ok_result_page<T>(data: T, total: u64) -> AppResult<Json<ResponsePage<T>>
         success: true,
         data: Some(data),
         total,
-    }))
-}
-
-pub fn err_result_msg(msg: &str) -> AppResult<Json<BaseResponse<String>>> {
-    Ok(Json(BaseResponse {
-        msg: msg.to_string(),
-        code: 1,
-        data: Some("None".to_string()),
     }))
 }
 
