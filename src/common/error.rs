@@ -4,8 +4,20 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use redis::RedisError;
+use serde::Serialize;
 use thiserror::Error;
 use validator::ValidationErrors;
+
+#[derive(Serialize)]
+struct ValidationErrorItem {
+    message: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ValidationErrorData {
+    validation_errors: Vec<ValidationErrorItem>,
+}
 
 #[derive(Error, Debug)]
 pub enum AppError {
@@ -28,8 +40,8 @@ pub enum AppError {
     #[error("业务异常: {0}")]
     BusinessError(&'static str),
 
-    #[error("验证异常: {0}")]
-    ValidationError(String),
+    #[error("验证异常")]
+    ValidationError(Vec<String>),
 
     #[error("内部异常: {0}")]
     InternalError(&'static str),
@@ -49,15 +61,14 @@ impl From<ValidationErrors> for AppError {
                     }
                 })
             })
-            .collect::<Vec<String>>()
-            .join(", ");
+            .collect::<Vec<String>>();
         AppError::ValidationError(errors)
     }
 }
 
 impl From<JsonRejection> for AppError {
     fn from(error: JsonRejection) -> Self {
-        AppError::ValidationError(error.body_text())
+        AppError::ValidationError(vec![error.body_text()])
     }
 }
 
@@ -66,29 +77,66 @@ pub type AppResult<T> = Result<T, AppError>;
 #[async_trait]
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        let response = BaseResponse {
-            msg: self.to_string(),
-            code: 1,
-            data: Some("None".to_string()),
-        };
-
         match self {
-            AppError::DbError(_) | AppError::RedisError(_) => {
+            AppError::DbError(error) => {
+                let response = BaseResponse {
+                    msg: AppError::DbError(error).to_string(),
+                    code: 1,
+                    data: Some("None".to_string()),
+                };
                 (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
             },
-            AppError::DiskCacheRead { source:_ } => {
+            AppError::RedisError(error) => {
+                let response = BaseResponse {
+                    msg: AppError::RedisError(error).to_string(),
+                    code: 1,
+                    data: Some("None".to_string()),
+                };
                 (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
             },
-            AppError::JwtTokenError (_msg) => {
+            AppError::DiskCacheRead { source } => {
+                let response = BaseResponse {
+                    msg: AppError::DiskCacheRead { source }.to_string(),
+                    code: 1,
+                    data: Some("None".to_string()),
+                };
+                (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
+            },
+            AppError::JwtTokenError(msg) => {
+                let response = BaseResponse {
+                    msg: AppError::JwtTokenError(msg).to_string(),
+                    code: 1,
+                    data: Some("None".to_string()),
+                };
                 (StatusCode::UNAUTHORIZED, Json(response)).into_response()
             },
-            AppError::BusinessError(_msg) => {
+            AppError::BusinessError(msg) => {
+                let response = BaseResponse {
+                    msg: AppError::BusinessError(msg).to_string(),
+                    code: 1,
+                    data: Some("None".to_string()),
+                };
                 (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
             },
-            AppError::ValidationError(_msg) => {
+            AppError::ValidationError(messages) => {
+                let response = BaseResponse {
+                    msg: "参数校验失败".to_string(),
+                    code: 1,
+                    data: Some(ValidationErrorData {
+                        validation_errors: messages
+                            .into_iter()
+                            .map(|message| ValidationErrorItem { message })
+                            .collect(),
+                    }),
+                };
                 (StatusCode::BAD_REQUEST, Json(response)).into_response()
             },
-            AppError::InternalError(_msg) => {
+            AppError::InternalError(msg) => {
+                let response = BaseResponse {
+                    msg: AppError::InternalError(msg).to_string(),
+                    code: 1,
+                    data: Some("None".to_string()),
+                };
                 (StatusCode::INTERNAL_SERVER_ERROR, Json(response)).into_response()
             },
         }

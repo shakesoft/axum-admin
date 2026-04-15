@@ -27,7 +27,7 @@ export function handleError(error: unknown): void {
             && "message" in validationError) {
           const msg = (validationError as Record<string, unknown>).message;
           if (typeof msg === "string") {
-            validationErrorMessage += msg + "\n";
+            validationErrorMessage += msg + "；\n";
           }
         }
       }
