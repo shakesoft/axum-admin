@@ -56,6 +56,7 @@ use reqwest::StatusCode;
 use tower_http::cors::CorsLayer;
 use tower_http::timeout::TimeoutLayer;
 use tracing_appender::rolling;
+use crate::common::result::ok_result_msg;
 use crate::workflow::state::traffic_light::TrafficLight;
 // use crate::common::daily_logfile::DailyLogFile;
 // use crate::handler::system::sys_user_handler::reset_sys_user_password;
@@ -239,18 +240,6 @@ async fn main() {
     let index_router = Router::new().route("/index", get(async||-> String{
         let json =json_data();
         return json.to_string();
-       let body =  post_json("http://dev.muche365.com/enter/lutong/order-request",json,"1d9ae6f8e29f3b6228ad19a95c841eb4","20260123094931","974C5C9091C3BF27B7E041693EBF64CB4AB423B8").await;
-        match body {
-           Ok(b)=>{
-               let person: ResponseData = serde_json::from_str(&b).unwrap();
-               println!("{:?}", person);
-               b
-           },
-           Err(e)=>{
-               println!("Error: {}", e);
-               "Error".to_string()
-           }
-        }
     }));
 
 
@@ -267,11 +256,8 @@ async fn main() {
         body
     }));
 
-    let test_router1 = Router::new().route("/test1", get(async||-> Json<ResponseData> {
-        Json(ResponseData {
-            code: "0".to_owned(),
-            message: "Tom".to_string(),
-        })
+    let test_router1 = Router::new().route("/test1", get(async || {
+        ok_result_msg("成功啦")
     }));
 
     // 构建应用路由，并合并多个子路由
@@ -313,13 +299,6 @@ async fn main() {
     // 使用监听器启动服务器
     axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await.unwrap();
 }
-
-#[derive(Debug, Serialize, Deserialize)]
-struct ResponseData {
-    code: String,
-    message: String,
-}
-
 
 pub fn json_data()->&'static str{
     let data:&'static str = r#"{
