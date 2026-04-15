@@ -93,6 +93,7 @@ pub async fn delete_sys_dept(State(state): State<Arc<AppState>>,Extension(sessio
     // info!("{function_name}:{item:?}",function_name = function_name!());
     info!("{}: {:?}", function_name!(), item);
     let user_id = &session.user_id;
+    // panic!("test");
     let permissons = &session.permissions;
     let rb = &state.batis;
 
