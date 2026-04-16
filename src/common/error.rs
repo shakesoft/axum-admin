@@ -73,7 +73,6 @@ impl From<JsonRejection> for AppError {
 
 pub type AppResult<T> = Result<T, AppError>;
 
-#[async_trait]
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let status_code = self.status_code();
@@ -98,7 +97,7 @@ impl IntoResponse for AppError {
                 let response = BaseResponse {
                     msg: message,
                     code: app_code,
-                    data: Some("None".to_string()),
+                    data: Some(()),
                 };
                 (status_code, Json(response)).into_response()
             },

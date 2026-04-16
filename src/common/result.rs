@@ -28,7 +28,6 @@ pub struct ResponsePage<T> {
     pub code: i32,
     pub msg: String,
     pub total: u64,
-    pub success: bool,
     pub data: Option<T>,
 }
 
@@ -48,7 +47,7 @@ pub fn ok_result_msg(msg: &str) -> AppResult<Json<BaseResponse<String>>> {
     Ok(Json(BaseResponse {
         msg: msg.to_string(),
         code: SUCCESS_CODE,
-        data: Some("None".to_string()),
+        data: None,
     }))
 }
 
@@ -64,7 +63,6 @@ pub fn ok_result_page<T>(data: T, total: u64) -> AppResult<Json<ResponsePage<T>>
     Ok(Json(ResponsePage {
         msg: "操作成功".to_string(),
         code: SUCCESS_CODE,
-        success: true,
         data: Some(data),
         total,
     }))
