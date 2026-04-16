@@ -6,6 +6,7 @@ use std::fmt::Debug;
 use utoipa::{ToSchema};
 
 const SUCCESS_CODE:i32 = 0;
+const SUCCESS_MSG:&str ="操作成功";
 
 // 统一返回vo
 #[derive(Serialize, Debug, Clone,ToSchema)]
@@ -33,14 +34,14 @@ pub struct ResponsePage<T> {
 
 pub fn ok() -> AppResult<Json<EmptyResponse>> {
     Ok(Json(EmptyResponse {
-        msg: "操作成功".to_string(),
+        msg: SUCCESS_MSG.to_string(),
         code: SUCCESS_CODE,
         data: Some(()),
     }))
 }
 
 pub fn ok_result() -> AppResult<Json<BaseResponse<String>>> {
-    ok_result_msg("操作成功")
+    ok_result_msg(SUCCESS_MSG)
 }
 
 pub fn ok_result_msg(msg: &str) -> AppResult<Json<BaseResponse<String>>> {
@@ -53,7 +54,7 @@ pub fn ok_result_msg(msg: &str) -> AppResult<Json<BaseResponse<String>>> {
 
 pub fn ok_result_data<T>(data: T) -> AppResult<Json<BaseResponse<T>>> {
     Ok(Json(BaseResponse {
-        msg: "操作成功".to_string(),
+        msg: SUCCESS_MSG.to_string(),
         code: SUCCESS_CODE,
         data: Some(data),
     }))
@@ -61,7 +62,7 @@ pub fn ok_result_data<T>(data: T) -> AppResult<Json<BaseResponse<T>>> {
 
 pub fn ok_result_page<T>(data: T, total: u64) -> AppResult<Json<ResponsePage<T>>> {
     Ok(Json(ResponsePage {
-        msg: "操作成功".to_string(),
+        msg: SUCCESS_MSG.to_string(),
         code: SUCCESS_CODE,
         data: Some(data),
         total,
