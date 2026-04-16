@@ -8,14 +8,6 @@ use utoipa::{ToSchema};
 const SUCCESS_CODE:i32 = 0;
 const SUCCESS_MSG:&str ="操作成功";
 
-// 统一返回vo
-#[derive(Serialize, Debug, Clone,ToSchema)]
-pub struct BaseResponse<T> {
-    pub code: i32,
-    pub msg: String,
-    pub data: Option<T>,
-}
-
 #[derive(Serialize, Debug, Clone,ToSchema)]
 pub struct EmptyResponse
 {
@@ -25,7 +17,14 @@ pub struct EmptyResponse
 }
 
 #[derive(Serialize, Debug, Clone,ToSchema)]
-pub struct ResponsePage<T> {
+pub struct BaseResponse<T> {
+    pub code: i32,
+    pub msg: String,
+    pub data: Option<T>,
+}
+
+#[derive(Serialize, Debug, Clone,ToSchema)]
+pub struct PageResponse<T> {
     pub code: i32,
     pub msg: String,
     pub total: u64,
@@ -60,8 +59,8 @@ pub fn ok_result_data<T>(data: T) -> AppResult<Json<BaseResponse<T>>> {
     }))
 }
 
-pub fn ok_result_page<T>(data: T, total: u64) -> AppResult<Json<ResponsePage<T>>> {
-    Ok(Json(ResponsePage {
+pub fn ok_result_page<T>(data: T, total: u64) -> AppResult<Json<PageResponse<T>>> {
+    Ok(Json(PageResponse {
         msg: SUCCESS_MSG.to_string(),
         code: SUCCESS_CODE,
         data: Some(data),
