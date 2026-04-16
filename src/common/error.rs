@@ -24,10 +24,10 @@ pub enum AppError {
     #[error("Failed to read the cache file")]
     DiskCacheRead { source: std::io::Error },
     
-    #[error("jwt：{0}")]
+    #[error("认证错误：{0}")]
     JwtTokenError(String),
 
-    #[error("授权访问错误：{0}")]
+    #[error("授权错误：{0}")]
     AuthorizationError(String),
 
     #[error("数据库错误: {0}")]
