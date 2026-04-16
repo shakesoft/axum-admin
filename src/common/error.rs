@@ -8,6 +8,8 @@ use serde::Serialize;
 use thiserror::Error;
 use validator::ValidationErrors;
 
+const DEFAULT_ERROR_MSG:&str="服务器发生内部异常，请稍后再试";
+
 #[derive(Serialize)]
 struct ValidationErrorItem {
     message: String,
@@ -141,7 +143,7 @@ impl AppError {
     }
 
     pub fn default() -> AppError {
-        AppError::InternalError("服务器发生内部异常，请稍后再试")
+        AppError::InternalError(DEFAULT_ERROR_MSG)
     }
     pub fn interrupt() -> AppResult<Json<BaseResponse<()>>> {
         Err(AppError::default())

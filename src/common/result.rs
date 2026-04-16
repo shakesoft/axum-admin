@@ -7,6 +7,9 @@ use utoipa::{ToSchema};
 
 const SUCCESS_CODE:i32 = 0;
 const SUCCESS_MSG:&str ="操作成功";
+const DATETIME_FORMAT:&str = "YYYY-MM-DD hh:mm:ss";
+
+const EMPTY_STRING:&str = "";
 
 #[derive(Serialize, Debug, Clone,ToSchema)]
 pub struct EmptyResponse
@@ -74,10 +77,10 @@ where
 {
     match dt {
         Some(datetime) => {
-            let formatted = datetime.format("YYYY-MM-DD hh:mm:ss");
+            let formatted = datetime.format(DATETIME_FORMAT);
             serializer.serialize_str(&formatted)
         }
-        None => serializer.serialize_str(""),
+        None => serializer.serialize_str(EMPTY_STRING),
     }
 }
 
