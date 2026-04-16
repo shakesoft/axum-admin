@@ -29,23 +29,23 @@ export function handleError(error: unknown): void {
         }
       }
       if (validationErrorMessage) {
-        message.error(validationErrorMessage);
+        message?.error(validationErrorMessage);
       }
     } else if ("msg" in data) { //服务端自定义错误消息（message）
       const msg = data.msg;
       if (typeof msg === "string") {
-        message.error(msg);
+        message?.error(msg);
       }
     } else if ("data" in data) { //服务端未成功响应但提供了详细错误（details）
       const msg = data.data;
       if (typeof msg === "string") {
-        message.error(msg);
+        message?.error(msg);
       }
     }
   } else if("statusText" in response){
     const statusText = response.statusText;
     if (typeof statusText === "string") {
-      message.error(statusText);
+      message?.error(statusText);
     }
   }
 }
