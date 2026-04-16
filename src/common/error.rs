@@ -33,7 +33,7 @@ pub enum AppError {
     #[error("数据库错误: {0}")]
     DbError(#[from] rbatis::Error),
 
-    #[error("redis错误: {0}")]
+    #[error("Redis错误: {0}")]
     RedisError(#[from] RedisError),
 
     #[error("业务异常: {0}")]
