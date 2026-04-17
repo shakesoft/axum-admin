@@ -111,14 +111,14 @@ impl IntoResponse for AppError {
 impl AppError {
     fn app_code(&self) -> i32 {
         match self {
-            AppError::DiskCacheRead { .. } => 2003,
-            AppError::JwtTokenError(_) => 1002,
-            AppError::AuthorizationError(_) => 1001,
-            AppError::DbError(_) => 2001,
-            AppError::RedisError(_) => 2002,
-            AppError::BusinessError(_) => 1003,
-            AppError::ValidationError(_) => 1001,
-            AppError::InternalError(_) => 9001,
+            AppError::DiskCacheRead { .. } => 9003,
+            AppError::JwtTokenError(_) => 3001,
+            AppError::AuthorizationError(_) => 4001,
+            AppError::DbError(_) => 9001,
+            AppError::RedisError(_) => 9002,
+            AppError::BusinessError(_) => 5001,
+            AppError::ValidationError(_) => 6001,
+            AppError::InternalError(_) => 8001,
         }
     }
 
