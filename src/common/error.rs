@@ -10,6 +10,8 @@ use validator::ValidationErrors;
 
 const DEFAULT_ERROR_MSG:&str="服务器发生内部异常，请稍后再试";
 
+pub type AppResult<T> = Result<T, AppError>;
+
 #[derive(Serialize)]
 struct ValidationErrorItem {
     message: String,
@@ -72,8 +74,6 @@ impl From<JsonRejection> for AppError {
         AppError::ValidationError(vec![error.body_text()])
     }
 }
-
-pub type AppResult<T> = Result<T, AppError>;
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
