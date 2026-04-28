@@ -57,7 +57,7 @@ use tower_http::cors::CorsLayer;
 use tower_http::timeout::TimeoutLayer;
 use tracing_appender::rolling;
 use crate::common::result::ok_result_msg;
-use crate::workflow::state::traffic_light::TrafficLight;
+use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, TrafficLightEvent};
 // use crate::common::daily_logfile::DailyLogFile;
 // use crate::handler::system::sys_user_handler::reset_sys_user_password;
 
@@ -134,14 +134,20 @@ async fn main() {
     //     // 初始化日志配置
     //     log4rs::init_file("src/config/log4rs.yaml", Default::default()).unwrap();
     // }
-    let light = TrafficLight::new(());
+    let mut light = DynamicTrafficLight::new(());
     // Type is TrafficLight<Red>
 
 
-    let light = light.next().unwrap();
+    light.handle(TrafficLightEvent::Next).unwrap();
+    println!("{:?}",light.current_state());
     // Type is TrafficLight<Green>
 
-    let light = light.next().unwrap();
+    light.handle(TrafficLightEvent::Next).unwrap();
+    println!("{:?}",light.current_state());
+    // Type is TrafficLight<Yellow>
+
+    let a = light.into_yellow().unwrap();
+    println!("{:?}", a);//Yellow
     // Type is TrafficLight<Yellow>
 
 
@@ -152,6 +158,9 @@ async fn main() {
     // let cc = dynamic_light.into_green().unwrap();
     let bb = dynamic_light.current_state();
     println!("{}",bb);
+
+    dynamic_light.handle(TrafficLightEvent::Next).unwrap();
+    println!("{}",dynamic_light.current_state());
 
     // #[derive(Debug)]
     // struct ImportantExcerpt<'a> {
