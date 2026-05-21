@@ -35,7 +35,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::time::Duration;
 use axum::body::Body;
-use axum::extract::FromRef;
+use axum::extract::{FromRef, State};
 use axum::http::{Method, Request, Response};
 use axum::response::IntoResponse;
 // use tower::{ServiceBuilder};
@@ -70,14 +70,9 @@ use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, T
 pub struct AppState {
     pub batis: RBatis,
     pub redis: Client,
-    pub module: Arc<AutoFacModule>,
+    pub container: Arc<AutoFacModule>,
 }
 
-impl FromRef<AppState> for Arc<AutoFacModule> {
-    fn from_ref(app_state: &AppState) -> Arc<AutoFacModule> {
-        app_state.module.clone()
-    }
-}
 
 impl AppState {
     /// 返回一些安全的诊断信息（不依赖内部类型的 Debug 实现）
@@ -204,17 +199,16 @@ async fn main() {
     let rb = init_db(config.db.url.as_str()).await;
     let rd = init_redis(config.redis.url.as_str()).await;
 
-    let module = Arc::new(
+    let module =Arc::new(
         AutoFacModule::builder()
             .with_component_parameters::<TodayWriter>(TodayWriterParameters {
                 today: "November 5".to_string(),
                 year: 2020,
             })
-            .build(),
-    );
+            .build());
 
     // 创建共享应用状态，包含数据库连接池
-    let shared_state = Arc::new(AppState { batis: rb, redis: rd, module });
+    let shared_state = Arc::new(AppState { batis: rb, redis: rd, container: module});
 
     // 跨域中间件
     let cors = CorsLayer::new()
@@ -296,20 +290,6 @@ async fn main() {
     //     writer.get_date()
     // }
 
-    // DI demo handler — create a local module instance and use its IDateWriter
-    async fn di_index() -> String {
-        let local_module = AutoFacModule::builder()
-            .with_component_parameters::<TodayWriter>(TodayWriterParameters {
-                today: "November 5".to_string(),
-                year: 2020,
-            })
-            .build();
-        let local_module = Arc::new(local_module);
-        let writer: Arc<dyn IDateWriter> = local_module.resolve();
-        writer.write_date();
-        writer.get_date()
-    }
-
     let di_router = Router::new().route("/di", get(di_index));
 
     // 构建应用路由，并合并多个子路由
@@ -350,6 +330,14 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind(config.server.addr).await.unwrap();
     // 使用监听器启动服务器
     axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await.unwrap();
+}
+
+pub async fn di_index() -> String {
+    // let service: &dyn IDateWriter =
+    //     state.container.resolve_ref();
+    // service.write_date();
+    // service.get_date();
+    String::from("sss")
 }
 
 pub fn json_data()->&'static str{

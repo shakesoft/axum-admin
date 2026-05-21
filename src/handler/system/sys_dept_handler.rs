@@ -16,10 +16,12 @@ use rbs::value;
 use std::sync::Arc;
 use aspect_macros::{aspect};
 use aspect_std::{LoggingAspect, TimingAspect};
+use shaku::HasComponent;
 use tracing::instrument;
 // use std::time::Duration;
 // use tokio::time::sleep;
 use validator::Validate;
+use crate::common::autofac::IDateWriter;
 use crate::service::system::sys_dept_service::SysDeptService;
 use crate::vo::system::sys_user_vo::UserSession;
 /*
@@ -42,6 +44,14 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(item
     // info!("add sys_dept params: {:?}", &item);
     // info!("{function_name}:{item:?}",function_name = function_name!());
     // info!("{function_name}:{item:?}",function_name = function_name!());
+
+    let container = &state.container;
+
+    let service: &dyn IDateWriter =
+        state.container.resolve_ref();
+
+    service.write_date();
+    service.get_date();
 
     let a = SysDeptService::test_closure(10,2);
     let b  = a.0();
