@@ -33,7 +33,7 @@ use crate::vo::system::sys_user_vo::UserSession;
     request_body = DeptReq,
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
-#[instrument]
+// #[instrument]
 // #[function_name::named]
 pub async fn add_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(item): ValidatedJson<DeptReq>) -> impl IntoResponse {
     // panic!("test");

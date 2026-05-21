@@ -11,10 +11,11 @@ pub mod vo;
 pub mod dao;
 pub mod workflow;
 pub mod service;
-mod aop;
+pub mod aop;
+pub mod inject;
 
 use std::net::SocketAddr;
-use axum::{middleware as md, Json, Router};
+use axum::{middleware as md, Json, Router, ServiceExt};
 use crate::route::system::sys_dept_route::build_sys_dept_route;
 use crate::route::system::sys_dict_data_route::build_sys_dict_data_route;
 use crate::route::system::sys_dict_type_route::build_sys_dict_type_route;
@@ -34,6 +35,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::time::Duration;
 use axum::body::Body;
+use axum::extract::FromRef;
 use axum::http::{Method, Request, Response};
 use axum::response::IntoResponse;
 // use tower::{ServiceBuilder};
@@ -56,16 +58,25 @@ use reqwest::StatusCode;
 use tower_http::cors::CorsLayer;
 use tower_http::timeout::TimeoutLayer;
 use tracing_appender::rolling;
+use crate::common::autofac::{AutoFacModule, IDateWriter, TodayWriter, TodayWriterParameters};
+use shaku::HasComponent;
 use crate::common::result::ok_result_msg;
+use crate::inject::inject_component::Inject;
 use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, TrafficLightEvent};
 // use crate::common::daily_logfile::DailyLogFile;
 // use crate::handler::system::sys_user_handler::reset_sys_user_password;
 
 // 定义应用状态结构体，包含数据库连接池
-#[derive(Debug)]
 pub struct AppState {
     pub batis: RBatis,
     pub redis: Client,
+    pub module: Arc<AutoFacModule>,
+}
+
+impl FromRef<AppState> for Arc<AutoFacModule> {
+    fn from_ref(app_state: &AppState) -> Arc<AutoFacModule> {
+        app_state.module.clone()
+    }
 }
 
 impl AppState {
@@ -193,8 +204,17 @@ async fn main() {
     let rb = init_db(config.db.url.as_str()).await;
     let rd = init_redis(config.redis.url.as_str()).await;
 
+    let module = Arc::new(
+        AutoFacModule::builder()
+            .with_component_parameters::<TodayWriter>(TodayWriterParameters {
+                today: "November 5".to_string(),
+                year: 2020,
+            })
+            .build(),
+    );
+
     // 创建共享应用状态，包含数据库连接池
-    let shared_state = Arc::new(AppState { batis: rb, redis: rd });
+    let shared_state = Arc::new(AppState { batis: rb, redis: rd, module });
 
     // 跨域中间件
     let cors = CorsLayer::new()
@@ -252,6 +272,7 @@ async fn main() {
     }));
 
 
+
     let test_router = Router::new().route("/test", get(async||-> String {
         let body = reqwest::get("http://dev.domain365.com/enter/lutong/order-request")
             .await.unwrap()
@@ -269,8 +290,30 @@ async fn main() {
         ok_result_msg("成功啦")
     }));
 
+    // async fn di_index(writer: Inject<AutoFacModule, dyn IDateWriter>) -> String {
+    //     println!("di");
+    //     writer.write_date();
+    //     writer.get_date()
+    // }
+
+    // DI demo handler — create a local module instance and use its IDateWriter
+    async fn di_index() -> String {
+        let local_module = AutoFacModule::builder()
+            .with_component_parameters::<TodayWriter>(TodayWriterParameters {
+                today: "November 5".to_string(),
+                year: 2020,
+            })
+            .build();
+        let local_module = Arc::new(local_module);
+        let writer: Arc<dyn IDateWriter> = local_module.resolve();
+        writer.write_date();
+        writer.get_date()
+    }
+
+    let di_router = Router::new().route("/di", get(di_index));
+
     // 构建应用路由，并合并多个子路由
-    let app = Router::new().merge(swagger_ui).merge(home_router).merge(index_router).merge(test_router).merge(test_router1)//.route_layer(md::from_fn(swagger_auth))
+    let app = Router::new().merge(swagger_ui).merge(home_router).merge(index_router).merge(test_router).merge(test_router1).merge(di_router)//.route_layer(md::from_fn(swagger_auth))
         .nest(
         "/api",
         Router::new()
