@@ -1,3 +1,4 @@
+use std::ops::Deref;
 use crate::common::error::{AppError};
 use crate::common::extractor::ValidatedJson;
 use crate::common::result::{ok, ok_result_data, BaseResponse, EmptyResponse};
@@ -21,7 +22,8 @@ use tracing::instrument;
 // use std::time::Duration;
 // use tokio::time::sleep;
 use validator::Validate;
-use crate::common::autofac::IDateWriter;
+use crate::common::autofac::{AutoFacModule, IDateWriter};
+use crate::inject::inject_component::Inject;
 use crate::service::system::sys_dept_service::SysDeptService;
 use crate::vo::system::sys_user_vo::UserSession;
 /*
@@ -48,7 +50,7 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(item
     let container = &state.container;
 
     let service: &dyn IDateWriter =
-        state.container.resolve_ref();
+        container.resolve_ref();
 
     service.write_date();
     service.get_date();
@@ -118,6 +120,35 @@ pub async fn delete_sys_dept(State(state): State<Arc<AppState>>,Extension(sessio
     }
 
     Dept::delete_by_map(rb, value! {"id": &item.id}).await.map(|_| ok())?
+}
+
+#[utoipa::path(
+    post,
+    path = "/api/system/dept/deleteDept1",
+    request_body = DeleteDeptReq,
+    responses((status = 200, description = "successfully", body = EmptyResponse))
+)]
+// #[function_name::named]
+pub async fn delete_sys_dept1(State(state): State<Arc<AppState>>,Extension(session): Extension<UserSession>, Json(item): Json<DeleteDeptReq>) -> impl IntoResponse {
+    let writer: &dyn IDateWriter = state.container.resolve_ref();
+    writer.write_date();
+    writer.get_date();
+    // info!("{function_name}:{item:?}",function_name = function_name!());
+    // info!("{}: {:?}", function_name!(), item);
+    // let user_id = &session.user_id;
+   ok()
+    // let permissons = &session.permissions;
+    // let rb = &state.batis;
+    //
+    // if select_dept_count(rb, &item.id).await? > 0 {
+    //     return Err(AppError::BusinessError("存在下级部门,不允许删除"));
+    // }
+    //
+    // if check_dept_exist_user(rb, &item.id).await? > 0 {
+    //     return Err(AppError::BusinessError("部门存在用户,不允许删除"));
+    // }
+    //
+    // Dept::delete_by_map(rb, value! {"id": &item.id}).await.map(|_| ok())?
 }
 
 /*

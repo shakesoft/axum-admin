@@ -70,7 +70,7 @@ use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, T
 pub struct AppState {
     pub batis: RBatis,
     pub redis: Client,
-    pub container: Arc<AutoFacModule>,
+    pub container: AutoFacModule,
 }
 
 
@@ -199,13 +199,13 @@ async fn main() {
     let rb = init_db(config.db.url.as_str()).await;
     let rd = init_redis(config.redis.url.as_str()).await;
 
-    let module =Arc::new(
+    let module =
         AutoFacModule::builder()
             .with_component_parameters::<TodayWriter>(TodayWriterParameters {
                 today: "November 5".to_string(),
                 year: 2020,
             })
-            .build());
+            .build();
 
     // 创建共享应用状态，包含数据库连接池
     let shared_state = Arc::new(AppState { batis: rb, redis: rd, container: module});
