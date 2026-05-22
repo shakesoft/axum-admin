@@ -129,8 +129,7 @@ pub async fn delete_sys_dept(State(state): State<Arc<AppState>>,Extension(sessio
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
 // #[function_name::named]
-pub async fn delete_sys_dept1(State(state): State<Arc<AppState>>,Extension(session): Extension<UserSession>, Json(item): Json<DeleteDeptReq>) -> impl IntoResponse {
-    let writer: &dyn IDateWriter = state.container.resolve_ref();
+pub async fn delete_sys_dept1(writer: Inject<AutoFacModule, dyn IDateWriter>) -> impl IntoResponse {
     writer.write_date();
     writer.get_date();
     // info!("{function_name}:{item:?}",function_name = function_name!());
