@@ -131,8 +131,11 @@ pub async fn delete_sys_dept(State(state): State<Arc<AppState>>,Extension(sessio
 )]
 // #[function_name::named]
 // pub async fn delete_sys_dept1(writer: Inject<AutoFacModule, dyn IDateWriter>) -> impl IntoResponse {
-pub async fn delete_sys_dept1(hello_world: InjectProvided<AutoFacModule, dyn HelloWorld>) -> impl IntoResponse {
-        hello_world.greet();
+pub async fn delete_sys_dept1(writer: Inject<AutoFacModule, dyn IDateWriter>,hello_world: InjectProvided<AutoFacModule, dyn HelloWorld>) -> impl IntoResponse {
+    writer.write_date();
+    writer.get_date();
+    let result =  hello_world.greet();
+    println!("{}", result);
     // info!("{function_name}:{item:?}",function_name = function_name!());
     // info!("{}: {:?}", function_name!(), item);
     // let user_id = &session.user_id;
