@@ -105,12 +105,10 @@ where
     }
 }
 
-impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref
-    for InjectProvided<M, I>
-{
+impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: ?Sized> Deref for InjectProvided<M, I> {
     type Target = I;
 
     fn deref(&self) -> &Self::Target {
-        Arc::as_ref(&self.0)
+        self.0.deref()
     }
 }
