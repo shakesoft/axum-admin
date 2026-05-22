@@ -105,10 +105,3 @@ where
     }
 }
 
-impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: ?Sized> Deref for InjectProvided<M, I> {
-    type Target = I;
-
-    fn deref(&self) -> &Self::Target {
-        self.0.deref()
-    }
-}
