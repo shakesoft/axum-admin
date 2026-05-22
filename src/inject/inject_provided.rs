@@ -8,7 +8,6 @@ use std::sync::Arc;
 
 use crate::common::autofac::AutoFacModule;
 use crate::AppState;
-use crate::inject::inject_component::Inject;
 
 /// Used to create a provided service from a shaku `Module`.
 /// The module should be stored in Axum state, wrapped in an `Arc` (`Arc<MyModule>`).
@@ -108,10 +107,12 @@ where
 
 
 
-impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref for InjectProvided<M, I> {
+impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref
+    for InjectProvided<M, I>
+{
     type Target = I;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        Box::as_ref(&self.0)
     }
 }
