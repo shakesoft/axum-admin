@@ -94,7 +94,9 @@ where
         _req: &mut Parts,
         state: &Arc<AppState>,
     ) -> Result<Self, Self::Rejection> {
-        let service = state.container.provide(). map_err(|e| {
+        let service = state.container
+            .provide()
+            .map_err(|e| {
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 format!("Failed to provide service: {}", e),
@@ -107,12 +109,10 @@ where
 
 
 
-impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref
-    for InjectProvided<M, I>
-{
+impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref for InjectProvided<M, I> {
     type Target = I;
 
     fn deref(&self) -> &Self::Target {
-        Box::as_ref(&self.0)
+        self.0.deref()
     }
 }
