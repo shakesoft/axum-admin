@@ -113,6 +113,6 @@ impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref
     type Target = I;
 
     fn deref(&self) -> &Self::Target {
-        Box::as_ref(&self.0)
+        self.0.deref()
     }
 }

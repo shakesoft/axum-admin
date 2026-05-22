@@ -47,7 +47,7 @@ impl IDateWriter for TodayWriter {
 }
 
 
-pub trait HelloWorld: Send + Sync {
+pub trait HelloWorld: Interface {
     fn greet(&self) -> String;
 }
 
