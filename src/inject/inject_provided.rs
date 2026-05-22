@@ -108,10 +108,10 @@ where
 
 
 
-impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref for Inject<M, I> {
+impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref for InjectProvided<M, I> {
     type Target = I;
 
     fn deref(&self) -> &Self::Target {
-        self.deref()
+        &self.0
     }
 }
