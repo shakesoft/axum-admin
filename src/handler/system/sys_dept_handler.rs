@@ -139,7 +139,7 @@ pub async fn delete_sys_dept1(
     writer.write_date();
     writer.get_date();
     let result =  hello_world.greet();
-    println!("{}", result);
+    info!("{}", result);
     // info!("{function_name}:{item:?}",function_name = function_name!());
     // info!("{}: {:?}", function_name!(), item);
     // let user_id = &session.user_id;
