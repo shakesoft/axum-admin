@@ -1,10 +1,10 @@
-use shaku::{module, Component, Interface};
+use shaku::{module, Component, Interface, Provider};
 use std::sync::Arc;
 
 module! {
     pub AutoFacModule {
         components = [ConsoleOutput, TodayWriter],
-        providers = []
+        providers = [HelloWorldImpl]
     }
 }
 
@@ -43,5 +43,20 @@ impl IDateWriter for TodayWriter {
 
     fn get_date(&self) -> String {
         format!("Today is {}, {}", self.today, self.year)
+    }
+}
+
+
+pub trait HelloWorld: Send + Sync {
+    fn greet(&self) -> String;
+}
+
+#[derive(Provider)]
+#[shaku(interface = HelloWorld)]
+struct HelloWorldImpl;
+
+impl HelloWorld for HelloWorldImpl {
+    fn greet(&self) -> String {
+        "Hello, world!".to_owned()
     }
 }
