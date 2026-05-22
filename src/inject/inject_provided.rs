@@ -1,7 +1,7 @@
 use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
 use axum::http::StatusCode;
-use shaku::{HasProvider, ModuleInterface};
+use shaku::{HasComponent, HasProvider, Interface, ModuleInterface};
 use std::marker::PhantomData;
 use std::ops::Deref;
 use std::sync::Arc;
@@ -78,7 +78,7 @@ use crate::AppState;
 ///     }
 /// }
 /// ```
-pub struct InjectProvided<M: ModuleInterface + HasProvider<I> + ?Sized, I: ?Sized>(
+pub struct InjectProvided<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized>(
     Box<I>,
     PhantomData<M>,
 );
@@ -86,7 +86,7 @@ pub struct InjectProvided<M: ModuleInterface + HasProvider<I> + ?Sized, I: ?Size
 impl<I> FromRequestParts<Arc<AppState>> for InjectProvided<AutoFacModule, I>
 where
     AutoFacModule: HasProvider<I>,
-    I: ?Sized,
+    I: Interface + ?Sized,
 {
     type Rejection = (StatusCode, String);
 
@@ -94,19 +94,23 @@ where
         _req: &mut Parts,
         state: &Arc<AppState>,
     ) -> Result<Self, Self::Rejection> {
-        let service = state
-            .container
-            .provide()
-            .map_err(|e| (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+        let service = state.container.provide(). map_err(|e| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Failed to provide service: {}", e),
+            )
+        })?;
 
         Ok(Self(service, PhantomData))
     }
 }
 
-impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: ?Sized> Deref for InjectProvided<M, I> {
+impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref
+    for InjectProvided<M, I>
+{
     type Target = I;
 
     fn deref(&self) -> &Self::Target {
-        self.0.deref()
+        Arc::as_ref(&self.0)
     }
 }
