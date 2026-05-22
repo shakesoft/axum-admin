@@ -1,10 +1,13 @@
-use axum::extract::{FromRef, FromRequestParts};
+use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
 use axum::http::StatusCode;
 use shaku::{HasProvider, ModuleInterface};
 use std::marker::PhantomData;
 use std::ops::Deref;
 use std::sync::Arc;
+
+use crate::common::autofac::AutoFacModule;
+use crate::AppState;
 
 /// Used to create a provided service from a shaku `Module`.
 /// The module should be stored in Axum state, wrapped in an `Arc` (`Arc<MyModule>`).
@@ -80,17 +83,19 @@ pub struct InjectProvided<M: ModuleInterface + HasProvider<I> + ?Sized, I: ?Size
     PhantomData<M>,
 );
 
-impl<S, M, I> FromRequestParts<S> for InjectProvided<M, I>
+impl<I> FromRequestParts<Arc<AppState>> for InjectProvided<AutoFacModule, I>
 where
-    S: Send + Sync,
-    M: ModuleInterface + HasProvider<I> + ?Sized,
+    AutoFacModule: HasProvider<I>,
     I: ?Sized,
-    Arc<M>: FromRef<S>,
 {
     type Rejection = (StatusCode, String);
 
-    async fn from_request_parts(_req: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let service = Arc::<M>::from_ref(state)
+    async fn from_request_parts(
+        _req: &mut Parts,
+        state: &Arc<AppState>,
+    ) -> Result<Self, Self::Rejection> {
+        let service = state
+            .container
             .provide()
             .map_err(|e| (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
 

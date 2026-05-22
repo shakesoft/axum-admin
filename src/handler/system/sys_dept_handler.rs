@@ -22,7 +22,7 @@ use tracing::instrument;
 // use std::time::Duration;
 // use tokio::time::sleep;
 use validator::Validate;
-use crate::common::autofac::{AutoFacModule, IDateWriter};
+use crate::common::autofac::{AutoFacModule, IDateWriter, IOutput};
 use crate::inject::inject_component::Inject;
 use crate::service::system::sys_dept_service::SysDeptService;
 use crate::vo::system::sys_user_vo::UserSession;
@@ -129,9 +129,10 @@ pub async fn delete_sys_dept(State(state): State<Arc<AppState>>,Extension(sessio
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
 // #[function_name::named]
-pub async fn delete_sys_dept1(writer: Inject<AutoFacModule, dyn IDateWriter>) -> impl IntoResponse {
+pub async fn delete_sys_dept1(writer: Inject<AutoFacModule, dyn IDateWriter>,output: Inject<AutoFacModule, dyn IOutput>) -> impl IntoResponse {
     writer.write_date();
     writer.get_date();
+    output.write("Hello, World!".to_string());
     // info!("{function_name}:{item:?}",function_name = function_name!());
     // info!("{}: {:?}", function_name!(), item);
     // let user_id = &session.user_id;
