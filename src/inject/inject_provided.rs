@@ -83,20 +83,20 @@ pub struct InjectProvided<M: ModuleInterface + HasProvider<I> + ?Sized, I: Inter
     PhantomData<M>,
 );
 
-impl<I> FromRequestParts<Arc<AppState>> for InjectProvided<AutoFacModule, I>
+impl<S,M,I> FromRequestParts<Arc<S>> for InjectProvided<M, I>
 where
-    AutoFacModule: ModuleInterface + HasProvider<I>,
+    S: Send + Sync,
+    M: ModuleInterface + HasProvider<I>,
     I: Interface + ?Sized,
+    Arc<M>: FromRef<S>,
 {
     type Rejection = (StatusCode, String);
 
     async fn from_request_parts(
         _req: &mut Parts,
-        state: &Arc<AppState>,
+        state: &Arc<S>,
     ) -> Result<Self, Self::Rejection> {
-        let service = Arc::<AutoFacModule>::from_ref(state.deref())
-            .provide()
-            .map_err(|e| {
+        let service = Arc::<M>::from_ref(state.deref()).provide().map_err(|e| {
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 format!("Failed to provide service: {}", e),
@@ -109,7 +109,9 @@ where
 
 
 
-impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref for InjectProvided<M, I> {
+impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref
+for InjectProvided<M, I>
+{
     type Target = I;
 
     fn deref(&self) -> &Self::Target {
