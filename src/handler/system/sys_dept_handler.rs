@@ -49,10 +49,7 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(item
     // info!("{function_name}:{item:?}",function_name = function_name!());
 
     let container = &state.container;
-
-    let service: &dyn IDateWriter =
-        container.resolve_ref();
-
+    let service: &dyn IDateWriter = container.resolve_ref();
     service.write_date();
     service.get_date();
 
