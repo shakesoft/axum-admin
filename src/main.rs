@@ -59,7 +59,7 @@ use reqwest::StatusCode;
 use tower_http::cors::CorsLayer;
 use tower_http::timeout::TimeoutLayer;
 use tracing_appender::rolling;
-use crate::common::autofac::{AutoFacModule, IDateWriter, TodayWriter, TodayWriterParameters};
+use inject::autofac::{AutoFacModule, IDateWriter, TodayWriter, TodayWriterParameters};
 use shaku::HasComponent;
 use crate::common::result::ok_result_msg;
 use crate::inject::inject_component::Inject;
