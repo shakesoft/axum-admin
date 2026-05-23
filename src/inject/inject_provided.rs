@@ -109,8 +109,7 @@ where
 
 
 
-impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref
-for InjectProvided<M, I>
+impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref for InjectProvided<M, I>
 {
     type Target = I;
 
