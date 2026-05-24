@@ -5,7 +5,7 @@ use shaku::{HasComponent, HasProvider, Interface, ModuleInterface};
 use std::marker::PhantomData;
 use std::ops::Deref;
 use std::sync::Arc;
-
+use tracing::info;
 use crate::inject::autofac::AutoFacModule;
 use crate::AppState;
 
@@ -102,7 +102,7 @@ where
                 format!("Failed to provide service: {}", e),
             )
         })?;
-
+        info!("Provided service: {:?}", std::any::type_name::<I>());
         Ok(Self(service, PhantomData))
     }
 }

@@ -79,6 +79,7 @@ pub struct AppState {
 
 impl FromRef<AppState> for Arc<AutoFacModule> {
     fn from_ref(app_state: &AppState) -> Self {
+        info!("AppState diag: {}", app_state.diag());
         app_state.container.clone()
     }
 }

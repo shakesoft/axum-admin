@@ -8,6 +8,7 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 use std::sync::Arc;
 use axum::extract::FromRef;
+use tracing::info;
 use crate::inject::autofac::AutoFacModule;
 use crate::AppState;
 
@@ -99,7 +100,7 @@ where
         state: &Arc<S>,
     ) -> Result<Self, Self::Rejection> {
         let component = Arc::<M>::from_ref(state.deref()).resolve();
-
+        info!("Provided component: {:?}", std::any::type_name::<I>());
         Ok(Self(component, PhantomData))
     }
 }
