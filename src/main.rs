@@ -53,6 +53,7 @@ use crate::common::error::AppError;
 // use crate::middleware::swagger::swagger_auth;
 use axum::routing::get;
 use chrono::{Local, Utc};
+use dill::{Catalog, OneOf};
 use rbatis::rbdc::DateTime;
 use reqwest::StatusCode;
 // use garde::rules::ip::IpKind::Any;
@@ -62,6 +63,7 @@ use tracing_appender::rolling;
 use inject::autofac::{AutoFacModule, IDateWriter, TodayWriter, TodayWriterParameters};
 use shaku::HasComponent;
 use crate::common::result::ok_result_msg;
+use crate::inject::autofac::{AImpl, BImpl, A};
 use crate::inject::inject_component::Inject;
 use crate::route::system::sys_account_route::build_sys_account_route;
 use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, TrafficLightEvent};
@@ -210,11 +212,12 @@ async fn main() {
     let rd = init_redis(config.redis.url.as_str()).await;
 
     // Register components
-    // let cat = Catalog::builder()
-    //     .add::<AImpl>()
-    //     .add::<BImpl>()
-    //     .build();
-    // let inst = cat.get::<OneOf<dyn A>>().unwrap();
+    let cat = Catalog::builder()
+        .add::<AImpl>()
+        .add::<BImpl>()
+        .build();
+    let inst = cat.get::<OneOf<dyn A>>().unwrap();
+    info!("{}",inst.test());
 
     // Register Container
     let module =Arc::new(
