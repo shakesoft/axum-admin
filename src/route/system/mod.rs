@@ -1,3 +1,4 @@
+pub mod sys_account_route;
 pub mod sys_dept_route;
 pub mod sys_dict_data_route;
 pub mod sys_dict_type_route;
@@ -8,4 +9,3 @@ pub mod sys_operate_log_route;
 pub mod sys_post_route;
 pub mod sys_role_route;
 pub mod sys_user_route;
-pub mod sys_account_route;

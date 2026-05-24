@@ -46,7 +46,6 @@ impl IDateWriter for TodayWriter {
     }
 }
 
-
 pub trait HelloWorld: shaku::Interface {
     fn greet(&self) -> String;
 }
@@ -60,7 +59,6 @@ impl HelloWorld for HelloWorldImpl {
         "Hello, world!".to_owned()
     }
 }
-
 
 pub trait A: Send + Sync {
     fn test(&self) -> String;

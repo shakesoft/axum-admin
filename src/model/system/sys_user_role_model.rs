@@ -1,4 +1,4 @@
-// author：刘飞华
+// author：罗京生
 // createTime：2024/12/12 14:41:44
 
 use rbatis::rbdc::datetime::DateTime;
@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 /*
  *角色用户关联表
- *author：刘飞华
+ *author：罗京生
  *date：2024/12/12 14:41:44
  */
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -17,4 +17,3 @@ pub struct UserRole {
     pub role_id: i64,                  //角色ID
     pub create_time: Option<DateTime>, //创建时间
 }
-

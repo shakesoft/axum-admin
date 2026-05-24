@@ -1,8 +1,8 @@
 use rbatis::rbatis::RBatis;
 use rbatis::rbdc::db::Connection;
 use rbatis::rbdc::pool::{ConnectionManager, Pool};
-use rbdc_mysql::MysqlDriver;
 use rbdc_mssql::MssqlDriver;
+use rbdc_mysql::MysqlDriver;
 use rbdc_pool_fast::FastPool;
 
 pub async fn init_db(url: &str) -> RBatis {

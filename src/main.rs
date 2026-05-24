@@ -1,21 +1,19 @@
 #[macro_use]
 extern crate rbatis;
 
+pub mod aop;
 pub mod common;
+pub mod dao;
 pub mod handler;
+pub mod inject;
 pub mod middleware;
 pub mod model;
 pub mod route;
+pub mod service;
 pub mod utils;
 pub mod vo;
-pub mod dao;
 pub mod workflow;
-pub mod service;
-pub mod aop;
-pub mod inject;
 
-use std::net::SocketAddr;
-use axum::{middleware as md, Json, Router, ServiceExt};
 use crate::route::system::sys_dept_route::build_sys_dept_route;
 use crate::route::system::sys_dict_data_route::build_sys_dict_data_route;
 use crate::route::system::sys_dict_type_route::build_sys_dict_type_route;
@@ -24,6 +22,11 @@ use crate::route::system::sys_notice_route::build_sys_notice_route;
 use crate::route::system::sys_operate_log_route::build_sys_operate_log_route;
 use crate::route::system::sys_post_route::build_sys_post_route;
 use crate::utils::redis_util::init_redis;
+use axum::body::Body;
+use axum::extract::{FromRef, State};
+use axum::http::{Method, Request, Response};
+use axum::response::IntoResponse;
+use axum::{middleware as md, Json, Router, ServiceExt};
 use config::{Config, File};
 use middleware::auth::auth;
 use rbatis::RBatis;
@@ -32,23 +35,18 @@ use route::system::sys_menu_route::build_sys_menu_route;
 use route::system::sys_role_route::build_sys_role_route;
 use route::system::sys_user_route::build_sys_user_route;
 use serde::{Deserialize, Serialize};
+use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
-use axum::body::Body;
-use axum::extract::{FromRef, State};
-use axum::http::{Method, Request, Response};
-use axum::response::IntoResponse;
 // use tower::{ServiceBuilder};
-use tower_http::{
-    catch_panic::CatchPanicLayer, classify::ServerErrorsFailureClass, trace::TraceLayer,
-};
+use crate::common::error::AppError;
+use tower_http::{catch_panic::CatchPanicLayer, classify::ServerErrorsFailureClass, trace::TraceLayer};
 use tracing::{error, info, Span};
 use tracing_subscriber;
-use utoipa::{OpenApi};
+use utils::db::init_db;
+use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 use uuid::Uuid;
-use utils::db::init_db;
-use crate::common::error::AppError;
 // use crate::middleware::error::{ handle_middleware_error};
 // use crate::middleware::swagger::swagger_auth;
 use axum::routing::get;
@@ -57,16 +55,16 @@ use dill::{Catalog, OneOf};
 use rbatis::rbdc::DateTime;
 use reqwest::StatusCode;
 // use garde::rules::ip::IpKind::Any;
-use tower_http::cors::CorsLayer;
-use tower_http::timeout::TimeoutLayer;
-use tracing_appender::rolling;
-use inject::autofac::{AutoFacModule, IDateWriter, TodayWriter, TodayWriterParameters};
-use shaku::HasComponent;
 use crate::common::result::ok_result_msg;
 use crate::inject::autofac::{AImpl, BImpl, A};
 use crate::inject::inject_component::Inject;
 use crate::route::system::sys_account_route::build_sys_account_route;
 use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, TrafficLightEvent};
+use inject::autofac::{AutoFacModule, IDateWriter, TodayWriter, TodayWriterParameters};
+use shaku::HasComponent;
+use tower_http::cors::CorsLayer;
+use tower_http::timeout::TimeoutLayer;
+use tracing_appender::rolling;
 // use crate::common::daily_logfile::DailyLogFile;
 // use crate::handler::system::sys_user_handler::reset_sys_user_password;
 
@@ -156,19 +154,17 @@ async fn main() {
     let mut light = DynamicTrafficLight::new(());
     // Type is TrafficLight<Red>
 
-
     light.handle(TrafficLightEvent::Next).unwrap();
-    println!("{:?}",light.current_state());
+    println!("{:?}", light.current_state());
     // Type is TrafficLight<Green>
 
     light.handle(TrafficLightEvent::Next).unwrap();
-    println!("{:?}",light.current_state());
+    println!("{:?}", light.current_state());
     // Type is TrafficLight<Yellow>
 
     let a = light.into_yellow().unwrap();
-    println!("{:?}", a);//Yellow
-    // Type is TrafficLight<Yellow>
-
+    println!("{:?}", a); //Yellow
+                         // Type is TrafficLight<Yellow>
 
     let light = TrafficLight::new(());
     let mut dynamic_light = light.into_dynamic();
@@ -176,10 +172,10 @@ async fn main() {
     // let ee = dd.into_dynamic().current_state();
     // let cc = dynamic_light.into_green().unwrap();
     let bb = dynamic_light.current_state();
-    println!("{}",bb);
+    println!("{}", bb);
 
     dynamic_light.handle(TrafficLightEvent::Next).unwrap();
-    println!("{}",dynamic_light.current_state());
+    println!("{}", dynamic_light.current_state());
 
     // #[derive(Debug)]
     // struct ImportantExcerpt<'a> {
@@ -213,98 +209,90 @@ async fn main() {
     let rd = init_redis(config.redis.url.as_str()).await;
 
     // Register components
-    let catalog = Catalog::builder()
-        .add::<AImpl>()
-        .add::<BImpl>()
-        .build();
+    let catalog = Catalog::builder().add::<AImpl>().add::<BImpl>().build();
     // let inst = catalog.get::<OneOf<dyn A>>().unwrap();
     // info!("{}",inst.test());
 
     // Register Container
-    let module =Arc::new(
+    let module = Arc::new(
         AutoFacModule::builder()
             .with_component_parameters::<TodayWriter>(TodayWriterParameters {
                 today: Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
                 year: DateTime::now().year() as usize,
             })
-            .build());
+            .build(),
+    );
 
     // 创建共享应用状态，包含数据库连接池
-    let shared_state = Arc::new(AppState { batis: rb, redis: rd, container: module, catalog});
+    let shared_state = Arc::new(AppState {
+        batis: rb,
+        redis: rd,
+        container: module,
+        catalog,
+    });
 
     // 跨域中间件
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE, Method::PATCH])
         .allow_origin(tower_http::cors::Any)
         .allow_headers(tower_http::cors::Any);
-		
-		/*
-		let cors = CorsLayer::new()
-        .allow_origin("*".parse::<HeaderValue>().unwrap())
-        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
-        .allow_headers([CONTENT_TYPE, AUTHORIZATION, ACCEPT]);
-		**/
+
+    /*
+    let cors = CorsLayer::new()
+    .allow_origin("*".parse::<HeaderValue>().unwrap())
+    .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
+    .allow_headers([CONTENT_TYPE, AUTHORIZATION, ACCEPT]);
+    **/
 
     // Swagger-UI
     let swagger_ui = SwaggerUi::new("/swagger-ui").url("/api-doc/openapi.json", ApiDoc::openapi());
 
     // 请求超时中间件
-    let timeout = TimeoutLayer::with_status_code(StatusCode::REQUEST_TIMEOUT,Duration::from_secs(6));
+    let timeout = TimeoutLayer::with_status_code(StatusCode::REQUEST_TIMEOUT, Duration::from_secs(6));
 
     // 请求追踪中间件
     let trace = TraceLayer::new_for_http()
         .make_span_with(|_request: &Request<Body>| {
-                let request_id = Uuid::new_v4().to_string();
-                tracing::info_span!("http-request: ", %request_id)
-            }
-        )
-        .on_request(|request: &Request<Body>, _span: &Span| {
-                info!("request: {} {}", request.method(), request.uri().path())
-            }
-        )
+            let request_id = Uuid::new_v4().to_string();
+            tracing::info_span!("http-request: ", %request_id)
+        })
+        .on_request(|request: &Request<Body>, _span: &Span| info!("request: {} {}", request.method(), request.uri().path()))
         .on_response(|response: &Response<Body>, latency: Duration, _span: &Span| {
-                info!("response: {} {:?}", response.status(), latency);
-            },
-        )
-        .on_failure(|err: ServerErrorsFailureClass, _latency: Duration, _span: &Span| {
-                error!("Don't panic, C'est la vie. {}", err)
-            },
-        );
+            info!("response: {} {:?}", response.status(), latency);
+        })
+        .on_failure(|err: ServerErrorsFailureClass, _latency: Duration, _span: &Span| error!("Don't panic, C'est la vie. {}", err));
 
     // 全局异常捕获中间件
     let panic = CatchPanicLayer::custom(|panic_info: Box<dyn std::any::Any + Send>| {
-        error!("Custom panic hook: {panic_info:?}");// 这里可以上报日志、监控或做其他操作
+        error!("Custom panic hook: {panic_info:?}"); // 这里可以上报日志、监控或做其他操作
         AppError::default().into_response() // 保持原有的响应行为
     });
 
     // 首页路由
-    let home_router = Router::new().route("/", get(async||-> &'static str {
-        "Hello axum-admin!"
-    }));
+    let home_router = Router::new().route("/", get(async || -> &'static str { "Hello axum-admin!" }));
 
-    let index_router = Router::new().route("/index", get(async||-> String{
-        let json =json_data();
-        return json.to_string();
-    }));
+    let index_router = Router::new().route(
+        "/index",
+        get(async || -> String {
+            let json = json_data();
+            return json.to_string();
+        }),
+    );
 
+    let test_router = Router::new().route(
+        "/test",
+        get(async || -> String {
+            let body = reqwest::get("http://dev.domain365.com/enter/lutong/order-request").await.unwrap().text().await.unwrap();
 
+            //let mut body = String::new();
+            // res.read_to_string(&mut body)?;
+            info!("{body}");
+            println!("{}", body);
+            body
+        }),
+    );
 
-    let test_router = Router::new().route("/test", get(async||-> String {
-        let body = reqwest::get("http://dev.domain365.com/enter/lutong/order-request")
-            .await.unwrap()
-            .text()
-            .await.unwrap();
-
-        //let mut body = String::new();
-        // res.read_to_string(&mut body)?;
-        info!("{body}");
-        println!("{}", body);
-        body
-    }));
-
-    let test_router1 = Router::new().route("/test1", get(async || {
-        ok_result_msg("成功啦")
-    }));
+    let test_router1 = Router::new().route("/test1", get(async || ok_result_msg("成功啦")));
 
     // async fn di_index(writer: Inject<AutoFacModule, dyn IDateWriter>) -> String {
     //     println!("di");
@@ -315,26 +303,34 @@ async fn main() {
     let di_router = Router::new().route("/di", get(di_index));
 
     // 构建应用路由，并合并多个子路由
-    let app = Router::new().merge(swagger_ui).merge(home_router).merge(index_router).merge(test_router).merge(test_router1).merge(di_router)//.route_layer(md::from_fn(swagger_auth))
-        .nest("/api",Router::new()
-            .merge(build_sys_account_route())
-            .merge(build_sys_user_route())
-            .merge(build_sys_role_route())
-            .merge(build_sys_menu_route())
-            .merge(build_sys_dept_route())
-            .merge(build_sys_dict_type_route())
-            .merge(build_sys_dict_data_route())
-            .merge(build_sys_post_route())
-            .merge(build_sys_login_log_route())
-            .merge(build_sys_operate_log_route())
-            .merge(build_sys_notice_route())
-            .layer(cors)
-            .layer(timeout) // 设置请求超时时间为3秒
-            .layer(trace)
-            .layer(panic)
-            .route_layer(md::from_fn_with_state(Arc::clone(&shared_state), auth)) // 添加认证中间件
-            .with_state(shared_state), // 设置共享状态
-    );
+    let app = Router::new()
+        .merge(swagger_ui)
+        .merge(home_router)
+        .merge(index_router)
+        .merge(test_router)
+        .merge(test_router1)
+        .merge(di_router) //.route_layer(md::from_fn(swagger_auth))
+        .nest(
+            "/api",
+            Router::new()
+                .merge(build_sys_account_route())
+                .merge(build_sys_user_route())
+                .merge(build_sys_role_route())
+                .merge(build_sys_menu_route())
+                .merge(build_sys_dept_route())
+                .merge(build_sys_dict_type_route())
+                .merge(build_sys_dict_data_route())
+                .merge(build_sys_post_route())
+                .merge(build_sys_login_log_route())
+                .merge(build_sys_operate_log_route())
+                .merge(build_sys_notice_route())
+                .layer(cors)
+                .layer(timeout) // 设置请求超时时间为3秒
+                .layer(trace)
+                .layer(panic)
+                .route_layer(md::from_fn_with_state(Arc::clone(&shared_state), auth)) // 添加认证中间件
+                .with_state(shared_state), // 设置共享状态
+        );
 
     // 以下代码适用于axum 0.6.x版本
     // 定义服务器监听地址
@@ -361,8 +357,8 @@ pub async fn di_index() -> String {
     String::from("sss")
 }
 
-pub fn json_data()->&'static str{
-    let data:&'static str = r#"{
+pub fn json_data() -> &'static str {
+    let data: &'static str = r#"{
   "accidentType": "0",
   "carModel": "WEYWEY全新蓝山",
   "caseCity": "上海市",
@@ -411,13 +407,7 @@ pub fn json_data()->&'static str{
     data
 }
 
-pub async fn post_json(
-    url: &str,
-    json_body: &str,
-    app_key: &str,
-    timestamp: &str,
-    sign: &str,
-) -> Result<String, reqwest::Error> {
+pub async fn post_json(url: &str, json_body: &str, app_key: &str, timestamp: &str, sign: &str) -> Result<String, reqwest::Error> {
     let client = reqwest::Client::new();
     let resp = client
         .post(url)
@@ -428,7 +418,7 @@ pub async fn post_json(
         .body(json_body.to_string())
         .send()
         .await?
-        .error_for_status()?   // 自动检查 4xx/5xx
+        .error_for_status()? // 自动检查 4xx/5xx
         .text()
         .await?;
 

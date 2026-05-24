@@ -2,7 +2,7 @@ use rbatis::rbdc::DateTime;
 
 /*
  *时间转字符串
- *author：刘飞华
+ *author：罗京生
  *date：2025/01/02 14:38:11
  */
 pub fn time_to_string(t: Option<DateTime>) -> String {
@@ -19,6 +19,5 @@ pub fn timestamp_to_utc(timestamp: i64) -> Option<chrono::DateTime<chrono::Utc>>
 
 /// 安全地将 Unix 时间戳（秒）转换为本地 DateTime
 pub fn timestamp_to_local(timestamp: i64) -> Option<chrono::DateTime<chrono::Local>> {
-    chrono::DateTime::from_timestamp(timestamp, 0)
-        .map(|utc| utc.with_timezone(&chrono::Local))
+    chrono::DateTime::from_timestamp(timestamp, 0).map(|utc| utc.with_timezone(&chrono::Local))
 }

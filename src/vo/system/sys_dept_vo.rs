@@ -1,4 +1,4 @@
-// author：刘飞华
+// author：罗京生
 // createTime：2024/12/25 10:01:11
 
 use crate::common::result::serialize_datetime;
@@ -6,12 +6,12 @@ use rbatis::rbdc::DateTime;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
-use validator::Validate;
 use utoipa::ToSchema;
+use validator::Validate;
 /*
 删除部门表请求参数
 */
-#[derive(Debug, Serialize, Deserialize,ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct DeleteDeptReq {
     pub id: i64,
 }
@@ -21,7 +21,7 @@ static PHONE_NUMBER: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\d{11}$").u
 /*
 更新部门表请求参数
 */
-#[derive(Debug, Serialize, Deserialize, Validate,ToSchema)]
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct DeptReq {
     pub id: Option<i64>, //部门id
@@ -42,7 +42,7 @@ pub struct DeptReq {
 /*
 更新部门表状态请求参数
 */
-#[derive(Debug, Serialize, Deserialize,ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct UpdateDeptStatusReq {
     pub id: i64,
     pub status: i8,
@@ -51,7 +51,7 @@ pub struct UpdateDeptStatusReq {
 /*
 查询部门表详情请求参数
 */
-#[derive(Debug, Serialize, Deserialize,ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct QueryDeptDetailReq {
     pub id: i64,
 }
@@ -59,7 +59,7 @@ pub struct QueryDeptDetailReq {
 /*
 查询部门表列表请求参数
 */
-#[derive(Debug, Serialize, Deserialize, Validate,ToSchema)]
+#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryDeptListReq {
     pub dept_name: Option<String>, //部门名称
@@ -75,7 +75,7 @@ fn default_status() -> Option<i8> {
 /*
 查询部门表列表响应参数
 */
-#[derive(Debug, Serialize, Deserialize, Clone,ToSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct DeptResp {
     pub id: Option<i64>,           //部门id

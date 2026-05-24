@@ -1,29 +1,22 @@
-use std::ops::Deref;
-use crate::common::error::{AppError};
 use crate::common::extractor::ValidatedJson;
-use crate::common::result::{ok, ok_result_data, BaseResponse, EmptyResponse};
-use crate::model::system::sys_dept_model::{Dept};
+use crate::common::result::{ok, BaseResponse, EmptyResponse};
 use crate::vo::system::sys_dept_vo::*;
 use crate::AppState;
-use crate::dao::system::sys_dept_dao::SysDeptDao;
+use aspect_macros::aspect;
+use aspect_std::{LoggingAspect, TimingAspect};
 use axum::extract::State;
 use axum::response::IntoResponse;
 use axum::{Extension, Json};
-use log::info;
-use rbatis::rbatis_codegen::ops::AsProxy;
-use rbatis::RBatis;
-use rbatis::rbdc::DateTime;
-use rbs::value;
-use std::sync::Arc;
-use aspect_macros::{aspect};
-use aspect_std::{LoggingAspect, TimingAspect};
 use dill::OneOf;
+use log::info;
+use rbatis::rbdc::DateTime;
+use rbatis::RBatis;
 use shaku::HasComponent;
+use std::ops::Deref;
+use std::sync::Arc;
 use tracing::instrument;
 // use std::time::Duration;
 // use tokio::time::sleep;
-use validator::Validate;
-use crate::dao::system::sys_dept_dao;
 use crate::inject::autofac::{AutoFacModule, HelloWorld, IDateWriter, IOutput, A};
 use crate::inject::inject_component::Inject;
 use crate::inject::inject_provided::InjectProvided;
@@ -31,7 +24,7 @@ use crate::service::system::sys_dept_service::SysDeptService;
 use crate::vo::system::sys_user_vo::UserSession;
 /*
  *添加部门表
- *author：刘飞华
+ *author：罗京生
  *date：2024/12/25 11:36:48
  */
 #[utoipa::path(
@@ -70,31 +63,12 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(item
     // info!("{}: {item:?}",function_name!());
     let rb = &state.batis;
 
-    if Dept::select_by_dept_name(rb, &item.dept_name, &item.parent_id).await?.is_some() {
-        return Err(AppError::BusinessError("部门名称已存在"));
-    }
-
-    match Dept::select_by_id(rb, &item.parent_id).await? {
-        None => Err(AppError::BusinessError("添加失败,上级部门不存在")),
-        Some(dept) => {
-            if dept.status == 0 {
-                return Err(AppError::BusinessError("部门停用，不允许添加"));
-            }
-            let ancestors = format!("{},{}", dept.ancestors.unwrap_or_default(), &item.parent_id);
-            let mut sys_dept = Dept::from(item);
-            // let mut sys_dept:Dept = item.into();
-            sys_dept.ancestors = Some(ancestors);
-            if let Err(e) = sys_dept.validate() {
-                return Err(e.into());
-            }
-            Dept::insert(rb, &sys_dept).await.map(|_| ok())?
-        }
-    }
+    SysDeptService::add_sys_dept(rb, item).await
 }
 
 /*
  *删除部门表
- *author：刘飞华
+ *author：罗京生
  *date：2024/12/25 11:36:48
  */
 #[utoipa::path(
@@ -104,23 +78,13 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(item
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
 #[function_name::named]
-pub async fn delete_sys_dept(State(state): State<Arc<AppState>>,Extension(session): Extension<UserSession>, Json(item): Json<DeleteDeptReq>) -> impl IntoResponse {
+pub async fn delete_sys_dept(State(state): State<Arc<AppState>>, Extension(_session): Extension<UserSession>, Json(item): Json<DeleteDeptReq>) -> impl IntoResponse {
     // info!("{function_name}:{item:?}",function_name = function_name!());
     info!("{}: {:?}", function_name!(), item);
-    let user_id = &session.user_id;
     // panic!("test");
-    let permissons = &session.permissions;
     let rb = &state.batis;
 
-    if sys_dept_dao::select_dept_count(rb, &item.id).await? > 0 {
-        return Err(AppError::BusinessError("存在下级部门,不允许删除"));
-    }
-
-    if sys_dept_dao::check_dept_exist_user(rb, &item.id).await? > 0 {
-        return Err(AppError::BusinessError("部门存在用户,不允许删除"));
-    }
-
-    Dept::delete_by_map(rb, value! {"id": &item.id}).await.map(|_| ok())?
+    SysDeptService::delete_sys_dept(rb, item).await
 }
 
 #[utoipa::path(
@@ -131,20 +95,21 @@ pub async fn delete_sys_dept(State(state): State<Arc<AppState>>,Extension(sessio
 )]
 // #[function_name::named]
 pub async fn delete_sys_dept1(
-                              writer: Inject<AutoFacModule, dyn IDateWriter>,
-                              hello_world: InjectProvided<AutoFacModule, dyn HelloWorld>,
-                              State(state): State<Arc<AppState>>,
-                              Extension(session): Extension<UserSession>,
-                              Json(item): Json<DeleteDeptReq>) -> impl IntoResponse {
+    writer: Inject<AutoFacModule, dyn IDateWriter>,
+    hello_world: InjectProvided<AutoFacModule, dyn HelloWorld>,
+    State(state): State<Arc<AppState>>,
+    Extension(session): Extension<UserSession>,
+    Json(item): Json<DeleteDeptReq>,
+) -> impl IntoResponse {
     writer.write_date();
     writer.get_date();
-    let result =  hello_world.greet();
+    let result = hello_world.greet();
     info!("{}", result);
 
     let cat = &state.catalog;
     let inst = cat.get::<OneOf<dyn A>>().unwrap();
-    info!("{}",inst.test());
-    
+    info!("{}", inst.test());
+
     // info!("{function_name}:{item:?}",function_name = function_name!());
     // info!("{}: {:?}", function_name!(), item);
     // let user_id = &session.user_id;
@@ -165,7 +130,7 @@ pub async fn delete_sys_dept1(
 
 /*
  *更新部门表
- *author：刘飞华
+ *author：罗京生
  *date：2024/12/25 11:36:48
  */
 #[utoipa::path(
@@ -175,62 +140,16 @@ pub async fn delete_sys_dept1(
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
 #[function_name::named]
-pub async fn update_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(mut item): ValidatedJson<DeptReq>) -> impl IntoResponse {
+pub async fn update_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(item): ValidatedJson<DeptReq>) -> impl IntoResponse {
     info!("{}: {:?}", function_name!(), item);
     let rb = &state.batis;
 
-    let id = item.id;
-
-    if item.id.is_none() {
-        return Err(AppError::BusinessError("主键不能为空"));
-    }
-
-    if Some(item.parent_id) == id {
-        return Err(AppError::BusinessError("上级部门不能是自己"));
-    }
-
-    let old_ancestors = match Dept::select_by_id(rb, &id.unwrap_or_default()).await? {
-        None => return Err(AppError::BusinessError("部门不存在")),
-        Some(dept) => dept.ancestors.unwrap_or_default(),
-    };
-
-    let ancestors = match Dept::select_by_id(rb, &item.parent_id).await? {
-        None => return Err(AppError::BusinessError("上级部门不存在")),
-        Some(dept) => {
-            format!("{},{}", dept.ancestors.unwrap_or_default(), &item.parent_id)
-        }
-    };
-
-    if let Some(dept) = Dept::select_by_dept_name(rb, &item.dept_name, &item.parent_id).await? {
-        if dept.id != id {
-            return Err(AppError::BusinessError("部门名称已存在"));
-        }
-    }
-
-    if sys_dept_dao::select_normal_children_dept_by_id(rb, &id.unwrap_or_default()).await? > 0 && item.status == 0 {
-        return Err(AppError::BusinessError("该部门包含未停用的子部门"));
-    }
-
-    for mut x in sys_dept_dao::select_children_dept_by_id(rb, &id.unwrap_or_default()).await? {
-        x.ancestors = Some(x.ancestors.unwrap_or_default().replace(old_ancestors.as_str(), ancestors.as_str()));
-        Dept::update_by_map(rb, &x, value! {"id": &x.id}).await?;
-    }
-
-    if item.status == 1 && ancestors != "0" {
-        SysDeptDao::update_dept_status(rb, &ancestors, item.status).await?;
-    }
-    item.ancestors = Some(ancestors.clone());
-
-    let data = Dept::from(item);
-    if let Err(e) = data.validate() {
-        return Err(e.into());
-    }
-    Dept::update_by_map(rb, &data, value! {"id":  &id}).await.map(|_| ok())?
+    SysDeptService::update_sys_dept(rb, item).await
 }
 
 /*
  *更新部门表状态
- *author：刘飞华
+ *author：罗京生
  *date：2024/12/25 11:36:48
  */
 #[utoipa::path(
@@ -245,18 +164,11 @@ pub async fn update_sys_dept_status(State(state): State<Arc<AppState>>, Json(ite
     info!("{}: {:?}", function_name!(), item);
     let rb = &state.batis;
 
-    let mut ids = vec![item.id];
-    if item.status == 1 {
-        if let Some(x) = Dept::select_by_id(rb, &item.id).await? {
-            ids.extend(&x.ancestors.unwrap_or_default().split(",").map(|s| s.i64()).collect::<Vec<i64>>())
-        }
-    }
-
-    SysDeptDao::update_dept_status(rb, &ids.iter().map(|_| "?").collect::<Vec<&str>>().join(", "), item.status).await.map(|_| ok())?
+    SysDeptService::update_sys_dept_status(rb, item).await
 }
 /*
  *查询部门表详情
- *author：刘飞华
+ *author：罗京生
  *date：2024/12/25 11:36:48
  */
 #[utoipa::path(
@@ -267,20 +179,15 @@ pub async fn update_sys_dept_status(State(state): State<Arc<AppState>>, Json(ite
 )]
 #[function_name::named]
 pub async fn query_sys_dept_detail(State(state): State<Arc<AppState>>, Json(item): Json<QueryDeptDetailReq>) -> impl IntoResponse {
-    info!("{function_name}:{item:?}",function_name = function_name!());
+    info!("{function_name}:{item:?}", function_name = function_name!());
     let rb = &state.batis;
-    Dept::select_by_id(rb, &item.id).await?.map_or_else(
-        || Err(AppError::BusinessError("部门不存在")),
-        |x| {
-            let data: DeptResp = x.into();
-            ok_result_data(data)
-        },
-    )
+
+    SysDeptService::query_sys_dept_detail(rb, item).await
 }
 
 /*
  *查询部门表列表
- *author：刘飞华
+ *author：罗京生
  *date：2024/12/25 11:36:48
  */
 #[utoipa::path(
@@ -289,14 +196,11 @@ pub async fn query_sys_dept_detail(State(state): State<Arc<AppState>>, Json(item
     request_body = QueryDeptListReq,
     responses((status = 200, description = "successfully", body = BaseResponse<Vec<DeptResp>>))
 )]
-
 #[function_name::named]
 // #[aspect(TimingAspect::new())]
 pub async fn query_sys_dept_list(State(state): State<Arc<AppState>>, Json(item): Json<QueryDeptListReq>) -> impl IntoResponse {
-    info!("{function_name}:{item:?}",function_name = function_name!());
+    info!("{function_name}:{item:?}", function_name = function_name!());
     let rb = &state.batis;
 
-    Dept::select_page_dept_list(rb, &item)
-        .await
-        .map(|x| ok_result_data(x.into_iter().map(|x| x.into()).collect::<Vec<DeptResp>>()))?
+    SysDeptService::query_sys_dept_list(rb, item).await
 }

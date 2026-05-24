@@ -2,11 +2,11 @@ use crate::handler::system::sys_notice_handler;
 use crate::AppState;
 use axum::routing::post;
 use axum::Router;
-use std::sync::Arc;
 use reqwest::get;
+use std::sync::Arc;
 /*
  *构建通知公告表路由
- *author：刘飞华
+ *author：罗京生
  *date：2024/12/25 14:07:37
  */
 pub fn build_sys_notice_route() -> Router<Arc<AppState>> {

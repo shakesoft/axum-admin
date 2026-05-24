@@ -1,16 +1,13 @@
-use std::any::Any;
 use aspect_core::{Aspect, AspectError, AsyncAspect, AsyncProceedingJoinPoint, ProceedingJoinPoint};
-use tokio::time::Instant;
 use log::info;
+use std::any::Any;
+use tokio::time::Instant;
 
 #[derive(Default)]
 pub struct Timer;
 
 impl AsyncAspect for Timer {
-    async fn around(
-        &self,
-        pjp: AsyncProceedingJoinPoint<'_>,
-    ) ->  Result<Box<dyn Any + Send + Sync>, AspectError>  {
+    async fn around(&self, pjp: AsyncProceedingJoinPoint<'_>) -> Result<Box<dyn Any + Send + Sync>, AspectError> {
         let start = Instant::now();
         let function_name = pjp.context().function_name;
         let result = pjp.proceed().await;
@@ -19,7 +16,6 @@ impl AsyncAspect for Timer {
         result
     }
 }
-
 
 // impl Aspect for Timer {
 //     fn around(&self, pjp: ProceedingJoinPoint) -> Result<Box<dyn Any>, AspectError>  {

@@ -1,4 +1,4 @@
-// author：刘飞华
+// author：罗京生
 // createTime：2024/12/12 14:41:44
 
 use crate::rbatis::rbatis_codegen::IntoSql;
@@ -8,7 +8,7 @@ use rbatis::RBatis;
 use serde::{Deserialize, Serialize};
 /*
  *菜单信息
- *author：刘飞华
+ *author：罗京生
  *date：2024/12/12 14:41:44
  */
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -27,7 +27,6 @@ pub struct Menu {
     pub create_time: Option<DateTime>, //创建时间
     pub update_time: Option<DateTime>, //修改时间
 }
-
 
 impl From<MenuReq> for Menu {
     fn from(item: MenuReq) -> Self {

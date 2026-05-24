@@ -1,4 +1,4 @@
-// author：刘飞华
+// author：罗京生
 // createTime：2024/12/12 14:41:44
 
 use crate::common::result::serialize_datetime;
@@ -105,10 +105,10 @@ pub struct UserResp {
 /*
 登录请求参数
 */
-#[derive(Debug, Deserialize, Clone,Validate,ToSchema)]
+#[derive(Debug, Deserialize, Clone, Validate, ToSchema)]
 pub struct UserLoginReq {
     #[validate(length(min = 2, max = 30, message = "手机号码不能为空"))]
-    pub mobile: String,   //手机
+    pub mobile: String, //手机
 
     #[validate(length(min = 2, max = 30, message = "用户密码不能为空且长度为2-30"))]
     pub password: String, //密码
@@ -117,10 +117,9 @@ pub struct UserLoginReq {
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserLoginResp {
-    pub token: String, //登录成功后返回token
+    pub token: String,     //登录成功后返回token
     pub expires_at: usize, //token过期时间，时间戳
 }
-
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]

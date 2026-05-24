@@ -4,13 +4,13 @@ use axum::{
 };
 use shaku::{HasComponent, Interface, ModuleInterface};
 
+use crate::inject::autofac::AutoFacModule;
+use crate::AppState;
+use axum::extract::FromRef;
 use std::marker::PhantomData;
 use std::ops::Deref;
 use std::sync::Arc;
-use axum::extract::FromRef;
 use tracing::info;
-use crate::inject::autofac::AutoFacModule;
-use crate::AppState;
 
 /// Used to retrieve a reference to a component from a shaku `Module`.
 /// The module should be stored in Axum state, wrapped in an `Arc` (`Arc<MyModule>`).
@@ -81,12 +81,9 @@ use crate::AppState;
 ///     # }
 /// }
 /// ```
-pub struct Inject<M: ModuleInterface + HasComponent<I> + ?Sized, I: Interface + ?Sized>(
-    Arc<I>,
-    PhantomData<M>,
-);
+pub struct Inject<M: ModuleInterface + HasComponent<I> + ?Sized, I: Interface + ?Sized>(Arc<I>, PhantomData<M>);
 
-impl<S,M,I> FromRequestParts<Arc<S>> for Inject<M, I>
+impl<S, M, I> FromRequestParts<Arc<S>> for Inject<M, I>
 where
     S: Send + Sync,
     M: ModuleInterface + HasComponent<I>,
@@ -95,10 +92,7 @@ where
 {
     type Rejection = (StatusCode, String);
 
-    async fn from_request_parts(
-        _req: &mut Parts,
-        state: &Arc<S>,
-    ) -> Result<Self, Self::Rejection> {
+    async fn from_request_parts(_req: &mut Parts, state: &Arc<S>) -> Result<Self, Self::Rejection> {
         let component = Arc::<M>::from_ref(state.deref()).resolve();
         info!("Provided component: {:?}", std::any::type_name::<I>());
         Ok(Self(component, PhantomData))

@@ -1,9 +1,9 @@
 use crate::common::error::AppError;
 use crate::common::error::AppError::JwtTokenError;
 use jsonwebtoken::{decode, encode, errors::ErrorKind, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use nameof::name_of;
 use serde::{Deserialize, Serialize};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use nameof::name_of;
 
 pub const JWT_EXPIRATION_SECONDS: u64 = 86400; // 24小时过期时间，单位为秒
 pub const JWT_SECRET: &str = "123";
@@ -34,18 +34,18 @@ impl JwtToken {
     pub fn new(id: i64, username: &str) -> JwtToken {
         let now = SystemTime::now();
         let now = now.duration_since(UNIX_EPOCH).expect("获取系统时间失败");
-        let exp = Duration::from_secs(JWT_EXPIRATION_SECONDS);//过期时间
+        let exp = Duration::from_secs(JWT_EXPIRATION_SECONDS); //过期时间
 
         JwtToken {
             id,
             username: String::from(username),
             aud: String::from(JWT_AUDIENCE), // (audience)：受众
             exp: (now + exp).as_secs() as usize,
-            iat: now.as_secs() as usize,     // (Issued At)：签发时间
-            nbf: now.as_secs() as usize,     // (Not Before)：生效时间
-            iss: String::from(JWT_ISSUER),   // (issuer)：签发人
-            sub: String::from(JWT_SUBJECT),  // (subject)：主题
-            jti: String::from(JWT_JTI),      // (JWT ID)：编号
+            iat: now.as_secs() as usize,    // (Issued At)：签发时间
+            nbf: now.as_secs() as usize,    // (Not Before)：生效时间
+            iss: String::from(JWT_ISSUER),  // (issuer)：签发人
+            sub: String::from(JWT_SUBJECT), // (subject)：主题
+            jti: String::from(JWT_JTI),     // (JWT ID)：编号
         }
     }
 
@@ -68,7 +68,7 @@ impl JwtToken {
         validation.leeway = 60;
         validation.sub = Some(JWT_SUBJECT.to_string());
         validation.set_audience(&[JWT_AUDIENCE]);
-        validation.set_required_spec_claims(&[name_of!(exp in JwtToken),name_of!(sub in JwtToken),name_of!(aud in JwtToken)]);
+        validation.set_required_spec_claims(&[name_of!(exp in JwtToken), name_of!(sub in JwtToken), name_of!(aud in JwtToken)]);
         match decode::<JwtToken>(&token, &DecodingKey::from_secret(secret.as_ref()), &validation) {
             Ok(c) => Ok(c.claims),
             Err(err) => match *err.kind() {
@@ -83,9 +83,9 @@ impl JwtToken {
 
 #[cfg(test)]
 mod tests {
-    use tracing::debug;
     use crate::utils::jwt_util;
     use crate::utils::jwt_util::JwtToken;
+    use tracing::debug;
 
     #[test]
     fn test_jwt() {

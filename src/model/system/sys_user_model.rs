@@ -1,4 +1,4 @@
-// author：刘飞华
+// author：罗京生
 // createTime：2024/12/12 14:41:44
 
 use crate::vo::system::sys_user_vo::{QueryUserListReq, UserReq, UserResp};
@@ -8,7 +8,7 @@ use rbatis::rbdc::Error;
 use serde::{Deserialize, Serialize};
 /*
  *用户信息
- *author：刘飞华
+ *author：罗京生
  *date：2024/12/12 14:41:44
  */
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -33,7 +33,6 @@ pub struct User {
     pub create_time: Option<DateTime>,     //创建时间
     pub update_time: Option<DateTime>,     //修改时间
 }
-
 
 impl From<UserReq> for User {
     fn from(item: UserReq) -> Self {

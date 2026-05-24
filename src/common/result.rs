@@ -1,31 +1,30 @@
-use crate::common::error::{AppResult};
+use crate::common::error::AppResult;
 use axum::Json;
 use rbatis::rbdc::DateTime;
 use serde::Serialize;
 use std::fmt::Debug;
-use utoipa::{ToSchema};
+use utoipa::ToSchema;
 
-const SUCCESS_CODE:i32 = 0;
-const SUCCESS_MSG:&str ="操作成功";
-const DATETIME_FORMAT:&str = "YYYY-MM-DD hh:mm:ss";
-const EMPTY_STRING:&str = "";
+const SUCCESS_CODE: i32 = 0;
+const SUCCESS_MSG: &str = "操作成功";
+const DATETIME_FORMAT: &str = "YYYY-MM-DD hh:mm:ss";
+const EMPTY_STRING: &str = "";
 
-#[derive(Serialize, Debug, Clone,ToSchema)]
-pub struct EmptyResponse
-{
+#[derive(Serialize, Debug, Clone, ToSchema)]
+pub struct EmptyResponse {
     pub code: i32,
     pub msg: String,
     pub data: Option<()>,
 }
 
-#[derive(Serialize, Debug, Clone,ToSchema)]
+#[derive(Serialize, Debug, Clone, ToSchema)]
 pub struct BaseResponse<T> {
     pub code: i32,
     pub msg: String,
     pub data: Option<T>,
 }
 
-#[derive(Serialize, Debug, Clone,ToSchema)]
+#[derive(Serialize, Debug, Clone, ToSchema)]
 pub struct PageResponse<T> {
     pub code: i32,
     pub msg: String,
@@ -82,4 +81,3 @@ where
         None => serializer.serialize_str(EMPTY_STRING),
     }
 }
-

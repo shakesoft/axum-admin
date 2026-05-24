@@ -1,3 +1,5 @@
+use crate::inject::autofac::AutoFacModule;
+use crate::AppState;
 use axum::extract::{FromRef, FromRequestParts};
 use axum::http::request::Parts;
 use axum::http::StatusCode;
@@ -6,8 +8,6 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 use std::sync::Arc;
 use tracing::info;
-use crate::inject::autofac::AutoFacModule;
-use crate::AppState;
 
 /// Used to create a provided service from a shaku `Module`.
 /// The module should be stored in Axum state, wrapped in an `Arc` (`Arc<MyModule>`).
@@ -78,12 +78,9 @@ use crate::AppState;
 ///     }
 /// }
 /// ```
-pub struct InjectProvided<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized>(
-    Box<I>,
-    PhantomData<M>,
-);
+pub struct InjectProvided<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized>(Box<I>, PhantomData<M>);
 
-impl<S,M,I> FromRequestParts<Arc<S>> for InjectProvided<M, I>
+impl<S, M, I> FromRequestParts<Arc<S>> for InjectProvided<M, I>
 where
     S: Send + Sync,
     M: ModuleInterface + HasProvider<I>,
@@ -92,25 +89,16 @@ where
 {
     type Rejection = (StatusCode, String);
 
-    async fn from_request_parts(
-        _req: &mut Parts,
-        state: &Arc<S>,
-    ) -> Result<Self, Self::Rejection> {
-        let service = Arc::<M>::from_ref(state.deref()).provide().map_err(|e| {
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Failed to provide service: {}", e),
-            )
-        })?;
+    async fn from_request_parts(_req: &mut Parts, state: &Arc<S>) -> Result<Self, Self::Rejection> {
+        let service = Arc::<M>::from_ref(state.deref())
+            .provide()
+            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to provide service: {}", e)))?;
         info!("Provided service: {:?}", std::any::type_name::<I>());
         Ok(Self(service, PhantomData))
     }
 }
 
-
-
-impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref for InjectProvided<M, I>
-{
+impl<M: ModuleInterface + HasProvider<I> + ?Sized, I: Interface + ?Sized> Deref for InjectProvided<M, I> {
     type Target = I;
 
     fn deref(&self) -> &Self::Target {

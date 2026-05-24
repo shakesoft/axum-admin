@@ -1,4 +1,4 @@
-// author：刘飞华
+// author：罗京生
 // createTime：2024/12/25 10:01:11
 
 use crate::common::result::serialize_datetime;
@@ -16,7 +16,7 @@ pub struct DeleteDictDataReq {
 /*
 更新字典数据表请求参数
 */
-#[derive(Debug,Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DictDataReq {
     pub id: Option<i64>,        //字典编码
