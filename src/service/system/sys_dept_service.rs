@@ -1,5 +1,5 @@
-use crate::common::error::{AppError, AppResult};
-use crate::common::result::{ok, ok_result_data, BaseResponse, EmptyResponse};
+use crate::common::error::{AppError, ServiceResult};
+use crate::common::result::{ok, ok_result, ok_result_data};
 use crate::dao::system::sys_dept_dao;
 use crate::dao::system::sys_dept_dao::SysDeptDao;
 use crate::model::system::sys_dept_model::Dept;
@@ -13,7 +13,7 @@ use validator::Validate;
 pub struct SysDeptService;
 
 impl SysDeptService {
-    pub async fn add_sys_dept(rb: &RBatis, item: DeptReq) -> AppResult<Json<EmptyResponse>> {
+    pub async fn add_sys_dept(rb: &RBatis, item: DeptReq) -> ServiceResult {
         if Dept::select_by_dept_name(rb, &item.dept_name, &item.parent_id).await?.is_some() {
             return Err(AppError::BusinessError("部门名称已存在"));
         }
@@ -35,7 +35,7 @@ impl SysDeptService {
         }
     }
 
-    pub async fn delete_sys_dept(rb: &RBatis, item: DeleteDeptReq) -> AppResult<Json<EmptyResponse>> {
+    pub async fn delete_sys_dept(rb: &RBatis, item: DeleteDeptReq) -> ServiceResult {
         if sys_dept_dao::select_dept_count(rb, &item.id).await? > 0 {
             return Err(AppError::BusinessError("存在下级部门,不允许删除"));
         }
@@ -47,7 +47,7 @@ impl SysDeptService {
         Dept::delete_by_map(rb, value! {"id": &item.id}).await.map(|_| ok())?
     }
 
-    pub async fn update_sys_dept(rb: &RBatis, mut item: DeptReq) -> AppResult<Json<EmptyResponse>> {
+    pub async fn update_sys_dept(rb: &RBatis, mut item: DeptReq) -> ServiceResult {
         let id = item.id;
 
         if item.id.is_none() {
@@ -97,7 +97,7 @@ impl SysDeptService {
         Dept::update_by_map(rb, &data, value! {"id":  &id}).await.map(|_| ok())?
     }
 
-    pub async fn update_sys_dept_status(rb: &RBatis, item: UpdateDeptStatusReq) -> AppResult<Json<EmptyResponse>> {
+    pub async fn update_sys_dept_status(rb: &RBatis, item: UpdateDeptStatusReq) -> ServiceResult {
         let mut ids = vec![item.id];
         if item.status == 1 {
             if let Some(x) = Dept::select_by_id(rb, &item.id).await? {
@@ -110,7 +110,7 @@ impl SysDeptService {
             .map(|_| ok())?
     }
 
-    pub async fn query_sys_dept_detail(rb: &RBatis, item: QueryDeptDetailReq) -> AppResult<Json<BaseResponse<DeptResp>>> {
+    pub async fn query_sys_dept_detail(rb: &RBatis, item: QueryDeptDetailReq) -> ServiceResult<DeptResp> {
         Dept::select_by_id(rb, &item.id).await?.map_or_else(
             || Err(AppError::BusinessError("部门不存在")),
             |x| {
@@ -120,7 +120,7 @@ impl SysDeptService {
         )
     }
 
-    pub async fn query_sys_dept_list(rb: &RBatis, item: QueryDeptListReq) -> AppResult<Json<BaseResponse<Vec<DeptResp>>>> {
+    pub async fn query_sys_dept_list(rb: &RBatis, item: QueryDeptListReq) -> ServiceResult<Vec<DeptResp>> {
         Dept::select_page_dept_list(rb, &item)
             .await
             .map(|x| ok_result_data(x.into_iter().map(|x| x.into()).collect::<Vec<DeptResp>>()))?

@@ -1,5 +1,5 @@
-use crate::common::error::{AppError, AppResult};
-use crate::common::result::{ok_result, ok_result_data, ok_result_page, BaseResponse, PageResponse};
+use crate::common::error::{AppError,ServiceResultPage, ServiceResult};
+use crate::common::result::{ok_result, ok_result_data, ok_result_page};
 use crate::dao::system::sys_dict_data_dao::SysDictDataDao;
 use crate::model::system::sys_dict_data_model::DictData;
 use crate::vo::system::sys_dict_data_vo::{DeleteDictDataReq, DictDataReq, DictDataResp, QueryDictDataDetailReq, QueryDictDataListReq, UpdateDictDataStatusReq};
@@ -11,7 +11,7 @@ use rbs::value;
 pub struct SysDictDataService;
 
 impl SysDictDataService {
-    pub async fn add_sys_dict_data(rb: &RBatis, mut item: DictDataReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn add_sys_dict_data(rb: &RBatis, mut item: DictDataReq) -> ServiceResult<String> {
         if DictData::select_by_dict_label(rb, &item.dict_type, &item.dict_label).await?.is_some() {
             return Err(AppError::BusinessError("字典标签已存在"));
         }
@@ -24,11 +24,11 @@ impl SysDictDataService {
         DictData::insert(rb, &DictData::from(item)).await.map(|_| ok_result())?
     }
 
-    pub async fn delete_sys_dict_data(rb: &RBatis, item: DeleteDictDataReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn delete_sys_dict_data(rb: &RBatis, item: DeleteDictDataReq) -> ServiceResult<String> {
         DictData::delete_by_map(rb, value! {"id": &item.ids}).await.map(|_| ok_result())?
     }
 
-    pub async fn update_sys_dict_data(rb: &RBatis, item: DictDataReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_sys_dict_data(rb: &RBatis, item: DictDataReq) -> ServiceResult<String> {
         let id = item.id;
 
         if item.id.is_none() {
@@ -54,11 +54,11 @@ impl SysDictDataService {
         DictData::update_by_map(rb, &DictData::from(item), value! {"id": &id}).await.map(|_| ok_result())?
     }
 
-    pub async fn update_sys_dict_data_status(rb: &RBatis, item: UpdateDictDataStatusReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_sys_dict_data_status(rb: &RBatis, item: UpdateDictDataStatusReq) -> ServiceResult<String> {
         SysDictDataDao::update_dict_data_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
     }
 
-    pub async fn query_sys_dict_data_detail(rb: &RBatis, item: QueryDictDataDetailReq) -> AppResult<Json<BaseResponse<DictDataResp>>> {
+    pub async fn query_sys_dict_data_detail(rb: &RBatis, item: QueryDictDataDetailReq) -> ServiceResult<DictDataResp> {
         DictData::select_by_id(rb, &item.id).await?.map_or_else(
             || Err(AppError::BusinessError("字典数据不存在")),
             |x| {
@@ -68,7 +68,7 @@ impl SysDictDataService {
         )
     }
 
-    pub async fn query_sys_dict_data_list(rb: &RBatis, item: QueryDictDataListReq) -> AppResult<Json<PageResponse<Vec<DictDataResp>>>> {
+    pub async fn query_sys_dict_data_list(rb: &RBatis, item: QueryDictDataListReq) -> ServiceResultPage<DictDataResp> {
         let page = &PageRequest::new(item.page_no, item.page_size);
 
         DictData::select_dict_data_list(rb, page, &item)

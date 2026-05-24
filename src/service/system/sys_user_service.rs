@@ -1,5 +1,5 @@
-use crate::common::error::{AppError, AppResult};
-use crate::common::result::{ok_result, ok_result_data, ok_result_page, BaseResponse, PageResponse};
+use crate::common::error::{AppError, AppResult, ServiceResult, ServiceResultPage};
+use crate::common::result::{ok_result, ok_result_data, ok_result_page};
 use crate::dao::system::sys_user_dao::SysUserDao;
 use crate::model::system::sys_dept_model::Dept;
 use crate::model::system::sys_menu_model::Menu;
@@ -30,7 +30,7 @@ use std::net::SocketAddr;
 pub struct SysUserService;
 
 impl SysUserService {
-    pub async fn add_sys_user(rb: &RBatis, mut item: UserReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn add_sys_user(rb: &RBatis, mut item: UserReq) -> ServiceResult<String> {
         if User::select_by_user_name(rb, &item.user_name).await?.is_some() {
             return Err(AppError::BusinessError("登录账号已存在"));
         }
@@ -55,7 +55,7 @@ impl SysUserService {
         UserPost::insert_batch(rb, &user_post_list, user_post_list.len() as u64).await.map(|_| ok_result())?
     }
 
-    pub async fn delete_sys_user(rb: &RBatis, redis: &redis::Client, headers: HeaderMap, item: DeleteUserReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn delete_sys_user(rb: &RBatis, redis: &redis::Client, headers: HeaderMap, item: DeleteUserReq) -> ServiceResult<String> {
         let mut conn = redis.get_connection()?;
         let user_id = headers.get("user_id").unwrap().to_str().unwrap().parse::<i64>().unwrap();
 
@@ -78,7 +78,7 @@ impl SysUserService {
         User::delete_by_map(rb, value! {"id": &item.ids}).await.map(|_| ok_result())?
     }
 
-    pub async fn update_sys_user(rb: &RBatis, redis: &redis::Client, item: UserReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_sys_user(rb: &RBatis, redis: &redis::Client, item: UserReq) -> ServiceResult<String> {
         let mut conn = redis.get_connection()?;
         let id = item.id;
         if item.id.is_none() {
@@ -129,7 +129,7 @@ impl SysUserService {
         User::update_by_map(rb, &User::from(item), value! {"id": &id}).await.map(|_| ok_result())?
     }
 
-    pub async fn update_sys_user_status(rb: &RBatis, redis: &redis::Client, item: UpdateUserStatusReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_sys_user_status(rb: &RBatis, redis: &redis::Client, item: UpdateUserStatusReq) -> ServiceResult<String> {
         let ids = item.ids.clone();
         let mut conn = redis.get_connection()?;
 
@@ -145,7 +145,7 @@ impl SysUserService {
         SysUserDao::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
     }
 
-    pub async fn reset_sys_user_password(rb: &RBatis, redis: &redis::Client, item: ResetUserPwdReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn reset_sys_user_password(rb: &RBatis, redis: &redis::Client, item: ResetUserPwdReq) -> ServiceResult<String> {
         let mut conn = redis.get_connection()?;
 
         let key = format!("axum:admin:user:info:{}", item.id.clone());
@@ -167,7 +167,7 @@ impl SysUserService {
         }
     }
 
-    pub async fn update_sys_user_password(rb: &RBatis, headers: HeaderMap, item: UpdateUserPwdReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_sys_user_password(rb: &RBatis, headers: HeaderMap, item: UpdateUserPwdReq) -> ServiceResult<String> {
         let user_id = headers.get("user_id").unwrap().to_str().unwrap().parse::<i64>().unwrap();
 
         match User::select_by_id(rb, user_id).await? {
@@ -183,7 +183,7 @@ impl SysUserService {
         }
     }
 
-    pub async fn query_sys_user_detail(rb: &RBatis, item: QueryUserDetailReq) -> AppResult<Json<BaseResponse<UserResp>>> {
+    pub async fn query_sys_user_detail(rb: &RBatis, item: QueryUserDetailReq) -> ServiceResult<UserResp> {
         let mut x = match User::select_by_id(rb, item.id).await? {
             None => return Err(AppError::BusinessError("用户不存在")),
             Some(user) => {
@@ -209,7 +209,7 @@ impl SysUserService {
         ok_result_data(x)
     }
 
-    pub async fn query_sys_user_list(rb: &RBatis, item: QueryUserListReq) -> AppResult<Json<PageResponse<Vec<UserResp>>>> {
+    pub async fn query_sys_user_list(rb: &RBatis, item: QueryUserListReq) -> ServiceResultPage<UserResp> {
         let _num = add(1, 2).await;
         let page = &PageRequest::new(item.page_no, item.page_size);
 
@@ -218,7 +218,7 @@ impl SysUserService {
             .map(|x| ok_result_page(x.records.into_iter().map(|x| x.into()).collect::<Vec<UserResp>>(), x.total))?
     }
 
-    pub async fn login(rb: &RBatis, redis: &redis::Client, headers: HeaderMap, remote_addr: SocketAddr, item: UserLoginReq) -> AppResult<Json<BaseResponse<UserLoginResp>>> {
+    pub async fn login(rb: &RBatis, redis: &redis::Client, headers: HeaderMap, remote_addr: SocketAddr, item: UserLoginReq) -> ServiceResult<UserLoginResp> {
         let mut conn = redis.get_connection()?;
 
         let user_agent = headers.get("User-Agent").unwrap().to_str().unwrap();
@@ -253,7 +253,7 @@ impl SysUserService {
         }
     }
 
-    pub async fn query_user_role(rb: &RBatis, item: QueryUserRoleReq) -> AppResult<Json<BaseResponse<QueryUserRoleResp>>> {
+    pub async fn query_user_role(rb: &RBatis, item: QueryUserRoleReq) -> ServiceResult<QueryUserRoleResp> {
         let role_list = Role::select_all(rb).await.map(|x| x.into_iter().map(|x| x.into()).collect::<Vec<RoleResp>>())?;
         let sys_role_list = role_list.clone();
         let mut user_role_ids = role_list.into_iter().map(|x| x.id.unwrap_or_default()).collect::<Vec<i64>>();
@@ -266,7 +266,7 @@ impl SysUserService {
         ok_result_data(QueryUserRoleResp { sys_role_list, user_role_ids })
     }
 
-    pub async fn update_user_role(rb: &RBatis, redis: &redis::Client, item: UpdateUserRoleReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_user_role(rb: &RBatis, redis: &redis::Client, item: UpdateUserRoleReq) -> ServiceResult<String> {
         let mut conn = redis.get_connection()?;
 
         let user_id = item.user_id;
@@ -296,7 +296,7 @@ impl SysUserService {
         UserRole::insert_batch(rb, &list, len as u64).await.map(|_| ok_result())?
     }
 
-    pub async fn query_user_menu(rb: &RBatis, redis: &redis::Client, headers: HeaderMap) -> AppResult<Json<BaseResponse<QueryUserMenuResp>>> {
+    pub async fn query_user_menu(rb: &RBatis, redis: &redis::Client, headers: HeaderMap) -> ServiceResult<QueryUserMenuResp> {
         let user_id = headers.get("user_id").unwrap().to_str().unwrap().parse::<i64>().unwrap();
         let mut conn = redis.get_connection()?;
 

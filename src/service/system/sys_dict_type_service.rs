@@ -1,5 +1,5 @@
-use crate::common::error::{AppError, AppResult};
-use crate::common::result::{ok_result, ok_result_data, ok_result_page, BaseResponse, PageResponse};
+use crate::common::error::{AppError, ServiceResult, ServiceResultPage};
+use crate::common::result::{ok_result, ok_result_data, ok_result_page};
 use crate::dao::system::sys_dict_data_dao;
 use crate::dao::system::sys_dict_type_dao::SysDictTypeDao;
 use crate::model::system::sys_dict_type_model::DictType;
@@ -12,7 +12,7 @@ use rbs::value;
 pub struct SysDictTypeService;
 
 impl SysDictTypeService {
-    pub async fn add_sys_dict_type(rb: &RBatis, mut item: DictTypeReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn add_sys_dict_type(rb: &RBatis, mut item: DictTypeReq) -> ServiceResult<String> {
         if DictType::select_by_dict_type(rb, &item.dict_type).await?.is_some() {
             return Err(AppError::BusinessError("字典类型已存在"));
         }
@@ -21,7 +21,7 @@ impl SysDictTypeService {
         DictType::insert(rb, &DictType::from(item)).await.map(|_| ok_result())?
     }
 
-    pub async fn delete_sys_dict_type(rb: &RBatis, item: DeleteDictTypeReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn delete_sys_dict_type(rb: &RBatis, item: DeleteDictTypeReq) -> ServiceResult<String> {
         let ids = item.ids.clone();
         for id in ids {
             let p = match DictType::select_by_id(rb, &id).await? {
@@ -37,7 +37,7 @@ impl SysDictTypeService {
         DictType::delete_by_map(rb, value! {"id": &item.ids}).await.map(|_| ok_result())?
     }
 
-    pub async fn update_sys_dict_type(rb: &RBatis, item: DictTypeReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_sys_dict_type(rb: &RBatis, item: DictTypeReq) -> ServiceResult<String> {
         let id = item.id;
 
         if item.id.is_none() {
@@ -60,11 +60,11 @@ impl SysDictTypeService {
         DictType::update_by_map(rb, &DictType::from(item), value! {"id": &id}).await.map(|_| ok_result())?
     }
 
-    pub async fn update_sys_dict_type_status(rb: &RBatis, item: UpdateDictTypeStatusReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_sys_dict_type_status(rb: &RBatis, item: UpdateDictTypeStatusReq) -> ServiceResult<String> {
         SysDictTypeDao::update_dict_type_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
     }
 
-    pub async fn query_sys_dict_type_detail(rb: &RBatis, item: QueryDictTypeDetailReq) -> AppResult<Json<BaseResponse<DictTypeResp>>> {
+    pub async fn query_sys_dict_type_detail(rb: &RBatis, item: QueryDictTypeDetailReq) -> ServiceResult<DictTypeResp> {
         DictType::select_by_id(rb, &item.id).await?.map_or_else(
             || Err(AppError::BusinessError("字典类型不存在")),
             |x| {
@@ -74,7 +74,7 @@ impl SysDictTypeService {
         )
     }
 
-    pub async fn query_sys_dict_type_list(rb: &RBatis, item: QueryDictTypeListReq) -> AppResult<Json<PageResponse<Vec<DictTypeResp>>>> {
+    pub async fn query_sys_dict_type_list(rb: &RBatis, item: QueryDictTypeListReq) -> ServiceResultPage<DictTypeResp> {
         let page = &PageRequest::new(item.page_no, item.page_size);
 
         DictType::select_dict_type_list(rb, page, &item)

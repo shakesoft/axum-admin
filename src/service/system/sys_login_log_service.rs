@@ -1,5 +1,5 @@
-use crate::common::error::{AppError, AppResult};
-use crate::common::result::{ok_result, ok_result_data, ok_result_page, BaseResponse, PageResponse};
+use crate::common::error::{AppError, AppResult, ServiceResult, ServiceResultPage};
+use crate::common::result::{ok_result, ok_result_data, ok_result_page};
 use crate::dao::system::sys_login_log_dao;
 use crate::model::system::sys_login_log_model::LoginLog;
 use crate::utils::user_agent_util::UserAgentUtil;
@@ -13,15 +13,15 @@ use rbs::value;
 pub struct SysLoginLogService;
 
 impl SysLoginLogService {
-    pub async fn delete_sys_login_log(rb: &RBatis, item: DeleteLoginLogReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn delete_sys_login_log(rb: &RBatis, item: DeleteLoginLogReq) -> ServiceResult<String> {
         LoginLog::delete_by_map(rb, value! {"id": &item.ids}).await.map(|_| ok_result())?
     }
 
-    pub async fn clean_sys_login_log(rb: &RBatis) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn clean_sys_login_log(rb: &RBatis) -> ServiceResult<String> {
         sys_login_log_dao::clean_login_log(rb).await.map(|_| ok_result())?
     }
 
-    pub async fn query_sys_login_log_detail(rb: &RBatis, item: QueryLoginLogDetailReq) -> AppResult<Json<BaseResponse<LoginLogResp>>> {
+    pub async fn query_sys_login_log_detail(rb: &RBatis, item: QueryLoginLogDetailReq) -> ServiceResult<LoginLogResp> {
         LoginLog::select_by_id(rb, &item.id).await?.map_or_else(
             || Err(AppError::BusinessError("系统访问记录不存在")),
             |x| {
@@ -31,7 +31,7 @@ impl SysLoginLogService {
         )
     }
 
-    pub async fn query_sys_login_log_list(rb: &RBatis, item: QueryLoginLogListReq) -> AppResult<Json<PageResponse<Vec<LoginLogResp>>>> {
+    pub async fn query_sys_login_log_list(rb: &RBatis, item: QueryLoginLogListReq) -> ServiceResultPage<LoginLogResp> {
         let page = &PageRequest::new(item.page_no, item.page_size);
 
         LoginLog::select_login_log_list(rb, page, &item)

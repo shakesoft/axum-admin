@@ -1,5 +1,5 @@
-use crate::common::error::{AppError, AppResult};
-use crate::common::result::{ok_result, ok_result_data, ok_result_page, BaseResponse, PageResponse};
+use crate::common::error::{AppError, ServiceResult, ServiceResultPage};
+use crate::common::result::{ok_result, ok_result_data, ok_result_page};
 use crate::dao::system::sys_role_dao::SysRoleDao;
 use crate::dao::system::{sys_role_menu_dao, sys_user_dao, sys_user_role_dao};
 use crate::model::system::sys_menu_model::Menu;
@@ -17,7 +17,7 @@ use rbs::value;
 pub struct SysRoleService;
 
 impl SysRoleService {
-    pub async fn add_sys_role(rb: &RBatis, mut item: RoleReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn add_sys_role(rb: &RBatis, mut item: RoleReq) -> ServiceResult<String> {
         if Role::select_by_role_name(rb, &item.role_name).await?.is_some() {
             return Err(AppError::BusinessError("角色名称已存在"));
         }
@@ -30,7 +30,7 @@ impl SysRoleService {
         Role::insert(rb, &Role::from(item)).await.map(|_| ok_result())?
     }
 
-    pub async fn delete_sys_role(rb: &RBatis, item: DeleteRoleReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn delete_sys_role(rb: &RBatis, item: DeleteRoleReq) -> ServiceResult<String> {
         let ids = item.ids.clone();
 
         if ids.contains(&1) {
@@ -51,7 +51,7 @@ impl SysRoleService {
         ok_result()
     }
 
-    pub async fn update_sys_role(rb: &RBatis, item: RoleReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_sys_role(rb: &RBatis, item: RoleReq) -> ServiceResult<String> {
         let id = item.id;
         if item.id.is_none() {
             return Err(AppError::BusinessError("主键不能为空"));
@@ -80,7 +80,7 @@ impl SysRoleService {
         Role::update_by_map(rb, &Role::from(item), value! {"id": &id}).await.map(|_| ok_result())?
     }
 
-    pub async fn update_sys_role_status(rb: &RBatis, item: UpdateRoleStatusReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_sys_role_status(rb: &RBatis, item: UpdateRoleStatusReq) -> ServiceResult<String> {
         if item.ids.contains(&1) {
             return Err(AppError::BusinessError("不允许操作超级管理员角色"));
         }
@@ -88,7 +88,7 @@ impl SysRoleService {
         SysRoleDao::update_status(rb, &item.ids, item.status).await.map(|_| ok_result())?
     }
 
-    pub async fn query_sys_role_detail(rb: &RBatis, item: QueryRoleDetailReq) -> AppResult<Json<BaseResponse<RoleResp>>> {
+    pub async fn query_sys_role_detail(rb: &RBatis, item: QueryRoleDetailReq) -> ServiceResult<RoleResp> {
         Role::select_by_id(rb, &item.id).await?.map_or_else(
             || Err(AppError::BusinessError("角色不存在")),
             |x| {
@@ -98,7 +98,7 @@ impl SysRoleService {
         )
     }
 
-    pub async fn query_sys_role_list(rb: &RBatis, item: QueryRoleListReq) -> AppResult<Json<PageResponse<Vec<RoleResp>>>> {
+    pub async fn query_sys_role_list(rb: &RBatis, item: QueryRoleListReq) -> ServiceResultPage<RoleResp> {
         let page = &PageRequest::new(item.page_no, item.page_size);
 
         Role::select_sys_role_list(rb, page, &item)
@@ -106,7 +106,7 @@ impl SysRoleService {
             .map(|x| ok_result_page(x.records.into_iter().map(|x| x.into()).collect::<Vec<RoleResp>>(), x.total))?
     }
 
-    pub async fn query_role_menu(rb: &RBatis, item: QueryRoleMenuReq) -> AppResult<Json<BaseResponse<QueryRoleMenuData>>> {
+    pub async fn query_role_menu(rb: &RBatis, item: QueryRoleMenuReq) -> ServiceResult<QueryRoleMenuData> {
         let menu_list_all = Menu::select_all(rb).await?;
 
         let mut menu_list: Vec<MenuDataList> = Vec::new();
@@ -138,7 +138,7 @@ impl SysRoleService {
         ok_result_data(QueryRoleMenuData { menu_ids, menu_list })
     }
 
-    pub async fn update_role_menu(rb: &RBatis, item: UpdateRoleMenuReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_role_menu(rb: &RBatis, item: UpdateRoleMenuReq) -> ServiceResult<String> {
         let role_id = item.role_id;
 
         if role_id == 1 {
@@ -162,7 +162,7 @@ impl SysRoleService {
         RoleMenu::insert_batch(rb, &role_menu, item.menu_ids.len() as u64).await.map(|_| ok_result())?
     }
 
-    pub async fn query_allocated_list(rb: &RBatis, item: AllocatedListReq) -> AppResult<Json<PageResponse<Vec<UserResp>>>> {
+    pub async fn query_allocated_list(rb: &RBatis, item: AllocatedListReq) -> ServiceResultPage<UserResp> {
         let page_no = item.page_no;
         let page_size = item.page_size;
         let role_id = item.role_id;
@@ -181,7 +181,7 @@ impl SysRoleService {
         ok_result_page(list, total)
     }
 
-    pub async fn query_unallocated_list(rb: &RBatis, item: UnallocatedListReq) -> AppResult<Json<PageResponse<Vec<UserResp>>>> {
+    pub async fn query_unallocated_list(rb: &RBatis, item: UnallocatedListReq) -> ServiceResultPage<UserResp> {
         let page_no = item.page_no;
         let page_size = item.page_size;
         let role_id = item.role_id;
@@ -200,15 +200,15 @@ impl SysRoleService {
         ok_result_page(list, total)
     }
 
-    pub async fn cancel_auth_user(rb: &RBatis, item: CancelAuthUserReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn cancel_auth_user(rb: &RBatis, item: CancelAuthUserReq) -> ServiceResult<String> {
         sys_user_role_dao::delete_user_role_by_role_id_user_id(rb, item.role_id, item.user_id).await.map(|_| ok_result())?
     }
 
-    pub async fn batch_cancel_auth_user(rb: &RBatis, item: CancelAuthUserAllReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn batch_cancel_auth_user(rb: &RBatis, item: CancelAuthUserAllReq) -> ServiceResult<String> {
         SysRoleDao::batch_cancel_auth_user(rb, item.role_id, &item.user_ids).await.map(|_| ok_result())?
     }
 
-    pub async fn batch_auth_user(rb: &RBatis, item: SelectAuthUserAllReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn batch_auth_user(rb: &RBatis, item: SelectAuthUserAllReq) -> ServiceResult<String> {
         let role_id = item.role_id;
 
         let mut user_role: Vec<UserRole> = Vec::new();

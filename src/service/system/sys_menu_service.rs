@@ -1,5 +1,5 @@
-use crate::common::error::{AppError, AppResult};
-use crate::common::result::{ok_result, ok_result_data, BaseResponse};
+use crate::common::error::{AppError, ServiceResult};
+use crate::common::result::{ok_result, ok_result_data};
 use crate::dao::system::sys_menu_dao;
 use crate::dao::system::sys_menu_dao::SysMenuDao;
 use crate::dao::system::sys_role_menu_dao;
@@ -12,7 +12,7 @@ use rbs::value;
 pub struct SysMenuService;
 
 impl SysMenuService {
-    pub async fn add_sys_menu(rb: &RBatis, mut item: MenuReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn add_sys_menu(rb: &RBatis, mut item: MenuReq) -> ServiceResult<String> {
         if Menu::select_by_menu_name(rb, &item.menu_name).await?.is_some() {
             return Err(AppError::BusinessError("菜单名称已存在"));
         }
@@ -27,7 +27,7 @@ impl SysMenuService {
         Menu::insert(rb, &Menu::from(item)).await.map(|_| ok_result())?
     }
 
-    pub async fn delete_sys_menu(rb: &RBatis, item: DeleteMenuReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn delete_sys_menu(rb: &RBatis, item: DeleteMenuReq) -> ServiceResult<String> {
         if sys_menu_dao::select_count_menu_by_parent_id(rb, &item.id).await? > 0 {
             return Err(AppError::BusinessError("存在子菜单,不允许删除"));
         }
@@ -39,7 +39,7 @@ impl SysMenuService {
         Menu::delete_by_map(rb, value! {"id": &item.id}).await.map(|_| ok_result())?
     }
 
-    pub async fn update_sys_menu(rb: &RBatis, item: MenuReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_sys_menu(rb: &RBatis, item: MenuReq) -> ServiceResult<String> {
         let id = item.id;
 
         if item.id.is_none() {
@@ -67,11 +67,11 @@ impl SysMenuService {
         Menu::update_by_map(rb, &Menu::from(item), value! {"id": &id}).await.map(|_| ok_result())?
     }
 
-    pub async fn update_sys_menu_status(rb: &RBatis, item: UpdateMenuStatusReq) -> AppResult<Json<BaseResponse<String>>> {
+    pub async fn update_sys_menu_status(rb: &RBatis, item: UpdateMenuStatusReq) -> ServiceResult<String> {
         SysMenuDao::update_menu_status(rb, item.status, &item.ids).await.map(|_| ok_result())?
     }
 
-    pub async fn query_sys_menu_detail(rb: &RBatis, item: QueryMenuDetailReq) -> AppResult<Json<BaseResponse<MenuResp>>> {
+    pub async fn query_sys_menu_detail(rb: &RBatis, item: QueryMenuDetailReq) -> ServiceResult<MenuResp> {
         Menu::select_by_id(rb, &item.id).await?.map_or_else(
             || Err(AppError::BusinessError("菜单信息不存在")),
             |x| {
@@ -81,11 +81,11 @@ impl SysMenuService {
         )
     }
 
-    pub async fn query_sys_menu_list(rb: &RBatis, _item: QueryMenuListReq) -> AppResult<Json<BaseResponse<Vec<MenuResp>>>> {
+    pub async fn query_sys_menu_list(rb: &RBatis, _item: QueryMenuListReq) -> ServiceResult<Vec<MenuResp>> {
         Menu::select_all(rb).await.map(|x| ok_result_data(x.into_iter().map(|x| x.into()).collect::<Vec<MenuResp>>()))?
     }
 
-    pub async fn query_sys_menu_list_simple(rb: &RBatis) -> AppResult<Json<BaseResponse<Vec<MenuListSimpleDataResp>>>> {
+    pub async fn query_sys_menu_list_simple(rb: &RBatis) -> ServiceResult<Vec<MenuListSimpleDataResp>> {
         let list = Menu::select_menu_list(rb).await?;
 
         let mut menu_list: Vec<MenuListSimpleDataResp> = Vec::new();

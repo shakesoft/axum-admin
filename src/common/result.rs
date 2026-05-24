@@ -10,12 +10,7 @@ const SUCCESS_MSG: &str = "操作成功";
 const DATETIME_FORMAT: &str = "YYYY-MM-DD hh:mm:ss";
 const EMPTY_STRING: &str = "";
 
-#[derive(Serialize, Debug, Clone, ToSchema)]
-pub struct EmptyResponse {
-    pub code: i32,
-    pub msg: String,
-    pub data: Option<()>,
-}
+pub type EmptyResponse = BaseResponse<()>;
 
 #[derive(Serialize, Debug, Clone, ToSchema)]
 pub struct BaseResponse<T> {
@@ -32,8 +27,8 @@ pub struct PageResponse<T> {
     pub data: Option<T>,
 }
 
-pub fn ok() -> AppResult<Json<EmptyResponse>> {
-    Ok(Json(EmptyResponse {
+pub fn ok() -> AppResult<Json<BaseResponse<()>>> {
+    Ok(Json(BaseResponse {
         msg: SUCCESS_MSG.to_string(),
         code: SUCCESS_CODE,
         data: Some(()),
