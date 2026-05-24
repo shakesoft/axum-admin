@@ -61,3 +61,34 @@ impl HelloWorld for HelloWorldImpl {
         "Hello, world!".to_owned()
     }
 }
+
+//
+// pub trait A: Send + Sync {
+//     fn test(&self) -> String;
+// }
+//
+// #[dill::component]
+// #[dill::interface(dyn A)]
+// pub struct AImpl {
+//     b: Arc<dyn B>,
+// }
+//
+// impl A for AImpl {
+//     fn test(&self) -> String {
+//         format!("aimpl::{}", self.b.test())
+//     }
+// }
+//
+// pub trait B: Send + Sync {
+//     fn test(&self) -> String;
+// }
+//
+// #[dill::component]
+// #[dill::interface(dyn B)]
+// pub struct BImpl;
+//
+// impl B for BImpl {
+//     fn test(&self) -> String {
+//         "bimpl".to_owned()
+//     }
+// }

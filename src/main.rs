@@ -209,6 +209,14 @@ async fn main() {
     let rb = init_db(config.db.url.as_str()).await;
     let rd = init_redis(config.redis.url.as_str()).await;
 
+    // Register components
+    // let cat = Catalog::builder()
+    //     .add::<AImpl>()
+    //     .add::<BImpl>()
+    //     .build();
+    // let inst = cat.get::<OneOf<dyn A>>().unwrap();
+
+    // Register Container
     let module =Arc::new(
         AutoFacModule::builder()
             .with_component_parameters::<TodayWriter>(TodayWriterParameters {
