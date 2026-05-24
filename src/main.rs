@@ -217,8 +217,8 @@ async fn main() {
         .add::<AImpl>()
         .add::<BImpl>()
         .build();
-    let inst = catalog.get::<OneOf<dyn A>>().unwrap();
-    info!("{}",inst.test());
+    // let inst = catalog.get::<OneOf<dyn A>>().unwrap();
+    // info!("{}",inst.test());
 
     // Register Container
     let module =Arc::new(
