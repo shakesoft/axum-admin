@@ -1,4 +1,4 @@
-use crate::common::result::{BaseResponse, EmptyResponse, PageResponse};
+use crate::common::result::{BaseResponse, PageResponse};
 use axum::extract::rejection::JsonRejection;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
