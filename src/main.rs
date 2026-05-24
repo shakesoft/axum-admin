@@ -76,6 +76,7 @@ use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, T
 pub struct AppState {
     pub batis: RBatis,
     pub redis: Client,
+    pub catalog: Catalog,
     pub container: Arc<AutoFacModule>,
 }
 
@@ -212,11 +213,11 @@ async fn main() {
     let rd = init_redis(config.redis.url.as_str()).await;
 
     // Register components
-    let cat = Catalog::builder()
+    let catalog = Catalog::builder()
         .add::<AImpl>()
         .add::<BImpl>()
         .build();
-    let inst = cat.get::<OneOf<dyn A>>().unwrap();
+    let inst = catalog.get::<OneOf<dyn A>>().unwrap();
     info!("{}",inst.test());
 
     // Register Container
@@ -229,7 +230,7 @@ async fn main() {
             .build());
 
     // 创建共享应用状态，包含数据库连接池
-    let shared_state = Arc::new(AppState { batis: rb, redis: rd, container: module});
+    let shared_state = Arc::new(AppState { batis: rb, redis: rd, container: module, catalog});
 
     // 跨域中间件
     let cors = CorsLayer::new()

@@ -1,19 +1,18 @@
-use shaku::{module, Component, Interface, Provider};
 use std::sync::Arc;
 use tracing::info;
 
-module! {
+shaku::module! {
     pub AutoFacModule {
         components = [ConsoleOutput, TodayWriter],
         providers = [HelloWorldImpl]
     }
 }
 
-pub trait IOutput: Interface {
+pub trait IOutput: shaku::Interface {
     fn write(&self, content: String);
 }
 
-#[derive(Component)]
+#[derive(shaku::Component)]
 #[shaku(interface = IOutput)]
 pub struct ConsoleOutput;
 
@@ -23,12 +22,12 @@ impl IOutput for ConsoleOutput {
     }
 }
 
-pub trait IDateWriter: Interface {
+pub trait IDateWriter: shaku::Interface {
     fn write_date(&self);
     fn get_date(&self) -> String;
 }
 
-#[derive(Component)]
+#[derive(shaku::Component)]
 #[shaku(interface = IDateWriter)]
 pub struct TodayWriter {
     #[shaku(inject)]
@@ -48,11 +47,11 @@ impl IDateWriter for TodayWriter {
 }
 
 
-pub trait HelloWorld: Interface {
+pub trait HelloWorld: shaku::Interface {
     fn greet(&self) -> String;
 }
 
-#[derive(Provider)]
+#[derive(shaku::Provider)]
 #[shaku(interface = HelloWorld)]
 struct HelloWorldImpl;
 

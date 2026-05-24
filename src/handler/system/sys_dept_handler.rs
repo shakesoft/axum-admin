@@ -17,13 +17,14 @@ use rbs::value;
 use std::sync::Arc;
 use aspect_macros::{aspect};
 use aspect_std::{LoggingAspect, TimingAspect};
+use dill::OneOf;
 use shaku::HasComponent;
 use tracing::instrument;
 // use std::time::Duration;
 // use tokio::time::sleep;
 use validator::Validate;
 use crate::dao::system::sys_dept_dao;
-use crate::inject::autofac::{AutoFacModule, HelloWorld, IDateWriter, IOutput};
+use crate::inject::autofac::{AutoFacModule, HelloWorld, IDateWriter, IOutput, A};
 use crate::inject::inject_component::Inject;
 use crate::inject::inject_provided::InjectProvided;
 use crate::service::system::sys_dept_service::SysDeptService;
@@ -139,10 +140,15 @@ pub async fn delete_sys_dept1(
     writer.get_date();
     let result =  hello_world.greet();
     info!("{}", result);
+
+    let cat = &state.catalog;
+    let inst = cat.get::<OneOf<dyn A>>().unwrap();
+    info!("{}",inst.test());
+    
     // info!("{function_name}:{item:?}",function_name = function_name!());
     // info!("{}: {:?}", function_name!(), item);
     // let user_id = &session.user_id;
-   ok()
+    ok()
     // let permissons = &session.permissions;
     // let rb = &state.batis;
     //
