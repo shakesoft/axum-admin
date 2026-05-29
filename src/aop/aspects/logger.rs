@@ -17,13 +17,13 @@ impl AsyncAspect for Logger {
             info!("Logger.before: arg0 missing or not Arc<AppState>");
         }
 
-        let arg1 = ctx.args.get(1).and_then(|b| b.downcast_ref::<QueryUserListReq>());
-        if let Some(q) = arg1 {
-            info!("Logger.before: page_no = {}", q.page_no);
-            info!("{function_name}:{q:?}", function_name = ctx.function_name);
-        } else {
-            info!("Logger.before: arg1 missing or not QueryUserListReq");
-        }
+        // let arg1 = ctx.args.get(1).and_then(|b| b.downcast_ref::<QueryUserListReq>());
+        // if let Some(q) = arg1 {
+        //     info!("Logger.before: page_no = {}", q.page_no);
+        //     info!("{function_name}:{q:?}", function_name = ctx.function_name);
+        // } else {
+        //     info!("Logger.before: arg1 missing or not QueryUserListReq");
+        // }
         info!("{}: {},{},{},{}", ctx.function_name, ctx.module_path, ctx.location.file, ctx.location.line, ctx.args.iter().count());
     }
 

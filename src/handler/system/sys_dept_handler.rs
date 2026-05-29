@@ -22,6 +22,7 @@ use crate::inject::inject_component::Inject;
 use crate::inject::inject_provided::InjectProvided;
 use crate::service::system::sys_dept_service::SysDeptService;
 use crate::vo::system::sys_user_vo::UserSession;
+use crate::aop::aspects::logger::Logger;
 /*
  *添加部门表
  *author：罗京生
@@ -35,6 +36,8 @@ use crate::vo::system::sys_user_vo::UserSession;
 )]
 // #[instrument]
 // #[function_name::named]
+#[aspect(Logger)]
+// #[aspect(TimingAspect::new())]
 pub async fn add_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(item): ValidatedJson<DeptReq>) -> impl IntoResponse {
     // panic!("test");
     // sleep(Duration::from_secs(8)).await;
