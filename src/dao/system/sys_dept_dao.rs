@@ -1,3 +1,4 @@
+use aspect_macros::aspect;
 use crate::model::system::sys_dept_model::Dept;
 use crate::vo::system::sys_dept_vo::QueryDeptListReq;
 use log::info;
@@ -6,6 +7,7 @@ use rbatis::rbdc::db::ExecResult;
 use rbatis::rbdc::DateTime;
 use rbatis::{Error, RBatis};
 use rbs::value;
+use crate::aop::aspects::logger::Logger;
 
 pub struct SysDeptDao;
 
@@ -29,8 +31,16 @@ impl SysDeptDao {
         params.extend(ids.iter().map(|&id| value!(id)));
 
         let result = rb.exec(&update_sql, params).await?;
+
+        test_dept_dao(rb).await;
         Ok(result)
     }
+}
+
+#[aspect(Logger)]
+pub async fn test_dept_dao(rb: &RBatis)->()
+{
+
 }
 
 /*
