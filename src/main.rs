@@ -56,7 +56,7 @@ use rbatis::rbdc::DateTime;
 use reqwest::StatusCode;
 // use garde::rules::ip::IpKind::Any;
 use crate::common::result::ok_result_msg;
-use crate::inject::autofac::{AImpl, BImpl, A};
+use crate::inject::autofac::{ A};
 use crate::inject::inject_component::Inject;
 use crate::route::system::sys_account_route::build_sys_account_route;
 use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, TrafficLightEvent};
@@ -68,7 +68,6 @@ use tracing_appender::rolling;
 // use crate::common::daily_logfile::DailyLogFile;
 // use crate::handler::system::sys_user_handler::reset_sys_user_password;
 
-use futures_lite::stream::StreamExt;
 use lapin::{
     options::*, types::FieldTable, BasicProperties, Connection,
     ConnectionProperties, Result,
@@ -151,69 +150,69 @@ struct ApiDoc;
 
 async fn test_mq()->() {
     return ();
-    let addr = std::env::var("AMQP_ADDR")
-        .unwrap_or_else(|_| "amqp://guest:guest@127.0.0.1:5672/".into());
-
-    let conn = Connection::connect(&addr, ConnectionProperties::default()).await?;
-    let channel = conn.create_channel().await?;
-
-    channel
-        .queue_declare("hello".into(), QueueDeclareOptions::durable(), FieldTable::default())
-        .await?;
-
-    channel
-        .basic_publish(
-            "".into(),
-            "hello".into(),
-            BasicPublishOptions::default(),
-            b"Hello, world!",
-            BasicProperties::default(),
-        )
-        .await?
-        .await?;
-
-    let mut consumer = channel
-        .basic_consume(
-            "hello".into(),
-            "my_consumer".into(),
-            BasicConsumeOptions::default(),
-            FieldTable::default(),
-        )
-        .await?;
-
-    while let Some(delivery) = consumer.next().await {
-        let delivery = delivery?;
-        delivery.ack(BasicAckOptions::default()).await?;
-    }
+    // let addr = std::env::var("AMQP_ADDR")
+    //     .unwrap_or_else(|_| "amqp://guest:guest@127.0.0.1:5672/".into());
+    //
+    // let conn = Connection::connect(&addr, ConnectionProperties::default()).await?;
+    // let channel = conn.create_channel().await?;
+    //
+    // channel
+    //     .queue_declare("hello".into(), QueueDeclareOptions::durable(), FieldTable::default())
+    //     .await?;
+    //
+    // channel
+    //     .basic_publish(
+    //         "".into(),
+    //         "hello".into(),
+    //         BasicPublishOptions::default(),
+    //         b"Hello, world!",
+    //         BasicProperties::default(),
+    //     )
+    //     .await?
+    //     .await?;
+    //
+    // let mut consumer = channel
+    //     .basic_consume(
+    //         "hello".into(),
+    //         "my_consumer".into(),
+    //         BasicConsumeOptions::default(),
+    //         FieldTable::default(),
+    //     )
+    //     .await?;
+    //
+    // while let Some(delivery) = consumer.next().await {
+    //     let delivery = delivery?;
+    //     delivery.ack(BasicAckOptions::default()).await?;
+    // }
 }
 
 async fn test_workflow()->() {
     return ();
-    let mut light = DynamicTrafficLight::new(());
-    // Type is TrafficLight<Red>
-
-    light.handle(TrafficLightEvent::Next).unwrap();
-    println!("{:?}", light.current_state());
-    // Type is TrafficLight<Green>
-
-    light.handle(TrafficLightEvent::Next).unwrap();
-    println!("{:?}", light.current_state());
-    // Type is TrafficLight<Yellow>
-
-    let a = light.into_yellow().unwrap();
-    println!("{:?}", a); //Yellow
-    // Type is TrafficLight<Yellow>
-
-    let light = TrafficLight::new(());
-    let mut dynamic_light = light.into_dynamic();
-    // let dd = dynamic_light.into_yellow().unwrap();
-    // let ee = dd.into_dynamic().current_state();
-    // let cc = dynamic_light.into_green().unwrap();
-    let bb = dynamic_light.current_state();
-    println!("{}", bb);
-
-    dynamic_light.handle(TrafficLightEvent::Next).unwrap();
-    println!("{}", dynamic_light.current_state());
+    // let mut light = DynamicTrafficLight::new(());
+    // // Type is TrafficLight<Red>
+    //
+    // light.handle(TrafficLightEvent::Next).unwrap();
+    // println!("{:?}", light.current_state());
+    // // Type is TrafficLight<Green>
+    //
+    // light.handle(TrafficLightEvent::Next).unwrap();
+    // println!("{:?}", light.current_state());
+    // // Type is TrafficLight<Yellow>
+    //
+    // let a = light.into_yellow().unwrap();
+    // println!("{:?}", a); //Yellow
+    // // Type is TrafficLight<Yellow>
+    //
+    // let light = TrafficLight::new(());
+    // let mut dynamic_light = light.into_dynamic();
+    // // let dd = dynamic_light.into_yellow().unwrap();
+    // // let ee = dd.into_dynamic().current_state();
+    // // let cc = dynamic_light.into_green().unwrap();
+    // let bb = dynamic_light.current_state();
+    // println!("{}", bb);
+    //
+    // dynamic_light.handle(TrafficLightEvent::Next).unwrap();
+    // println!("{}", dynamic_light.current_state());
 }
 
 // 主函数，使用tokio异步运行时
@@ -260,7 +259,7 @@ async fn main() {
     let rd = init_redis(config.redis.url.as_str()).await;
 
     // Register components
-    let catalog = Catalog::builder().add::<AImpl>().add::<BImpl>().build();
+    // let catalog = Catalog::builder().add::<AImpl>().add::<BImpl>().build();
     // let inst = catalog.get::<OneOf<dyn A>>().unwrap();
     // info!("{}",inst.test());
 
@@ -458,20 +457,20 @@ pub fn json_data() -> &'static str {
     data
 }
 
-pub async fn post_json(url: &str, json_body: &str, app_key: &str, timestamp: &str, sign: &str) -> Result<String, reqwest::Error> {
-    let client = reqwest::Client::new();
-    let resp = client
-        .post(url)
-        .header("Content-Type", "application/json")
-        .header("appKey", app_key)
-        .header("timestamp", timestamp)
-        .header("sign", sign)
-        .body(json_body.to_string())
-        .send()
-        .await?
-        .error_for_status()? // 自动检查 4xx/5xx
-        .text()
-        .await?;
-
-    Ok(resp)
-}
+// pub async fn post_json(url: &str, json_body: &str, app_key: &str, timestamp: &str, sign: &str) -> Result<String, reqwest::Error> {
+//     let client = reqwest::Client::new();
+//     let resp = client
+//         .post(url)
+//         .header("Content-Type", "application/json")
+//         .header("appKey", app_key)
+//         .header("timestamp", timestamp)
+//         .header("sign", sign)
+//         .body(json_body.to_string())
+//         .send()
+//         .await?
+//         .error_for_status()? // 自动检查 4xx/5xx
+//         .text()
+//         .await?;
+//
+//     Ok(resp)
+// }
