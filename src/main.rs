@@ -56,7 +56,7 @@ use rbatis::rbdc::DateTime;
 use reqwest::StatusCode;
 // use garde::rules::ip::IpKind::Any;
 use crate::common::result::ok_result_msg;
-use crate::inject::autofac::{ A};
+use crate::inject::autofac::{AImpl, BImpl, A};
 use crate::inject::inject_component::Inject;
 use crate::route::system::sys_account_route::build_sys_account_route;
 use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, TrafficLightEvent};
@@ -259,7 +259,7 @@ async fn main() {
     let rd = init_redis(config.redis.url.as_str()).await;
 
     // Register components
-    // let catalog = Catalog::builder().add::<AImpl>().add::<BImpl>().build();
+    let catalog = Catalog::builder().add::<AImpl>().add::<BImpl>().build();
     // let inst = catalog.get::<OneOf<dyn A>>().unwrap();
     // info!("{}",inst.test());
 
