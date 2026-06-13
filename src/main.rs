@@ -59,7 +59,7 @@ use crate::common::result::ok_result_msg;
 use crate::inject::autofac::{AImpl, BImpl, A};
 use crate::inject::inject_component::Inject;
 use crate::route::system::sys_account_route::build_sys_account_route;
-use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, TrafficLightEvent};
+use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, TrafficLightEvent, TrafficLightState};
 use inject::autofac::{AutoFacModule, IDateWriter, TodayWriter, TodayWriterParameters};
 use shaku::HasComponent;
 use tower_http::cors::CorsLayer;
@@ -187,38 +187,43 @@ async fn test_mq()->() {
 }
 
 async fn test_workflow()->() {
-    return ();
-    // let mut light = DynamicTrafficLight::new(());
-    // // Type is TrafficLight<Red>
-    //
-    // light.handle(TrafficLightEvent::Next).unwrap();
-    // println!("{:?}", light.current_state());
-    // // Type is TrafficLight<Green>
-    //
-    // light.handle(TrafficLightEvent::Next).unwrap();
-    // println!("{:?}", light.current_state());
-    // // Type is TrafficLight<Yellow>
-    //
-    // let a = light.into_yellow().unwrap();
-    // println!("{:?}", a); //Yellow
-    // // Type is TrafficLight<Yellow>
-    //
-    // let light = TrafficLight::new(());
-    // let mut dynamic_light = light.into_dynamic();
-    // // let dd = dynamic_light.into_yellow().unwrap();
-    // // let ee = dd.into_dynamic().current_state();
-    // // let cc = dynamic_light.into_green().unwrap();
-    // let bb = dynamic_light.current_state();
-    // println!("{}", bb);
-    //
-    // dynamic_light.handle(TrafficLightEvent::Next).unwrap();
-    // println!("{}", dynamic_light.current_state());
+    let mut light = DynamicTrafficLight::new(());
+
+    let mut light1 = DynamicTrafficLight::new_init_state((),TrafficLightState::Red);
+
+    let c = light1.get_available_events();
+    println!("{:?}", c);
+    // Type is TrafficLight<Red>
+
+    light.handle(TrafficLightEvent::Next).unwrap();
+    println!("{:?}", light.current_state().name());
+    // Type is TrafficLight<Green>
+
+    light.handle(TrafficLightEvent::Next).unwrap();
+    println!("{:?}", light.current_state().name());
+    // Type is TrafficLight<Yellow>
+
+    let a = light.into_yellow().unwrap();
+    println!("{:?}", a); //Yellow
+    // Type is TrafficLight<Yellow>
+
+    let light = TrafficLight::new(());
+    let mut dynamic_light = light.into_dynamic();
+    // let dd = dynamic_light.into_yellow().unwrap();
+    // let ee = dd.into_dynamic().current_state();
+    // let cc = dynamic_light.into_green().unwrap();
+    let bb = dynamic_light.current_state();
+    println!("{}", bb);
+
+    dynamic_light.handle(TrafficLightEvent::Next).unwrap();
+    println!("{}", dynamic_light.current_state());
 }
 
 // 主函数，使用tokio异步运行时
 #[tokio::main]
 async fn main() {
-    test_mq().await;
+    // test_mq().await;
+    // test_workflow().await;
     // #[cfg(debug_assertions)]
     // #[cfg(not(debug_assertions))]
     // {
