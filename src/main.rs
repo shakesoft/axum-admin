@@ -13,6 +13,8 @@ pub mod service;
 pub mod utils;
 pub mod vo;
 pub mod workflow;
+pub mod template;
+
 
 use crate::route::system::sys_dept_route::build_sys_dept_route;
 use crate::route::system::sys_dict_data_route::build_sys_dict_data_route;
@@ -25,7 +27,7 @@ use crate::utils::redis_util::init_redis;
 use axum::body::Body;
 use axum::extract::{FromRef, State};
 use axum::http::{Method, Request, Response};
-use axum::response::IntoResponse;
+use axum::response::{Html, IntoResponse};
 use axum::{middleware as md, Json, Router, ServiceExt};
 use config::{Config, File};
 use middleware::auth::auth;
@@ -72,8 +74,8 @@ use lapin::{
     options::*, types::FieldTable, BasicProperties, Connection,
     ConnectionProperties, Result,
 };
-
-
+use sailfish::TemplateSimple;
+use crate::template::hello_template::HelloTemplate;
 // 定义应用状态结构体，包含数据库连接池
 
 #[derive(Clone)]
@@ -327,13 +329,25 @@ async fn main() {
     });
 
     // 首页路由
-    let home_router = Router::new().route("/", get(async || -> &'static str { "Hello axum-admin!" }));
+    // let home_router = Router::new().route("/", get(async || -> &'static str { "Hello axum-admin!" }));
+    let home_router = Router::new().route("/", get(async || -> Html<String> {
+        let ctx = HelloTemplate {
+            messages: vec![String::from("Hello!"), String::from("axum-admin!")],
+        };
+        let content =  ctx.render_once().unwrap();
+        return Html(content);
+    }));
 
     let index_router = Router::new().route(
         "/index",
-        get(async || -> String {
-            let json = json_data();
-            return json.to_string();
+        get(async || -> Html<String> {
+            let ctx = HelloTemplate {
+                messages: vec![String::from("foo"), String::from("bar")],
+            };
+            let content =  ctx.render_once().unwrap();
+            return Html(content);
+            // let json = json_data();
+            // return json.to_string();
         }),
     );
 
@@ -341,7 +355,6 @@ async fn main() {
         "/test",
         get(async || -> String {
             let body = reqwest::get("http://dev.domain365.com/enter/lutong/order-request").await.unwrap().text().await.unwrap();
-
             //let mut body = String::new();
             // res.read_to_string(&mut body)?;
             info!("{body}");

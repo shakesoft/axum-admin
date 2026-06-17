@@ -12,13 +12,15 @@ use tracing::instrument;
 use validator::Validate;
 use crate::aop::aspects::logger::Logger;
 use aspect_std::LoggingAspect;
+use crate::aop::aspects::timer::Timer;
 
 pub struct SysDeptService;
 
 impl SysDeptService {
 
     // #[aspect(Logger)]
-    #[instrument]
+    // #[instrument]
+    #[aspect(Timer)]
     pub async fn add_sys_dept(rb: &RBatis, item: DeptReq) -> ServiceResult {
         if Dept::select_by_dept_name(rb, &item.dept_name, &item.parent_id).await?.is_some() {
             return Err(AppError::BusinessError("部门名称已存在"));
