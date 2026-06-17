@@ -338,8 +338,7 @@ async fn main() {
         return Html(content);
     }));
 
-    let index_router = Router::new().route(
-        "/index",
+    let index_router = Router::new().route("/index",
         get(async || -> Html<String> {
             let ctx = HelloTemplate {
                 messages: vec![String::from("foo"), String::from("bar")],
@@ -351,8 +350,7 @@ async fn main() {
         }),
     );
 
-    let test_router = Router::new().route(
-        "/test",
+    let test_router = Router::new().route("/test",
         get(async || -> String {
             let body = reqwest::get("http://dev.domain365.com/enter/lutong/order-request").await.unwrap().text().await.unwrap();
             //let mut body = String::new();
@@ -364,14 +362,9 @@ async fn main() {
     );
 
     let test_router1 = Router::new().route("/test1", get(async || ok_result_msg("成功啦")));
-
-    // async fn di_index(writer: Inject<AutoFacModule, dyn IDateWriter>) -> String {
-    //     println!("di");
-    //     writer.write_date();
-    //     writer.get_date()
-    // }
-
-    let di_router = Router::new().route("/di", get(di_index));
+    let di_router = Router::new()
+        .route("/di", get(di_index))
+        .with_state(Arc::clone(&shared_state));
 
     // 构建应用路由，并合并多个子路由
     let app = Router::new()
@@ -420,12 +413,11 @@ async fn main() {
     axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await.unwrap();
 }
 
-pub async fn di_index() -> String {
-    // let service: &dyn IDateWriter =
-    //     state.container.resolve_ref();
-    // service.write_date();
-    // service.get_date();
-    String::from("sss")
+pub async fn di_index(State(state): State<Arc<AppState>>) -> impl IntoResponse {
+    let service: &dyn IDateWriter = state.container.resolve_ref();
+    service.write_date();
+    service.get_date();
+    Html(String::from("sss"))
 }
 
 pub fn json_data() -> &'static str {
