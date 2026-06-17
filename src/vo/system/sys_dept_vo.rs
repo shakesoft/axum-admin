@@ -11,7 +11,7 @@ use validator::Validate;
 /*
 删除部门表请求参数
 */
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone)]
 pub struct DeleteDeptReq {
     pub id: i64,
 }

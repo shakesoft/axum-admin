@@ -11,6 +11,7 @@ use rbs::value;
 use tracing::instrument;
 use validator::Validate;
 use crate::aop::aspects::logger::Logger;
+use aspect_std::LoggingAspect;
 
 pub struct SysDeptService;
 
@@ -40,7 +41,7 @@ impl SysDeptService {
         }
     }
 
-    // #[aspect(LoggingAspect::new())]
+    #[aspect(Logger)]
     pub async fn delete_sys_dept(rb: &RBatis, item: DeleteDeptReq) -> ServiceResult {
         if sys_dept_dao::select_dept_count(rb, &item.id).await? > 0 {
             return Err(AppError::BusinessError("存在下级部门,不允许删除"));
@@ -53,6 +54,7 @@ impl SysDeptService {
         Dept::delete_by_map(rb, value! {"id": &item.id}).await.map(|_| ok())?
     }
 
+    #[aspect(LoggingAspect::new())]
     pub async fn update_sys_dept(rb: &RBatis, mut item: DeptReq) -> ServiceResult {
         let id = item.id;
 

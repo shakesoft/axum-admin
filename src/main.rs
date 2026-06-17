@@ -195,6 +195,9 @@ async fn test_workflow()->() {
     println!("{:?}", c);
     // Type is TrafficLight<Red>
 
+    let d = light1.is_available_event(&TrafficLightEvent::Next);
+    println!("{:?}", d);
+
     light.handle(TrafficLightEvent::Next).unwrap();
     println!("{:?}", light.current_state().name());
     // Type is TrafficLight<Green>
@@ -223,7 +226,7 @@ async fn test_workflow()->() {
 #[tokio::main]
 async fn main() {
     // test_mq().await;
-    // test_workflow().await;
+    test_workflow().await;
     // #[cfg(debug_assertions)]
     // #[cfg(not(debug_assertions))]
     // {

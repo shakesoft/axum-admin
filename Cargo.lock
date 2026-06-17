@@ -4021,8 +4021,8 @@ checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 
 [[package]]
 name = "state-machines"
-version = "0.9.0"
-source = "git+https://github.com/shakesoft/state-machines-rs?branch=master#a18a7405fa316622600417712e61196ece58985b"
+version = "0.20.0"
+source = "git+https://github.com/shakesoft/state-machines-rs?branch=master#eeb6c007c2677cddff04c76a5d59c6ad6207feb3"
 dependencies = [
  "state-machines-core",
  "state-machines-macro",
@@ -4031,12 +4031,12 @@ dependencies = [
 [[package]]
 name = "state-machines-core"
 version = "0.9.0"
-source = "git+https://github.com/shakesoft/state-machines-rs?branch=master#a18a7405fa316622600417712e61196ece58985b"
+source = "git+https://github.com/shakesoft/state-machines-rs?branch=master#eeb6c007c2677cddff04c76a5d59c6ad6207feb3"
 
 [[package]]
 name = "state-machines-macro"
-version = "0.9.0"
-source = "git+https://github.com/shakesoft/state-machines-rs?branch=master#a18a7405fa316622600417712e61196ece58985b"
+version = "0.20.0"
+source = "git+https://github.com/shakesoft/state-machines-rs?branch=master#eeb6c007c2677cddff04c76a5d59c6ad6207feb3"
 dependencies = [
  "proc-macro2",
  "quote",
