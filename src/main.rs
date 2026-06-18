@@ -58,7 +58,7 @@ use rbatis::rbdc::DateTime;
 use reqwest::StatusCode;
 // use garde::rules::ip::IpKind::Any;
 use crate::common::result::ok_result_msg;
-use crate::inject::autofac::{AImpl, BImpl, A};
+use crate::inject::autofac::{AImpl, BImpl, HelloWorld, A};
 use crate::inject::inject_component::Inject;
 use crate::route::system::sys_account_route::build_sys_account_route;
 use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, TrafficLightEvent, TrafficLightState};
@@ -75,6 +75,7 @@ use lapin::{
     ConnectionProperties, Result,
 };
 use sailfish::TemplateSimple;
+use crate::inject::inject_provided::InjectProvided;
 use crate::template::hello_template::HelloTemplate;
 // 定义应用状态结构体，包含数据库连接池
 
@@ -413,10 +414,16 @@ async fn main() {
     axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await.unwrap();
 }
 
-pub async fn di_index(State(state): State<Arc<AppState>>) -> impl IntoResponse {
-    let service: &dyn IDateWriter = state.container.resolve_ref();
-    service.write_date();
-    service.get_date();
+pub async fn di_index(writer: Inject<AutoFacModule, dyn IDateWriter>, hello_world: InjectProvided<AutoFacModule, dyn HelloWorld>, State(state): State<Arc<AppState>>) -> impl IntoResponse {
+    // let service: &dyn IDateWriter = state.container.resolve_ref();
+    // service.write_date();
+    // service.get_date();
+
+    writer.write_date();
+    writer.get_date();
+    let result = hello_world.greet();
+    info!("{}", result);
+
     Html(String::from("sss"))
 }
 
