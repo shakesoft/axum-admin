@@ -20,11 +20,9 @@ pub struct BaseResponse<T> {
 }
 
 #[derive(Serialize, Debug, Clone, ToSchema)]
-pub struct PageResponse<T> {
-    pub code: i32,
-    pub msg: String,
+pub struct Page<T> {
     pub total: u64,
-    pub data: Option<T>,
+    pub items: Vec<T>,
 }
 
 pub fn ok() -> AppResult<Json<BaseResponse<()>>> {
@@ -52,15 +50,6 @@ pub fn ok_result_data<T>(data: T) -> AppResult<Json<BaseResponse<T>>> {
         msg: SUCCESS_MSG.to_string(),
         code: SUCCESS_CODE,
         data: Some(data),
-    }))
-}
-
-pub fn ok_result_page<T>(data: T, total: u64) -> AppResult<Json<PageResponse<T>>> {
-    Ok(Json(PageResponse {
-        msg: SUCCESS_MSG.to_string(),
-        code: SUCCESS_CODE,
-        data: Some(data),
-        total,
     }))
 }
 
