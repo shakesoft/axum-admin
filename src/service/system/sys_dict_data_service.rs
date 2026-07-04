@@ -1,5 +1,5 @@
 use crate::common::error::{AppError, ServiceResult};
-use crate::common::result::{ok_result_empty, ok_result_data, Page};
+use crate::common::result::{ok_result_empty, ok_result_data, Paged};
 use crate::dao::system::sys_dict_data_dao::SysDictDataDao;
 use crate::model::system::sys_dict_data_model::DictData;
 use crate::vo::system::sys_dict_data_vo::{DeleteDictDataReq, DictDataReq, DictDataResp, QueryDictDataDetailReq, QueryDictDataListReq, UpdateDictDataStatusReq};
@@ -67,11 +67,11 @@ impl SysDictDataService {
         )
     }
 
-    pub async fn query_sys_dict_data_list(rb: &RBatis, item: QueryDictDataListReq) -> ServiceResult<Page<DictDataResp>> {
+    pub async fn query_sys_dict_data_list(rb: &RBatis, item: QueryDictDataListReq) -> ServiceResult<Paged<DictDataResp>> {
         let page = &PageRequest::new(item.page_no, item.page_size);
 
         DictData::select_dict_data_list(rb, page, &item)
             .await
-            .map(|x| ok_result_data(Page { total: x.total, items: x.records.into_iter().map(|x| x.into()).collect() }))?
+            .map(|x| ok_result_data(Paged { total: x.total, items: x.records.into_iter().map(|x| x.into()).collect() }))?
     }
 }

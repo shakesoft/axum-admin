@@ -20,7 +20,7 @@ pub struct BaseResponse<T> {
 }
 
 #[derive(Serialize, Debug, Clone, ToSchema)]
-pub struct Page<T> {
+pub struct Paged<T> {
     pub total: u64,
     pub items: Vec<T>,
 }
