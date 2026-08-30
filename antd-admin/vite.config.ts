@@ -12,6 +12,7 @@ export default defineConfig({
     }
   },
   server: {
+    host: '127.0.0.1', // ponytail: vite 默认 localhost 解析成 ::1，本机 IPv6 回环被拒绝
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:3000/', // 目标服务器地址
