@@ -9,6 +9,7 @@ use rbatis::rbatis_codegen::ops::AsProxy;
 use rbatis::RBatis;
 use rbs::value;
 use tracing::instrument;
+use tracing::info;
 use validator::Validate;
 use crate::aop::aspects::logger::Logger;
 use aspect_std::LoggingAspect;
@@ -59,6 +60,16 @@ impl SysDeptService {
     #[aspect(LoggingAspect::new())]
     pub async fn update_sys_dept(rb: &RBatis, mut item: DeptReq) -> ServiceResult {
         let id = item.id;
+
+
+        info!("Logger.before: arg0 {0}",id.unwrap());
+        info!("Logger.before: arg0 {0}",id.unwrap_or_default());
+        info!("Logger.before: arg0 {0}",id.unwrap_or_default());
+        info!("Logger.before: arg0 {0}",id.unwrap_or_default());
+        info!("Logger.before: arg0 {0}",id.unwrap_or_default());
+        info!("Logger.before: arg0 {0}",id.unwrap_or_default());
+        info!("Logger.before: arg0 {0}",id.unwrap_or_default());
+        info!("Logger.before: arg0 {0}",id.unwrap_or_default());
 
         if item.id.is_none() {
             return Err(AppError::BusinessError("主键不能为空"));
