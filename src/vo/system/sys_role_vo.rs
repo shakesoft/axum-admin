@@ -4,11 +4,12 @@
 use crate::common::result::serialize_datetime;
 use rbatis::rbdc::DateTime;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 /*
 删除角色信息请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct DeleteRoleReq {
     pub ids: Vec<i64>,
 }
@@ -16,7 +17,7 @@ pub struct DeleteRoleReq {
 /*
 更新角色信息请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct RoleReq {
     pub id: Option<i64>,        //主键
@@ -30,7 +31,7 @@ pub struct RoleReq {
 /*
 更新角色信息状态请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct UpdateRoleStatusReq {
     pub ids: Vec<i64>,
     pub status: i8,
@@ -39,7 +40,7 @@ pub struct UpdateRoleStatusReq {
 /*
 查询角色信息详情请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct QueryRoleDetailReq {
     pub id: i64,
 }
@@ -47,7 +48,7 @@ pub struct QueryRoleDetailReq {
 /*
 查询角色信息列表请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryRoleListReq {
     pub page_no: u64,
@@ -63,7 +64,7 @@ fn default_status() -> Option<i8> {
 /*
 查询角色信息列表响应参数
 */
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct RoleResp {
     pub id: Option<i64>,        //主键
@@ -73,15 +74,17 @@ pub struct RoleResp {
     pub status: i8,             //状态(1:正常，0:禁用)
     pub remark: Option<String>, //备注
     #[serde(serialize_with = "serialize_datetime")]
+    #[schema(value_type = Option<String>)]
     pub create_time: Option<DateTime>, //创建时间
     #[serde(serialize_with = "serialize_datetime")]
+    #[schema(value_type = Option<String>)]
     pub update_time: Option<DateTime>, //修改时间
 }
 
 /*
 查询角色菜单信息参数
 */
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryRoleMenuReq {
     pub role_id: i64, //角色id
@@ -90,7 +93,7 @@ pub struct QueryRoleMenuReq {
 /*
 角色菜单信息参数
 */
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryRoleMenuData {
     pub menu_ids: Vec<Option<i64>>,   //菜单Ids
@@ -100,7 +103,7 @@ pub struct QueryRoleMenuData {
 /*
 菜单信息参数
 */
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct MenuDataList {
     pub id: Option<i64>,        //主键
@@ -114,7 +117,7 @@ pub struct MenuDataList {
 /*
 更新用户角色信息
 */
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateRoleMenuReq {
     pub menu_ids: Vec<i64>,
@@ -124,7 +127,7 @@ pub struct UpdateRoleMenuReq {
 /*
 查询已分配用户角色列表
 */
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct AllocatedListReq {
     pub page_no: u64,
@@ -137,7 +140,7 @@ pub struct AllocatedListReq {
 /*
 查询未分配用户角色列表
 */
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UnallocatedListReq {
     pub page_no: u64,
@@ -150,7 +153,7 @@ pub struct UnallocatedListReq {
 /*
 取消授权用户
 */
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CancelAuthUserReq {
     pub user_id: i64,
@@ -160,7 +163,7 @@ pub struct CancelAuthUserReq {
 /*
 批量取消授权用户
 */
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CancelAuthUserAllReq {
     pub user_ids: Vec<i64>,
@@ -170,7 +173,7 @@ pub struct CancelAuthUserAllReq {
 /*
 批量选择用户授权
 */
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct SelectAuthUserAllReq {
     pub user_ids: Vec<i64>,

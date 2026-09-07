@@ -4,11 +4,12 @@
 use crate::common::result::serialize_datetime;
 use rbatis::rbdc::DateTime;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 /*
 删除字典类型表请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct DeleteDictTypeReq {
     pub ids: Vec<i64>,
 }
@@ -16,7 +17,7 @@ pub struct DeleteDictTypeReq {
 /*
 更新字典类型表请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct DictTypeReq {
     pub id: Option<i64>,        //字典主键
@@ -29,7 +30,7 @@ pub struct DictTypeReq {
 /*
 更新字典类型表状态请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct UpdateDictTypeStatusReq {
     pub ids: Vec<i64>,
     pub status: i8,
@@ -38,7 +39,7 @@ pub struct UpdateDictTypeStatusReq {
 /*
 查询字典类型表详情请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct QueryDictTypeDetailReq {
     pub id: i64,
 }
@@ -46,7 +47,7 @@ pub struct QueryDictTypeDetailReq {
 /*
 查询字典类型表列表请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryDictTypeListReq {
     pub page_no: u64,
@@ -62,7 +63,7 @@ fn default_status() -> Option<i8> {
 /*
 查询字典类型表列表响应参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct DictTypeResp {
     pub id: Option<i64>,        //字典主键
@@ -71,7 +72,9 @@ pub struct DictTypeResp {
     pub status: i8,             //状态（0：停用，1:正常）
     pub remark: Option<String>, //备注
     #[serde(serialize_with = "serialize_datetime")]
+    #[schema(value_type = Option<String>)]
     pub create_time: Option<DateTime>, //创建时间
     #[serde(serialize_with = "serialize_datetime")]
+    #[schema(value_type = Option<String>)]
     pub update_time: Option<DateTime>, //修改时间
 }

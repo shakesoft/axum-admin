@@ -4,11 +4,12 @@
 use crate::common::result::serialize_datetime;
 use rbatis::rbdc::DateTime;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 /*
 删除通知公告表请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct DeleteNoticeReq {
     pub ids: Vec<i64>,
 }
@@ -16,7 +17,7 @@ pub struct DeleteNoticeReq {
 /*
 更新通知公告表请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct NoticeReq {
     pub id: Option<i64>,        //公告ID
@@ -30,7 +31,7 @@ pub struct NoticeReq {
 /*
 更新通知公告表状态请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct UpdateNoticeStatusReq {
     pub ids: Vec<i64>,
     pub status: i8,
@@ -39,7 +40,7 @@ pub struct UpdateNoticeStatusReq {
 /*
 查询通知公告表详情请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct QueryNoticeDetailReq {
     pub id: i64,
 }
@@ -47,7 +48,7 @@ pub struct QueryNoticeDetailReq {
 /*
 查询通知公告表列表请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryNoticeListReq {
     pub page_no: u64,
@@ -63,7 +64,7 @@ fn default_status() -> Option<i8> {
 /*
 查询通知公告表列表响应参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct NoticeResp {
     pub id: Option<i64>,        //公告ID
@@ -73,7 +74,9 @@ pub struct NoticeResp {
     pub status: i8,             //公告状态（0:关闭,1:正常 ）
     pub remark: Option<String>, //备注
     #[serde(serialize_with = "serialize_datetime")]
+    #[schema(value_type = Option<String>)]
     pub create_time: Option<DateTime>, //创建时间
     #[serde(serialize_with = "serialize_datetime")]
+    #[schema(value_type = Option<String>)]
     pub update_time: Option<DateTime>, //修改时间
 }

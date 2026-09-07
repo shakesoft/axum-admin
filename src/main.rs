@@ -2,6 +2,7 @@
 extern crate rbatis;
 
 pub mod aop;
+pub mod config;
 pub mod common;
 pub mod dao;
 pub mod handler;
@@ -28,15 +29,15 @@ use axum::body::Body;
 use axum::extract::{FromRef, State};
 use axum::http::{Method, Request, Response};
 use axum::response::{Html, IntoResponse};
-use axum::{middleware as md, Json, Router, ServiceExt};
-use config::{Config, File};
+use axum::{middleware as md, Router};
+use ::config::{Config, File}; // 外部 crate，避开本地 crate::config 模块
 use middleware::auth::auth;
 use rbatis::RBatis;
 use redis::Client;
 use route::system::sys_menu_route::build_sys_menu_route;
 use route::system::sys_role_route::build_sys_role_route;
 use route::system::sys_user_route::build_sys_user_route;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
@@ -46,34 +47,30 @@ use tower_http::{catch_panic::CatchPanicLayer, classify::ServerErrorsFailureClas
 use tracing::{error, info, Span};
 use tracing_subscriber;
 use utils::db::init_db;
+use crate::config::api_doc::ApiDoc;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 use uuid::Uuid;
 // use crate::middleware::error::{ handle_middleware_error};
 // use crate::middleware::swagger::swagger_auth;
 use axum::routing::get;
-use chrono::{Local, Utc};
-use dill::{Catalog, OneOf};
+use chrono::Local;
+use dill::Catalog;
 use rbatis::rbdc::DateTime;
 use reqwest::StatusCode;
 // use garde::rules::ip::IpKind::Any;
 use crate::common::result::ok_result_msg;
-use crate::inject::autofac::{AImpl, BImpl, HelloWorld, A};
+use crate::inject::autofac::{AImpl, BImpl, HelloWorld};
 use crate::inject::inject_component::Inject;
 use crate::route::system::sys_account_route::build_sys_account_route;
 use crate::workflow::state::traffic_light::{DynamicTrafficLight, TrafficLight, TrafficLightEvent, TrafficLightState};
 use inject::autofac::{AutoFacModule, IDateWriter, TodayWriter, TodayWriterParameters};
-use shaku::HasComponent;
 use tower_http::cors::CorsLayer;
 use tower_http::timeout::TimeoutLayer;
 use tracing_appender::rolling;
 // use crate::common::daily_logfile::DailyLogFile;
 // use crate::handler::system::sys_user_handler::reset_sys_user_password;
 
-use lapin::{
-    options::*, types::FieldTable, BasicProperties, Connection,
-    ConnectionProperties, Result,
-};
 use sailfish::TemplateSimple;
 use crate::inject::inject_provided::InjectProvided;
 use crate::template::hello_template::HelloTemplate;
@@ -128,28 +125,6 @@ struct RedisConfig {
     url: String,
 }
 
-//这个宏用于生成OpenAPI文档，有没有办法可以通过脚本自动生成？
-#[derive(OpenApi)]
-#[openapi(
-    paths(
-        handler::system::sys_dept_handler::add_sys_dept,
-        handler::system::sys_dept_handler::delete_sys_dept,
-        handler::system::sys_dept_handler::update_sys_dept,
-        handler::system::sys_dept_handler::update_sys_dept_status,
-        handler::system::sys_dept_handler::query_sys_dept_detail,
-        handler::system::sys_dept_handler::query_sys_dept_list,
-    ),
-    components(
-        schemas(
-            vo::system::sys_dept_vo::DeptReq,
-            vo::system::sys_dept_vo::DeleteDeptReq
-        )
-    ),
-    tags(
-        (name = "axum-admin", description = "OpenAPI")
-    )
-)]
-struct ApiDoc;
 
 async fn test_mq()->() {
     return ();
@@ -192,7 +167,7 @@ async fn test_mq()->() {
 async fn test_workflow()->() {
     let mut light = DynamicTrafficLight::new(());
 
-    let mut light1 = DynamicTrafficLight::new_init_state((),TrafficLightState::Red);
+    let light1 = DynamicTrafficLight::new_init_state((),TrafficLightState::Red);
 
     let c = light1.get_available_events();
     println!("{:?}", c);
@@ -414,7 +389,7 @@ async fn main() {
     axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await.unwrap();
 }
 
-pub async fn di_index(writer: Inject<AutoFacModule, dyn IDateWriter>, hello_world: InjectProvided<AutoFacModule, dyn HelloWorld>, State(state): State<Arc<AppState>>) -> impl IntoResponse {
+pub async fn di_index(writer: Inject<AutoFacModule, dyn IDateWriter>, hello_world: InjectProvided<AutoFacModule, dyn HelloWorld>, State(_state): State<Arc<AppState>>) -> impl IntoResponse {
     // let service: &dyn IDateWriter = state.container.resolve_ref();
     // service.write_date();
     // service.get_date();

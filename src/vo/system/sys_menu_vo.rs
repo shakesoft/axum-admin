@@ -4,11 +4,12 @@
 use crate::common::result::serialize_datetime;
 use rbatis::rbdc::DateTime;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 /*
 删除菜单信息请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct DeleteMenuReq {
     pub id: i64,
 }
@@ -16,7 +17,7 @@ pub struct DeleteMenuReq {
 /*
 更新菜单信息请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct MenuReq {
     pub id: Option<i64>,           //主键
@@ -35,7 +36,7 @@ pub struct MenuReq {
 /*
 更新菜单信息状态请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct UpdateMenuStatusReq {
     pub ids: Vec<i64>,
     pub status: i8,
@@ -44,7 +45,7 @@ pub struct UpdateMenuStatusReq {
 /*
 查询菜单信息详情请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct QueryMenuDetailReq {
     pub id: i64,
 }
@@ -52,7 +53,7 @@ pub struct QueryMenuDetailReq {
 /*
 查询菜单信息列表请求参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryMenuListReq {
     pub menu_name: Option<String>, //菜单名称
@@ -61,7 +62,7 @@ pub struct QueryMenuListReq {
 /*
 查询菜单信息列表响应参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct MenuResp {
     pub id: Option<i64>,           //主键
@@ -76,15 +77,17 @@ pub struct MenuResp {
     pub menu_icon: Option<String>, //菜单图标
     pub remark: Option<String>,    //备注
     #[serde(serialize_with = "serialize_datetime")]
+    #[schema(value_type = Option<String>)]
     pub create_time: Option<DateTime>, //创建时间
     #[serde(serialize_with = "serialize_datetime")]
+    #[schema(value_type = Option<String>)]
     pub update_time: Option<DateTime>, //修改时间
 }
 
 /*
 查询菜单信息列表响应参数
 */
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct MenuListSimpleDataResp {
     pub id: Option<i64>,        //主键
