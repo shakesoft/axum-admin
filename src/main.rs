@@ -164,6 +164,7 @@ async fn test_mq()->() {
     // }
 }
 
+#[hotpath::measure]
 async fn test_workflow()->() {
     let mut light = DynamicTrafficLight::new(());
 
@@ -202,6 +203,7 @@ async fn test_workflow()->() {
 
 // 主函数，使用tokio异步运行时
 #[tokio::main]
+#[hotpath::main]
 async fn main() {
     // test_mq().await;
     test_workflow().await;
@@ -386,7 +388,11 @@ async fn main() {
     // 创建TCP监听器
     let listener = tokio::net::TcpListener::bind(config.server.addr).await.unwrap();
     // 使用监听器启动服务器
-    axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await.unwrap();
+    // Ctrl+C 时优雅退出，让 main 正常返回（hotpath 报告依赖于此）
+    axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>())
+        .with_graceful_shutdown(async { tokio::signal::ctrl_c().await.unwrap() })
+        .await
+        .unwrap();
 }
 
 pub async fn di_index(writer: Inject<AutoFacModule, dyn IDateWriter>, hello_world: InjectProvided<AutoFacModule, dyn HelloWorld>, State(_state): State<Arc<AppState>>) -> impl IntoResponse {

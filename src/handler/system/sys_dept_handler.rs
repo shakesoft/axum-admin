@@ -96,7 +96,8 @@ pub async fn delete_sys_dept(State(state): State<Arc<AppState>>, Extension(_sess
     request_body = DeleteDeptReq,
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
-// #[function_name::named]
+#[function_name::named]
+#[hotpath::measure]
 pub async fn delete_sys_dept1(
     writer: Inject<AutoFacModule, dyn IDateWriter>,
     hello_world: InjectProvided<AutoFacModule, dyn HelloWorld>,
