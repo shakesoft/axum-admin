@@ -164,7 +164,7 @@ async fn test_mq()->() {
     // }
 }
 
-#[hotpath::measure]
+// #[hotpath::measure]
 async fn test_workflow()->() {
     let mut light = DynamicTrafficLight::new(());
 
