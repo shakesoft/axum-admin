@@ -36,6 +36,7 @@ use crate::aop::aspects::logger::Logger;
 )]
 // #[instrument]
 // #[function_name::named]
+#[hotpath::measure]
 #[aspect(Logger)]
 // #[aspect(TimingAspect::new())]
 pub async fn add_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(item): ValidatedJson<DeptReq>) -> impl IntoResponse {
@@ -81,6 +82,7 @@ pub async fn add_sys_dept(State(state): State<Arc<AppState>>, ValidatedJson(item
     responses((status = 200, description = "successfully", body = EmptyResponse))
 )]
 #[function_name::named]
+#[hotpath::measure]
 pub async fn delete_sys_dept(State(state): State<Arc<AppState>>, Extension(_session): Extension<UserSession>, Json(item): Json<DeleteDeptReq>) -> impl IntoResponse {
     // info!("{function_name}:{item:?}",function_name = function_name!());
     info!("{}: {:?}", function_name!(), item);
