@@ -1,6 +1,7 @@
 use crate::common::error::{AppError, AppResult, ServiceResult};
 use crate::common::result::{ok, ok_result_empty, ok_result_data, Paged};
 use crate::dao::system::sys_user_dao::SysUserDao;
+use crate::dao::system::sys_user_role_dao;
 use crate::model::system::sys_dept_model::Dept;
 use crate::model::system::sys_menu_model::Menu;
 use crate::model::system::sys_role_model::Role;
@@ -55,8 +56,7 @@ impl SysUserService {
         UserPost::insert_batch(rb, &user_post_list, user_post_list.len() as u64).await.map(|_| ok_result_empty())?
     }
 
-    pub async fn delete_sys_user(rb: &RBatis, redis: &redis::Client, headers: HeaderMap, item: DeleteUserReq) -> ServiceResult<String> {
-        let mut conn = redis.get_connection()?;
+    pub async fn delete_sys_user(rb: &RBatis, headers: HeaderMap, item: DeleteUserReq) -> ServiceResult<String> {
         let user_id = headers.get("user_id").unwrap().to_str().unwrap().parse::<i64>().unwrap();
 
         let ids = item.ids.clone();
@@ -64,33 +64,20 @@ impl SysUserService {
             return Err(AppError::BusinessError("当前用户不能删除"));
         }
 
-        for id in ids.clone() {
-            let key = format!("axum:admin:user:info:{}", id);
-            let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
-
-            if is_admin {
-                return Err(AppError::BusinessError("不允许操作超级管理员用户"));
-            }
-        }
+        ensure_not_admin(rb, &ids).await?;
 
         UserRole::delete_by_map(rb, value! {"user_id": &ids}).await?;
         UserPost::delete_by_map(rb, value! {"user_id": &ids}).await?;
         User::delete_by_map(rb, value! {"id": &item.ids}).await.map(|_| ok_result_empty())?
     }
 
-    pub async fn update_sys_user(rb: &RBatis, redis: &redis::Client, item: UserReq) -> ServiceResult<String> {
-        let mut conn = redis.get_connection()?;
+    pub async fn update_sys_user(rb: &RBatis, item: UserReq) -> ServiceResult<String> {
         let id = item.id;
         if item.id.is_none() {
             return Err(AppError::BusinessError("主键不能为空"));
         }
 
-        let key = format!("axum:admin:user:info:{}", id.unwrap_or_default());
-        let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
-
-        if is_admin {
-            return Err(AppError::BusinessError("不允许操作超级管理员用户"));
-        }
+        ensure_not_admin(rb, &[id.unwrap_or_default()]).await?;
 
         let user = match User::select_by_id(rb, id.unwrap_or_default()).await? {
             None => return Err(AppError::BusinessError("用户不存在")),
@@ -129,31 +116,14 @@ impl SysUserService {
         User::update_by_map(rb, &User::from(item), value! {"id": &id}).await.map(|_| ok_result_empty())?
     }
 
-    pub async fn update_sys_user_status(rb: &RBatis, redis: &redis::Client, item: UpdateUserStatusReq) -> ServiceResult<String> {
-        let ids = item.ids.clone();
-        let mut conn = redis.get_connection()?;
-
-        for id in ids {
-            let key = format!("axum:admin:user:info:{}", id);
-            let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
-
-            if is_admin {
-                return Err(AppError::BusinessError("不允许操作超级管理员用户"));
-            }
-        }
+    pub async fn update_sys_user_status(rb: &RBatis, item: UpdateUserStatusReq) -> ServiceResult<String> {
+        ensure_not_admin(rb, &item.ids).await?;
 
         SysUserDao::update_status(rb, &item.ids, item.status).await.map(|_| ok_result_empty())?
     }
 
-    pub async fn reset_sys_user_password(rb: &RBatis, redis: &redis::Client, item: ResetUserPwdReq) -> ServiceResult<String> {
-        let mut conn = redis.get_connection()?;
-
-        let key = format!("axum:admin:user:info:{}", item.id.clone());
-        let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
-
-        if is_admin {
-            return Err(AppError::BusinessError("不允许操作超级管理员用户"));
-        }
+    pub async fn reset_sys_user_password(rb: &RBatis, item: ResetUserPwdReq) -> ServiceResult<String> {
+        ensure_not_admin(rb, &[item.id]).await?;
 
         let sys_user_result = User::select_by_id(rb, item.id).await?;
 
@@ -266,19 +236,12 @@ impl SysUserService {
         ok_result_data(QueryUserRoleResp { sys_role_list, user_role_ids })
     }
 
-    pub async fn update_user_role(rb: &RBatis, redis: &redis::Client, item: UpdateUserRoleReq) -> ServiceResult<String> {
-        let mut conn = redis.get_connection()?;
-
+    pub async fn update_user_role(rb: &RBatis, item: UpdateUserRoleReq) -> ServiceResult<String> {
         let user_id = item.user_id;
         let role_ids = &item.role_ids;
         let len = item.role_ids.len();
 
-        let key = format!("axum:admin:user:info:{}", user_id);
-        let is_admin: bool = conn.hget(&key, "is_admin").unwrap_or_default();
-
-        if is_admin {
-            return Err(AppError::BusinessError("不允许操作超级管理员用户"));
-        }
+        ensure_not_admin(rb, &[user_id]).await?;
 
         UserRole::delete_by_map(rb, value! {"user_id": user_id}).await?;
 
@@ -474,6 +437,16 @@ impl SysUserService {
         //info!("Fetched session info for user_id {}: token={}, is_admin={}, permissions={}, roles={}, expires_at={}", user_id, token, is_admin, permissions_str,roles_str, expires_at);
         Ok((permissions_str, roles_str, token, is_admin))
     }
+}
+
+/// 目标用户中有超级管理员则拒绝。查库而不是查 redis 会话：管理员未登录/已退出时会话不存在，查会话会放行
+async fn ensure_not_admin(rb: &RBatis, ids: &[i64]) -> Result<(), AppError> {
+    for id in ids {
+        if sys_user_role_dao::is_admin(rb, id).await? > 0 {
+            return Err(AppError::BusinessError("不允许操作超级管理员用户"));
+        }
+    }
+    Ok(())
 }
 
 fn user_info_key(user_id: i64) -> String {

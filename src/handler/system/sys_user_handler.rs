@@ -49,7 +49,7 @@ pub async fn add_sys_user(State(state): State<Arc<AppState>>, Json(item): Json<U
 pub async fn delete_sys_user(headers: HeaderMap, State(state): State<Arc<AppState>>, Json(item): Json<DeleteUserReq>) -> impl IntoResponse {
     info!("{function_name}:{item:?}", function_name = function_name!());
     let rb = &state.batis;
-    SysUserService::delete_sys_user(rb, &state.redis, headers, item).await
+    SysUserService::delete_sys_user(rb, headers, item).await
 }
 
 /*
@@ -67,7 +67,7 @@ pub async fn delete_sys_user(headers: HeaderMap, State(state): State<Arc<AppStat
 pub async fn update_sys_user(State(state): State<Arc<AppState>>, Json(item): Json<UserReq>) -> impl IntoResponse {
     info!("{function_name}:{item:?}", function_name = function_name!());
     let rb = &state.batis;
-    SysUserService::update_sys_user(rb, &state.redis, item).await
+    SysUserService::update_sys_user(rb, item).await
 }
 
 /*
@@ -85,7 +85,7 @@ pub async fn update_sys_user(State(state): State<Arc<AppState>>, Json(item): Jso
 pub async fn update_sys_user_status(State(state): State<Arc<AppState>>, Json(item): Json<UpdateUserStatusReq>) -> impl IntoResponse {
     info!("{function_name}:{item:?}", function_name = function_name!());
     let rb = &state.batis;
-    SysUserService::update_sys_user_status(rb, &state.redis, item).await
+    SysUserService::update_sys_user_status(rb, item).await
 }
 
 /*
@@ -103,7 +103,7 @@ pub async fn update_sys_user_status(State(state): State<Arc<AppState>>, Json(ite
 pub async fn reset_sys_user_password(State(state): State<Arc<AppState>>, Json(item): Json<ResetUserPwdReq>) -> impl IntoResponse {
     info!("{function_name}:{item:?}", function_name = function_name!());
     let rb = &state.batis;
-    SysUserService::reset_sys_user_password(rb, &state.redis, item).await
+    SysUserService::reset_sys_user_password(rb, item).await
 }
 
 /*
@@ -237,7 +237,7 @@ pub async fn query_user_role(State(state): State<Arc<AppState>>, Json(item): Jso
 pub async fn update_user_role(State(state): State<Arc<AppState>>, Json(item): Json<UpdateUserRoleReq>) -> impl IntoResponse {
     info!("{function_name}:{item:?}", function_name = function_name!());
     let rb = &state.batis;
-    SysUserService::update_user_role(rb, &state.redis, item).await
+    SysUserService::update_user_role(rb, item).await
 }
 
 #[utoipa::path(
