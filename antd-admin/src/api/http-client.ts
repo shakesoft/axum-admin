@@ -1,5 +1,5 @@
 import AppConsts from "./app-consts";
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 import {message} from 'antd';
 import { handleError } from "./error-handler";
 import {storageUtils} from "@/utils/storageUtils.ts";
@@ -11,6 +11,30 @@ export interface IResponse {
 }
 
 let _instance: AxiosInstance | null = null;
+
+const TOKEN_EXPIRED_CODE = 3002;
+let refreshing: Promise<string> | null = null;
+
+// 同一时间只发一次刷新请求，并发的过期请求共用结果（RefreshToken 是一次性的）
+function refreshAccessToken(): Promise<string> {
+  if (!refreshing) {
+    refreshing = axios
+      .post(`${AppConsts.remoteServiceBaseUrl}/api/system/user/refreshToken`, {
+        refreshToken: storageUtils.getRefreshToken(),
+      })
+      .then((r) => {
+        const { token, expiresAt, refreshToken, refreshExpiresAt } = r.data.data;
+        storageUtils.saveToken(token);
+        storageUtils.saveExpiresAt(expiresAt);
+        storageUtils.saveRefreshToken(refreshToken, refreshExpiresAt);
+        return token as string;
+      })
+      .finally(() => {
+        refreshing = null;
+      });
+  }
+  return refreshing;
+}
 
 export function apiHttp(): AxiosInstance {
   if (!_instance) {
@@ -27,7 +51,20 @@ export function apiHttp(): AxiosInstance {
         // }
         return r;
       },
-      (error) => {
+      async (error) => {
+        const cfg = error?.config as (InternalAxiosRequestConfig & { _retried?: boolean }) | undefined;
+        if (cfg && !cfg._retried && error.response?.data?.code === TOKEN_EXPIRED_CODE && storageUtils.getRefreshToken()) {
+          cfg._retried = true;
+          try {
+            const token = await refreshAccessToken();
+            cfg.headers["Authorization"] = `Bearer ${token}`;
+            return _instance!(cfg);
+          } catch {
+            storageUtils.logout();
+            window.location.href = "/login";
+            return Promise.reject(error);
+          }
+        }
         handleError(error);
         return Promise.reject(error);
       },

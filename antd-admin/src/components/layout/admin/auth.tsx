@@ -3,8 +3,8 @@ import {Navigate} from "react-router-dom"
 import {ReactNode} from "react";
 
 function isAuthenticated() {
-  const token = storageUtils.getToken();
-  const expiresAt = storageUtils.getExpiresAt();
+  const token = storageUtils.getRefreshToken();
+  const expiresAt = storageUtils.getRefreshExpiresAt();
   if (!token || !expiresAt) return false;
   return Math.floor(Date.now() / 1000) < Number(expiresAt);
 }

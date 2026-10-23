@@ -5,7 +5,8 @@ use nameof::name_of;
 use serde::{Deserialize, Serialize};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-pub const JWT_EXPIRATION_SECONDS: u64 = 86400; // 24小时过期时间，单位为秒
+pub const JWT_EXPIRATION_SECONDS: u64 = 1800; // AccessToken 30分钟过期，单位为秒
+pub const REFRESH_EXPIRATION_SECONDS: u64 = 7 * 86400; // RefreshToken 7天过期，单位为秒
 pub const JWT_SECRET: &str = "123";
 pub const JWT_ISSUER: &str = "koobe";
 pub const JWT_AUDIENCE: &str = "rust_admin";
@@ -74,7 +75,7 @@ impl JwtToken {
             Err(err) => match *err.kind() {
                 ErrorKind::InvalidToken => Err(JwtTokenError("InvalidToken".to_string())),
                 ErrorKind::InvalidIssuer => Err(JwtTokenError("InvalidIssuer".to_string())),
-                ErrorKind::ExpiredSignature => Err(JwtTokenError("TokenExpired".to_string())),
+                ErrorKind::ExpiredSignature => Err(AppError::TokenExpired),
                 _ => Err(JwtTokenError("InvalidToken Errors".to_string())),
             },
         }
@@ -94,5 +95,14 @@ mod tests {
         debug!("{:?}", res);
         let token = JwtToken::verify(jwt_util::JWT_SECRET, &res);
         debug!("{:?}", token)
+    }
+
+    // 过期必须返回 TokenExpired（3002），前端靠它触发刷新
+    #[test]
+    fn expired_token_is_token_expired() {
+        let mut jwt = JwtToken::new(1, "koobe");
+        jwt.exp -= jwt_util::JWT_EXPIRATION_SECONDS as usize + 3600;
+        let res = jwt.create_token(jwt_util::JWT_SECRET).unwrap();
+        assert!(matches!(JwtToken::verify(jwt_util::JWT_SECRET, &res), Err(crate::common::error::AppError::TokenExpired)));
     }
 }

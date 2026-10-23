@@ -75,6 +75,8 @@ use utoipa::OpenApi;
         crate::handler::system::sys_user_handler::query_sys_user_detail,
         crate::handler::system::sys_user_handler::query_sys_user_list,
         crate::handler::system::sys_user_handler::login,
+        crate::handler::system::sys_user_handler::refresh_token,
+        crate::handler::system::sys_user_handler::logout,
         crate::handler::system::sys_user_handler::query_user_role,
         crate::handler::system::sys_user_handler::update_user_role,
         crate::handler::system::sys_user_handler::query_user_menu
@@ -107,6 +109,6 @@ mod tests {
         dangling.sort();
         dangling.dedup();
         assert!(dangling.is_empty(), "未注册的 schema: {:?}", dangling);
-        assert_eq!(ApiDoc::openapi().paths.paths.len(), 72);
+        assert_eq!(ApiDoc::openapi().paths.paths.len(), 74);
     }
 }

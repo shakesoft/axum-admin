@@ -5,6 +5,7 @@ import {DownOutlined, LogoutOutlined, SettingOutlined, UserOutlined} from "@ant-
 import {storageUtils} from "../../utils/storageUtils";
 import {useNavigate} from "react-router-dom";
 import useStore from "../../store";
+import apiHttp from "@/api/http-client.ts";
 
 const items: MenuProps['items'] = [
     {
@@ -38,6 +39,10 @@ const MyHeader: React.FC = () => {
         } else if (key === "2") {
             navigate("/setting")
         } else {
+            const refreshToken = storageUtils.getRefreshToken();
+            if (refreshToken) {
+                apiHttp().post('/api/system/user/logout', {refreshToken}).catch(() => undefined);
+            }
             storageUtils.logout()
             navigate("/login", {replace: true})
         }

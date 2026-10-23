@@ -1,7 +1,8 @@
 use crate::aop::aspects::timer::Timer;
 use crate::service::system::sys_user_service::SysUserService;
 use crate::vo::system::sys_user_vo::*;
-use crate::common::result::{BaseResponse, Paged};
+use crate::common::extractor::ValidatedJson;
+use crate::common::result::{BaseResponse, EmptyResponse, Paged};
 use crate::AppState;
 use aspect_macros::aspect;
 use aspect_std::LoggingAspect;
@@ -179,6 +180,32 @@ pub async fn login(headers: HeaderMap, ConnectInfo(remote_addr): ConnectInfo<Soc
     info!("{function_name}:{item:?}", function_name = function_name!());
     let rb = &state.batis;
     SysUserService::login(rb, &state.redis, headers, remote_addr, item).await
+}
+
+/*
+ *刷新token
+ */
+#[utoipa::path(
+    post,
+    path = "/api/system/user/refreshToken",
+    request_body = RefreshTokenReq,
+    responses((status = 200, description = "successfully", body = BaseResponse<UserLoginResp>))
+)]
+pub async fn refresh_token(State(state): State<Arc<AppState>>, ValidatedJson(item): ValidatedJson<RefreshTokenReq>) -> impl IntoResponse {
+    SysUserService::refresh_token(&state.redis, item).await
+}
+
+/*
+ *退出登录
+ */
+#[utoipa::path(
+    post,
+    path = "/api/system/user/logout",
+    request_body = RefreshTokenReq,
+    responses((status = 200, description = "successfully", body = EmptyResponse))
+)]
+pub async fn logout(State(state): State<Arc<AppState>>, ValidatedJson(item): ValidatedJson<RefreshTokenReq>) -> impl IntoResponse {
+    SysUserService::logout(&state.redis, item).await
 }
 
 /*

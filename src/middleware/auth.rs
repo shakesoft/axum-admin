@@ -18,7 +18,7 @@ use std::sync::Arc;
 pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Next) -> Result<response::Response, StatusCode> {
     let path = req.uri().path();
     info!("{function_name}:request_uri {uri:?}", function_name = function_name!(), uri = path);
-    let ignore_paths = vec!["/system/user/login", "/system/user/register", "/system/user/logout"];
+    let ignore_paths = vec!["/system/user/login", "/system/user/register", "/system/user/logout", "/system/user/refreshToken"];
     if ignore_paths.iter().any(|ignore_path| path.starts_with(ignore_path)) {
         return Ok(next.run(req).await);
     }
@@ -34,11 +34,12 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
     let jwt_token = match jwt_token_error {
         Ok(data) => data,
         Err(err) => {
-            let er = match err {
-                AppError::JwtTokenError(s) => s,
-                _ => "no math error".to_string(),
-            };
-            return Ok(AppError::JwtTokenError(er).into_response());
+            return Ok(match err {
+                AppError::TokenExpired => err,
+                AppError::JwtTokenError(s) => AppError::JwtTokenError(s),
+                _ => AppError::JwtTokenError("no math error".to_string()),
+            }
+            .into_response());
         }
     };
 
@@ -66,7 +67,7 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
             }
         }
         Err(e) => match e {
-            AppError::BusinessError(msg) if msg == "用户未登录" => Ok(AppError::JwtTokenError(msg.to_string()).into_response()),
+            AppError::BusinessError(msg) if msg == "用户没有登录" => Ok(AppError::JwtTokenError(msg.to_string()).into_response()),
             _ => Ok(e.into_response()),
         },
     }
