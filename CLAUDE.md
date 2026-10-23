@@ -16,7 +16,7 @@ just build                        # release backend (copies config.toml into tar
 cd antd-admin && pnpm lint        # frontend lint
 ```
 
-- DB setup: create `rustdb`, import `rustdb.sql` (per-table DDL also in `docs/sql/`), edit `config.toml` (`[server] addr`, `[db] url`, `[redis] url`).
+- DB setup: create `rustdb`, import `rustdb.sql` (per-table DDL also in `docs/sql/`), edit `config.toml` (`[server] addr`, `[db] url`, `[redis] url`, `[jwt] secret`).
 - Manual API testing: JetBrains HTTP client files in `docs/test/system/*.http` with envs in `docs/test/http-client.env.json`. Log in via `sys_user.http` first (`admin` / `123456`); it stores the token for the rest.
 - `.rustfmt.toml` sets `max_width = 200`.
 - Logs go to `log/axum-admin.log` (daily rolling via tracing-appender), not stdout.

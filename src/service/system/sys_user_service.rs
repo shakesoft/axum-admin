@@ -407,7 +407,7 @@ impl SysUserService {
         let jwt = JwtToken::new(user_id, user_name);
         let expires_at = jwt.get_exp();
         let expires_time = time_util::timestamp_to_local(expires_at as i64);
-        let token = jwt.create_token(jwt_util::JWT_SECRET)?;
+        let token = jwt.create_token(jwt_util::secret())?;
         let refresh_token = Uuid::new_v4().simple().to_string();
         let refresh_expires_at = Local::now().timestamp() as usize + jwt_util::REFRESH_EXPIRATION_SECONDS as usize;
 

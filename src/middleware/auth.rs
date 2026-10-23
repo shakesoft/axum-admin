@@ -30,7 +30,7 @@ pub async fn auth(State(state): State<Arc<AppState>>, mut req: Request, next: Ne
 
     let authorization = auth_header.unwrap();
     let token = authorization.to_string().replace("Bearer ", "");
-    let jwt_token_error = JwtToken::verify(jwt_util::JWT_SECRET, &token);
+    let jwt_token_error = JwtToken::verify(jwt_util::secret(), &token);
     let jwt_token = match jwt_token_error {
         Ok(data) => data,
         Err(err) => {

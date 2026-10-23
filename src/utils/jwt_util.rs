@@ -3,11 +3,22 @@ use crate::common::error::AppError::JwtTokenError;
 use jsonwebtoken::{decode, encode, errors::ErrorKind, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use nameof::name_of;
 use serde::{Deserialize, Serialize};
+use std::sync::OnceLock;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 pub const JWT_EXPIRATION_SECONDS: u64 = 1800; // AccessToken 30分钟过期，单位为秒
 pub const REFRESH_EXPIRATION_SECONDS: u64 = 7 * 86400; // RefreshToken 7天过期，单位为秒
-pub const JWT_SECRET: &str = "123";
+static JWT_SECRET: OnceLock<String> = OnceLock::new();
+
+/// 启动时用 config.toml 的 [jwt] secret 初始化，只能调用一次
+pub fn init_secret(secret: String) {
+    assert!(!secret.trim().is_empty(), "config.toml [jwt] secret 不能为空");
+    JWT_SECRET.set(secret).expect("jwt secret 重复初始化");
+}
+
+pub fn secret() -> &'static str {
+    JWT_SECRET.get().expect("jwt secret 未初始化")
+}
 pub const JWT_ISSUER: &str = "koobe";
 pub const JWT_AUDIENCE: &str = "rust_admin";
 pub const JWT_SUBJECT: &str = "rust_admin";
@@ -87,12 +98,14 @@ mod tests {
     use crate::utils::jwt_util::JwtToken;
     use tracing::debug;
 
+    const TEST_SECRET: &str = "test-secret";
+
     #[test]
     fn test_jwt() {
         let jwt = JwtToken::new(1, "koobe");
-        let res = jwt.create_token(jwt_util::JWT_SECRET).unwrap_or_default();
+        let res = jwt.create_token(TEST_SECRET).unwrap_or_default();
         debug!("{:?}", res);
-        let token = JwtToken::verify(jwt_util::JWT_SECRET, &res);
+        let token = JwtToken::verify(TEST_SECRET, &res);
         debug!("{:?}", token)
     }
 
@@ -101,7 +114,7 @@ mod tests {
     fn expired_token_is_token_expired() {
         let mut jwt = JwtToken::new(1, "koobe");
         jwt.exp -= jwt_util::JWT_EXPIRATION_SECONDS as usize + 3600;
-        let res = jwt.create_token(jwt_util::JWT_SECRET).unwrap();
-        assert!(matches!(JwtToken::verify(jwt_util::JWT_SECRET, &res), Err(crate::common::error::AppError::TokenExpired)));
+        let res = jwt.create_token(TEST_SECRET).unwrap();
+        assert!(matches!(JwtToken::verify(TEST_SECRET, &res), Err(crate::common::error::AppError::TokenExpired)));
     }
 }
