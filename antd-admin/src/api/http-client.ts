@@ -61,7 +61,7 @@ export function apiHttp(): AxiosInstance {
             return _instance!(cfg);
           } catch {
             storageUtils.logout();
-            window.location.href = "/login";
+            window.location.href = `${import.meta.env.BASE_URL}login`;
             return Promise.reject(error);
           }
         }

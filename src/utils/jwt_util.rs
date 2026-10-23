@@ -11,7 +11,6 @@ pub const JWT_SECRET: &str = "123";
 pub const JWT_ISSUER: &str = "koobe";
 pub const JWT_AUDIENCE: &str = "rust_admin";
 pub const JWT_SUBJECT: &str = "rust_admin";
-pub const JWT_JTI: &str = "ignore";
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct JwtToken {
@@ -46,7 +45,7 @@ impl JwtToken {
             nbf: now.as_secs() as usize,    // (Not Before)：生效时间
             iss: String::from(JWT_ISSUER),  // (issuer)：签发人
             sub: String::from(JWT_SUBJECT), // (subject)：主题
-            jti: String::from(JWT_JTI),     // (JWT ID)：编号
+            jti: uuid::Uuid::new_v4().simple().to_string(), // (JWT ID)：编号，保证同一秒签发的 token 也不相同
         }
     }
 
